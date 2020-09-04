@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:jay_fm_flutter/details/details.dart';
 import 'package:jay_fm_flutter/util/colors.dart';
 import 'package:jay_fm_flutter/util/values.dart';
+import 'package:jay_fm_flutter/util/widget/widget.dart';
 
 Widget liveTabDetails() {
   return Container(
@@ -20,7 +22,7 @@ Widget liveTabDetails() {
             padding: EdgeInsets.only(left: 10),
             height: 700,
             child: ListView.builder(itemBuilder: (context, i) {
-              return baseItemCard(i, context);
+              return baseItemCard(i, "Day", context);
             }),
           )
         ],
@@ -47,7 +49,7 @@ Widget browseTabDetails() {
             padding: EdgeInsets.only(left: 10),
             height: 700,
             child: ListView.builder(itemBuilder: (context, i) {
-              return baseItemCard(i, context);
+              return baseItemCard(i, "Category Podcasts", context);
             }),
           )
         ],
@@ -74,7 +76,7 @@ Widget latestTabDetails() {
             padding: EdgeInsets.only(left: 10),
             height: 700,
             child: ListView.builder(itemBuilder: (context, i) {
-              return baseItemCard(i, context);
+              return baseItemCard(i, "Podcast Name", context);
             }),
           )
         ],
@@ -101,7 +103,7 @@ Widget savedTabDetails() {
             padding: EdgeInsets.only(left: 10),
             height: 700,
             child: ListView.builder(itemBuilder: (context, i) {
-              return baseItemCard(i, context);
+              return baseItemCard(i, "Saved Podcast", context);
             }),
           )
         ],
@@ -171,55 +173,4 @@ class HomePainter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
   }
-}
-
-Widget baseItemCard(int index, BuildContext context) {
-  return Container(
-    color: jayFmFancyBlack.withOpacity(0.0),
-    height: 120,
-    child: Card(
-      color: jayFmFancyBlack,
-      child: Row(
-        children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(3),
-            ),
-            width: 100,
-          ),
-          Padding(padding: EdgeInsets.only(left: 20)),
-          Container(
-            padding: EdgeInsets.only(top: 30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  "09.00 - 10.00",
-                  style: TextStyle(color: Colors.white),
-                ),
-                Text(
-                  "Show Name",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 5),
-                ),
-                Text(
-                  "Prsenter names",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-          Container(
-              child: Icon(
-            Icons.arrow_forward_ios,
-            color: Colors.white,
-          ))
-        ],
-      ),
-    ),
-  );
 }

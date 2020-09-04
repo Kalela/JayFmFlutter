@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jay_fm_flutter/home/widgets.dart';
+import 'package:jay_fm_flutter/util/colors.dart';
 import 'package:jay_fm_flutter/util/values.dart';
+import 'package:jay_fm_flutter/util/widget/widget.dart';
 
 class HomePage extends StatelessWidget {
   final List<Widget> tabViews = [
@@ -26,10 +28,7 @@ class HomePage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 48.0),
                   child: TabBar(
-                    indicator: ShapeDecoration(
-                      shape: Border.all()
-
-                    ),
+                    indicator: ShapeDecoration(shape: Border.all()),
                     tabs: [
                       topBarTab("Live", Colors.black),
                       topBarTab("Browse", Colors.black),
@@ -42,6 +41,11 @@ class HomePage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+      bottomSheet: Container(
+        height: 70,
+        color: Colors.white,
+        child: nowPlayingFooter(jayFmFancyBlack, Colors.white, Colors.grey),
       ),
     );
   }
