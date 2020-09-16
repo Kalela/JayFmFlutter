@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:jay_fm_flutter/home/home.dart';
 
-import 'home/home.dart';
+import 'browse/browse.dart';
 
 void main() {
   runApp(MyApp());

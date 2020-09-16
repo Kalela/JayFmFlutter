@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jay_fm_flutter/details/details.dart';
 import 'package:jay_fm_flutter/util/colors.dart';
 import 'package:jay_fm_flutter/util/values.dart';
 import 'package:jay_fm_flutter/util/widget/widget.dart';
