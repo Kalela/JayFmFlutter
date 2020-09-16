@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jay_fm_flutter/util/colors.dart';
+import 'package:jay_fm_flutter/util/constants.dart';
+import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/widget/widget.dart';
 
+// ignore: must_be_immutable
 class DetailsPage extends StatelessWidget {
   String title;
 
@@ -10,13 +13,32 @@ class DetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: jayFmFancyBlack,
+      backgroundColor: LightTheme.jayFmBlue,
       appBar: AppBar(
-        backgroundColor: jayFmFancyBlack,
+        backgroundColor: LightTheme.jayFmFancyBlack,
+        iconTheme: IconThemeData(color: Colors.grey),
+        actions: [
+          PopupMenuButton<String>(
+            itemBuilder: (context) {
+              return choices.map((String choice) {
+                return PopupMenuItem<String>(
+                    value: choice,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.check_circle),
+                        Text(choice),
+                      ],
+                    ));
+              }).toList();
+            },
+            onSelected: popUpChoiceAction,
+          )
+        ],
       ),
       body: Container(
         padding: EdgeInsets.only(left: 10),
-        color: jayFmFancyBlack,
+        color: LightTheme.jayFmBlue,
         child: SingleChildScrollView(
           physics: NeverScrollableScrollPhysics(),
           child: Column(
@@ -26,7 +48,7 @@ class DetailsPage extends StatelessWidget {
               ),
               Text(
                 title,
-                style: TextStyle(fontSize: 25, color: Colors.white),
+                style: TextStyle(fontSize: 25, color: LightTheme.jayFmFancyBlack),
               ),
               Padding(
                 padding: EdgeInsets.only(top: 20),
@@ -45,7 +67,7 @@ class DetailsPage extends StatelessWidget {
       bottomSheet: Container(
         height: 70,
         color: Colors.black,
-        child: nowPlayingFooter(jayFmMaroon, Colors.grey, jayFmOrange),
+        child: nowPlayingFooter(LightTheme.jayFmMaroon, Colors.grey, LightTheme.jayFmOrange),
       ),
     );
   }

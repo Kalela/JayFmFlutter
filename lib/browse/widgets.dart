@@ -119,7 +119,7 @@ Widget topBarTab(String text, Color borderColor) {
           height: 45,
           width: 45,
           decoration: BoxDecoration(
-            color: jayFmFancyBlack,
+            color: LightTheme.jayFmFancyBlack,
           ),
           child: Tab(
             child: Align(
@@ -140,9 +140,9 @@ Widget topBarTab(String text, Color borderColor) {
 Widget tabViewBackground(Widget viewContents) {
   return SizedBox.expand(
     child: Container(
-      color: jayFmBlue,
+      color: LightTheme.jayFmBlue,
       child: CustomPaint(
-        painter: HomePainter(),
+        // painter: HomePainter(),
         child: Container(
             padding: EdgeInsets.only(top: topBarHeight), child: viewContents),
       ),
@@ -156,7 +156,7 @@ class HomePainter extends CustomPainter {
     var path = Path();
     var paint = Paint();
 
-    paint.color = jayFmOrange;
+    paint.color = LightTheme.jayFmBlue;
 
     path.moveTo(0, 0);
     path.quadraticBezierTo(size.width / 2, 0, size.width, size.height * 0.25);

@@ -30,7 +30,7 @@ class _StatefulWrapperState extends State<StatefulWrapper> {
 
 Widget baseItemCard(int index, String title, BuildContext context) {
   return Container(
-    color: jayFmFancyBlack.withOpacity(0.0),
+    color: LightTheme.jayFmFancyBlack.withOpacity(0.0),
     height: 120,
     child: Ink(
       child: InkWell(
@@ -43,7 +43,7 @@ Widget baseItemCard(int index, String title, BuildContext context) {
                       )));
         },
         child: Card(
-          color: jayFmFancyBlack,
+          color: LightTheme.jayFmFancyBlack,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
