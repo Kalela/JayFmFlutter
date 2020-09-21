@@ -1,18 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:jay_fm_flutter/browse/browse.dart';
+import 'package:jay_fm_flutter/home/widgets.dart';
+import 'package:jay_fm_flutter/util/colors.dart';
 import 'package:jay_fm_flutter/util/constants.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
-import 'package:jay_fm_flutter/util/colors.dart';
+import 'package:jay_fm_flutter/util/values.dart';
 
-class HomePage extends StatelessWidget {
-  final double playButtonDiameter = 200;
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  final List<Widget> _tabViews = [
+    tabViewBackground(liveTabDetails()),
+    tabViewBackground(browseTabDetails()),
+    tabViewBackground(savedTabDetails()),
+  ];
+
+  TabController _topTabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _topTabController = TabController(length: _tabViews.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _topTabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text("JayFm"),
+        centerTitle: true,
         backgroundColor: LightTheme.jayFmFancyBlack,
         iconTheme: IconThemeData(color: Colors.grey),
+        textTheme: darkTextTheme,
         actions: [
           PopupMenuButton<String>(
             itemBuilder: (context) {
@@ -31,95 +59,27 @@ class HomePage extends StatelessWidget {
             onSelected: popUpChoiceAction,
           )
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(30.0),
+          child: SizedBox(
+            height: topBarHeight,
+            child: TabBar(
+              controller: _topTabController,
+              tabs: [
+                topBarTab("Live", darkTextTheme.headline6.color),
+                topBarTab("Browse", darkTextTheme.headline6.color),
+                topBarTab("Saved", darkTextTheme.headline6.color),
+              ],
+            ),
+          ),
+        ),
       ),
-      backgroundColor: LightTheme.jayFmBlue,
       body: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Stack(
           children: [
-            Column(
-              children: [
-                Text("LIVE PLAYING", style: TextStyle(fontSize: 16),),
-                Text("Jay Fm"),
-                Padding(padding: EdgeInsets.only(top: 8),),
-                Ink(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black,
-                          blurRadius: 2.0,
-                          spreadRadius: 0.0,
-                        )
-                      ],
-                      color: LightTheme.jayFmFancyBlack),
-                  child: InkWell(
-                    onTap: () {
-                      print("Play tapped");
-                    },
-                    child: Container(
-                      height: playButtonDiameter,
-                      width: playButtonDiameter,
-                      child: Center(
-                        child: Icon(
-                          Icons.play_arrow,
-                          color: LightTheme.jayFmOrange,
-                          size: playButtonDiameter / 2,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Text("AUDIO QUALITY"),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-                      children: [
-                        Radio(
-                          onChanged: (value) {},
-                          groupValue: null,
-                          value: null,
-                        ),
-                        Text("low")
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Radio(
-                          groupValue: null,
-                          onChanged: (Null value) {},
-                          value: null,
-                        ),
-                        Text("med")
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Radio(
-                          groupValue: null,
-                          onChanged: (Null value) {},
-                          value: null,
-                        ),
-                        Text("high")
-                      ],
-                    )
-                  ],
-                ),
-              ],
-            ),
-            RaisedButton(
-              color: LightTheme.jayFmOrange,
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => BrowsePage()));
-              },
-              child: Text("Browse Podcasts"),
+            SizedBox.expand(
+              child: TabBarView(
+                  controller: _topTabController, children: _tabViews),
             ),
           ],
         ),

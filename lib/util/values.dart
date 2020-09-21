@@ -1,1 +1,1 @@
-double topBarHeight = 120.0;
+double topBarHeight = 35.0;
