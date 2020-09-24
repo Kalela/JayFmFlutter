@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:jay_fm_flutter/details/details.dart';
-import 'package:jay_fm_flutter/util/colors.dart';
+import 'package:jay_fm_flutter/res/colors.dart';
+import 'package:jay_fm_flutter/screens/details/details.dart'; // TODO: Find way to remove this import(high order fuctions maybe?)
 
 class StatefulWrapper extends StatefulWidget {
   final Function onInit;
@@ -30,7 +30,7 @@ class _StatefulWrapperState extends State<StatefulWrapper> {
 
 Widget baseItemCard(int index, String title, BuildContext context) {
   return Container(
-    color: LightTheme.jayFmFancyBlack.withOpacity(0.0),
+    color: jayFmFancyBlack.withOpacity(0.0),
     height: 120,
     child: Ink(
       child: InkWell(
@@ -43,7 +43,7 @@ Widget baseItemCard(int index, String title, BuildContext context) {
                       )));
         },
         child: Card(
-          color: LightTheme.jayFmFancyBlack,
+          color: jayFmFancyBlack,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:jay_fm_flutter/home/widgets.dart';
-import 'package:jay_fm_flutter/util/colors.dart';
+import 'package:jay_fm_flutter/res/colors.dart';
+import 'package:jay_fm_flutter/screens/home/widgets.dart';
 import 'package:jay_fm_flutter/util/constants.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
-import 'package:jay_fm_flutter/util/values.dart';
+import 'package:jay_fm_flutter/res/values.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage>
       appBar: AppBar(
         title: Text("JayFm"),
         centerTitle: true,
-        backgroundColor: LightTheme.jayFmFancyBlack,
+        backgroundColor: jayFmFancyBlack,
         iconTheme: IconThemeData(color: Colors.grey),
         textTheme: darkTextTheme,
         actions: [

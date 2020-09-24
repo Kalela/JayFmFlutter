@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jay_fm_flutter/util/colors.dart';
+import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/util/constants.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
-import 'package:jay_fm_flutter/util/widget/widget.dart';
+import 'package:jay_fm_flutter/util/global_widgets.dart';
 
 // ignore: must_be_immutable
 class DetailsPage extends StatelessWidget {
@@ -13,9 +13,9 @@ class DetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: LightTheme.jayFmBlue,
+      backgroundColor: jayFmBlue,
       appBar: AppBar(
-        backgroundColor: LightTheme.jayFmFancyBlack,
+        backgroundColor: jayFmFancyBlack,
         iconTheme: IconThemeData(color: Colors.grey),
         actions: [
           PopupMenuButton<String>(
@@ -38,7 +38,7 @@ class DetailsPage extends StatelessWidget {
       ),
       body: Container(
         padding: EdgeInsets.only(left: 10),
-        color: LightTheme.jayFmBlue,
+        color: jayFmBlue,
         child: SingleChildScrollView(
           physics: NeverScrollableScrollPhysics(),
           child: Column(
@@ -48,7 +48,7 @@ class DetailsPage extends StatelessWidget {
               ),
               Text(
                 title,
-                style: TextStyle(fontSize: 25, color: LightTheme.jayFmFancyBlack),
+                style: TextStyle(fontSize: 25, color: jayFmFancyBlack),
               ),
               Padding(
                 padding: EdgeInsets.only(top: 20),
@@ -67,7 +67,7 @@ class DetailsPage extends StatelessWidget {
       bottomSheet: Container(
         height: 70,
         color: Colors.black,
-        child: nowPlayingFooter(LightTheme.jayFmMaroon, Colors.grey, LightTheme.jayFmOrange),
+        child: nowPlayingFooter(jayFmMaroon, Colors.grey, jayFmOrange),
       ),
     );
   }

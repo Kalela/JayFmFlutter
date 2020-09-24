@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 
-import 'home/home.dart';
+import 'package:jay_fm_flutter/screens/home/home.dart';
+import 'models/app_state.dart';
+
 
 void main() {
+  final _initialState = AppState(selectedTheme: SelectedTheme.LIGHT);
+  final Store<AppState> _store =
+      Store<AppState>(reducer, initialState: _initialState);
   runApp(MyApp());
 }
 

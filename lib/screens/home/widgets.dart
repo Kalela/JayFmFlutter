@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jay_fm_flutter/util/colors.dart';
-import 'package:jay_fm_flutter/util/values.dart';
-import 'package:jay_fm_flutter/util/widget/widget.dart';
+import 'package:jay_fm_flutter/res/colors.dart';
+import 'package:jay_fm_flutter/res/values.dart';
+import 'package:jay_fm_flutter/util/global_widgets.dart';
 
 Widget liveTabDetails() {
   final double _playButtonDiameter = 200;
@@ -31,7 +31,7 @@ Widget liveTabDetails() {
                       spreadRadius: 0.0,
                     )
                   ],
-                  color: LightTheme.jayFmFancyBlack),
+                  color: jayFmFancyBlack),
               child: InkWell(
                 onTap: () {
                   print("Play tapped");
@@ -42,7 +42,7 @@ Widget liveTabDetails() {
                   child: Center(
                     child: Icon(
                       Icons.play_arrow,
-                      color: LightTheme.jayFmOrange,
+                      color: jayFmOrange,
                       size: _playButtonDiameter / 2,
                     ),
                   ),
@@ -241,7 +241,7 @@ Widget browseBarTab(String text, Color borderColor) {
 Widget tabViewBackground(Widget viewContents) {
   return SizedBox.expand(
     child: Container(
-      color: LightTheme.jayFmBlue,
+      color: jayFmBlue,
       child: CustomPaint(
         // painter: HomePainter(),
         child: Container(
@@ -257,7 +257,7 @@ class HomePainter extends CustomPainter {
     var path = Path();
     var paint = Paint();
 
-    paint.color = LightTheme.jayFmBlue;
+    paint.color = jayFmBlue;
 
     path.moveTo(0, 0);
     path.quadraticBezierTo(size.width / 2, 0, size.width, size.height * 0.25);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jay_fm_flutter/util/strings.dart';
+import 'package:jay_fm_flutter/res/strings.dart';
 
 const List<String> choices = <String>[darkTheme, lightTheme];
 
