@@ -16,3 +16,16 @@ Color jayFmPurple = Color.fromARGB(200, 149, 11, 205);
 // rgb(168, 54, 102) Purple
 // rgb(171, 91, 76) Maroon
 // rgb(171, 91, 76) Maroon
+
+class GlobalAppColors {
+  Color mainBackgroundColor;
+  Color mainButtonsColor;
+  Color mainIconsColor;
+  Color mainTextColor;
+
+  GlobalAppColors(
+      {this.mainBackgroundColor,
+      this.mainButtonsColor,
+      this.mainIconsColor,
+      this.mainTextColor});
+}

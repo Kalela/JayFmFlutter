@@ -1,107 +1,108 @@
 import 'package:flutter/material.dart';
+import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 
-Widget liveTabDetails() {
+Widget liveTabDetails(GlobalAppColors colors) {
   final double _playButtonDiameter = 200;
 
-  return Container(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Column(
-          children: [
-            Text(
-              "LIVE PLAYING",
-              style: TextStyle(fontSize: 16),
-            ),
-            Text("Jay Fm"),
-            Padding(
-              padding: EdgeInsets.only(top: 8),
-            ),
-            Ink(
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Column(
+        children: [
+          Text(
+            "LIVE PLAYING",
+            style: defaultTextStyle(colors, TextStyle(fontSize: 16)),
+          ),
+          Text("Jay Fm", style: defaultTextStyle(colors)),
+          Padding(
+            padding: EdgeInsets.only(top: 8),
+          ),
+          Material(
+            type: MaterialType.transparency,
+            elevation: 0,
+            child: Ink(
+              height: _playButtonDiameter,
+              width: _playButtonDiameter + 10,
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black,
+                      color: colors.mainTextColor,
                       blurRadius: 2.0,
                       spreadRadius: 0.0,
                     )
                   ],
-                  color: jayFmFancyBlack),
+                  color: colors.mainButtonsColor),
               child: InkWell(
                 onTap: () {
                   print("Play tapped");
                 },
-                child: Container(
-                  height: _playButtonDiameter,
-                  width: _playButtonDiameter,
-                  child: Center(
-                    child: Icon(
-                      Icons.play_arrow,
-                      color: jayFmOrange,
-                      size: _playButtonDiameter / 2,
-                    ),
+                child: Center(
+                  child: Icon(
+                    Icons.play_arrow,
+                    color: colors.mainIconsColor,
+                    size: _playButtonDiameter / 2,
                   ),
                 ),
               ),
             ),
-          ],
-        ),
-        Column(
-          children: [
-            Text("AUDIO QUALITY"),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Column(
-                  children: [
-                    Radio(
-                      onChanged: (value) {},
-                      groupValue: null,
-                      value: null,
-                    ),
-                    Text("LOW")
-                  ],
-                ),
-                Column(
-                  children: [
-                    Radio(
-                      groupValue: null,
-                      onChanged: (Null value) {},
-                      value: null,
-                    ),
-                    Text("MED")
-                  ],
-                ),
-                Column(
-                  children: [
-                    Radio(
-                      groupValue: null,
-                      onChanged: (Null value) {},
-                      value: null,
-                    ),
-                    Text("HIGH")
-                  ],
-                )
-              ],
-            ),
-          ],
-        ),
-      ],
-    ),
+          ),
+        ],
+      ),
+      Column(
+        children: [
+          Text("AUDIO QUALITY", style: defaultTextStyle(colors)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  Radio(
+                    onChanged: (value) {},
+                    groupValue: null,
+                    value: null,
+                  ),
+                  Text("LOW", style: defaultTextStyle(colors))
+                ],
+              ),
+              Column(
+                children: [
+                  Radio(
+                    groupValue: null,
+                    onChanged: (Null value) {},
+                    value: null,
+                  ),
+                  Text("MED", style: defaultTextStyle(colors))
+                ],
+              ),
+              Column(
+                children: [
+                  Radio(
+                    groupValue: null,
+                    onChanged: (Null value) {},
+                    value: null,
+                  ),
+                  Text("HIGH", style: defaultTextStyle(colors))
+                ],
+              )
+            ],
+          ),
+        ],
+      ),
+    ],
   );
 }
 
 /// Provide the browse page as a tab widget
-Widget browseTabDetails() {
+Widget browseTabDetails(GlobalAppColors colors) {
   final List<Widget> _tabViews = [
     Container(),
     Container(),
-    tabViewBackground(savedTabDetails()),
+    Container(),
   ];
 
   return Container(
@@ -114,7 +115,7 @@ Widget browseTabDetails() {
             padding: EdgeInsets.only(top: 10, left: 15),
             child: Text(
               "Browse Categories",
-              style: TextStyle(fontSize: 25),
+              style: defaultTextStyle(colors, TextStyle(fontSize: 25)),
             ),
           ),
           Container(
@@ -134,9 +135,9 @@ Widget browseTabDetails() {
                         isScrollable: true,
                         unselectedLabelColor: Colors.black.withOpacity(0.3),
                         tabs: [
-                          browseBarTab("ENTERTAINMENT", Colors.black),
-                          browseBarTab("CURRENT AFFAIRS", Colors.black),
-                          browseBarTab("IDEOLOGY", Colors.black),
+                          browseBarTab("ENTERTAINMENT", defaultTextStyle(colors, TextStyle(fontSize: 10.0))),
+                          browseBarTab("CURRENT AFFAIRS", defaultTextStyle(colors, TextStyle(fontSize: 10.0))),
+                          browseBarTab("IDEOLOGY", defaultTextStyle(colors, TextStyle(fontSize: 10.0))),
                         ],
                       ),
                     ),
@@ -152,7 +153,7 @@ Widget browseTabDetails() {
 }
 
 /// Provide the latest page as a widget(depriciated)
-Widget latestTabDetails() {
+Widget latestTabDetails(GlobalAppColors colors) {
   return Container(
     child: SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
@@ -180,7 +181,7 @@ Widget latestTabDetails() {
 }
 
 /// Provide the saved page as a widget
-Widget savedTabDetails() {
+Widget savedTabDetails(GlobalAppColors colors) {
   return Container(
     child: SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
@@ -191,7 +192,7 @@ Widget savedTabDetails() {
             padding: EdgeInsets.only(top: 10, left: 15),
             child: Text(
               "Saved Podcasts",
-              style: TextStyle(fontSize: 25),
+              style: defaultTextStyle(colors, TextStyle(fontSize: 25)),
             ),
           ),
           Container(
@@ -223,31 +224,35 @@ Widget genericVerticalScrollableTabDetails() {
 }
 
 /// Main application tab bar
-/// 
+///
 /// Accepts the tab text [text]
 /// Acceppts th tab text color [textColor]
 Widget topBarTab(String text, Color textColor) {
-  return Text(text, style: TextStyle(color: textColor),);
-}
-
-/// Tab bar used in browser page
-Widget browseBarTab(String text, Color borderColor) {
-  return Text(
-    text,
-    style: TextStyle(color: Colors.black, fontSize: 10),
+  return SizedBox(
+    height: topBarHeight,
+    child: Center(
+      child: Text(
+        text,
+        style: TextStyle(color: textColor),
+      ),
+    ),
   );
 }
 
-Widget tabViewBackground(Widget viewContents) {
-  return SizedBox.expand(
-    child: Container(
-      color: jayFmBlue,
-      child: CustomPaint(
-        // painter: HomePainter(),
-        child: Container(
-            padding: EdgeInsets.only(top: topBarHeight), child: viewContents),
-      ),
-    ),
+/// Tab bar used in browser page
+Widget browseBarTab(String text, TextStyle textStyle) {
+  return Text(
+    text,
+    style: textStyle,
+  );
+}
+
+Widget tabViewBackground(Widget viewContents, AppState state) {
+  return Container(
+    color: state.selectedTheme == SelectedTheme.LIGHT
+        ? jayFmBlue
+        : jayFmFancyBlack,
+    child: viewContents,
   );
 }
 

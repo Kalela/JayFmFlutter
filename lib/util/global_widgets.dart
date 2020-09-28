@@ -1,33 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
-import 'package:jay_fm_flutter/screens/details/details.dart'; // TODO: Find way to remove this import(high order fuctions maybe?)
+import 'package:jay_fm_flutter/res/strings.dart';
+import 'package:jay_fm_flutter/res/values.dart';
+import 'package:jay_fm_flutter/screens/details/details.dart';
+import 'package:jay_fm_flutter/util/functions.dart'; // TODO: Find way to remove this import(high order fuctions maybe?)
 
-class StatefulWrapper extends StatefulWidget {
-  final Function onInit;
-  final Widget child;
+/// Text colors for dark theme
+const TextTheme darkTextTheme = TextTheme(
+    bodyText2: TextStyle(color: Colors.grey),
+    bodyText1: TextStyle(color: Colors.grey),
+    headline6: TextStyle(color: Colors.grey));
 
-  const StatefulWrapper({@required this.onInit, @required this.child});
-
-  @override
-  _StatefulWrapperState createState() => _StatefulWrapperState();
-}
-
-class _StatefulWrapperState extends State<StatefulWrapper> {
-  @override
-  void initState() {
-    if (widget.onInit != null) {
-      widget.onInit();
-    }
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.child;
-  }
-}
-
+/// Base Item card for podcasts
 Widget baseItemCard(int index, String title, BuildContext context) {
   return Container(
     color: jayFmFancyBlack.withOpacity(0.0),
@@ -97,7 +83,9 @@ Widget baseItemCard(int index, String title, BuildContext context) {
   );
 }
 
-Widget nowPlayingFooter(Color backgroundColor, Color titleColor, Color subtitleColor) {
+/// The now playing footer(typically goes into scaffold bottom)
+Widget nowPlayingFooter(
+    Color backgroundColor, Color titleColor, Color subtitleColor) {
   return Container(
       padding: EdgeInsets.all(10),
       color: backgroundColor,
@@ -143,4 +131,34 @@ Widget nowPlayingFooter(Color backgroundColor, Color titleColor, Color subtitleC
           ],
         ),
       ));
+}
+
+/// The tab bar pop up menu and button
+Widget tabBarPopUpMenu(BuildContext appContext, AppState state) {
+  return PopupMenuButton<String>(
+    itemBuilder: (context) {
+      return choices.map((String choice) {
+        return PopupMenuItem<String>(
+            value: choice,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Icon(
+                  Icons.check_circle,
+                  color: switchCase2(state.selectedTheme, {
+                    SelectedTheme.DARK:
+                        choice == darkTheme ? Colors.green : Colors.grey,
+                    SelectedTheme.LIGHT:
+                        choice == lightTheme ? Colors.green : Colors.grey
+                  }),
+                ),
+                Text(choice),
+              ],
+            ));
+      }).toList();
+    },
+    onSelected: (choice) {
+      tabBarPopUpChoiceAction(choice, appContext);
+    },
+  );
 }

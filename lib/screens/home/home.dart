@@ -1,89 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+
+import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/screens/home/widgets.dart';
-import 'package:jay_fm_flutter/util/constants.dart';
-import 'package:jay_fm_flutter/util/functions.dart';
-import 'package:jay_fm_flutter/res/values.dart';
+import 'package:jay_fm_flutter/util/global_widgets.dart';
 
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
-  final List<Widget> _tabViews = [
-    tabViewBackground(liveTabDetails()),
-    tabViewBackground(browseTabDetails()),
-    tabViewBackground(savedTabDetails()),
-  ];
-
-  TabController _topTabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _topTabController = TabController(length: _tabViews.length, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _topTabController.dispose();
-    super.dispose();
-  }
+class HomePage extends StatelessWidget {
+  final int tabViewsLength = 3;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("JayFm"),
-        centerTitle: true,
-        backgroundColor: jayFmFancyBlack,
-        iconTheme: IconThemeData(color: Colors.grey),
-        textTheme: darkTextTheme,
-        actions: [
-          PopupMenuButton<String>(
-            itemBuilder: (context) {
-              return choices.map((String choice) {
-                return PopupMenuItem<String>(
-                    value: choice,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Icon(Icons.check_circle),
-                        Text(choice),
-                      ],
-                    ));
-              }).toList();
-            },
-            onSelected: popUpChoiceAction,
-          )
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(30.0),
-          child: SizedBox(
-            height: topBarHeight,
-            child: TabBar(
-              controller: _topTabController,
-              tabs: [
-                topBarTab("Live", darkTextTheme.headline6.color),
-                topBarTab("Browse", darkTextTheme.headline6.color),
-                topBarTab("Saved", darkTextTheme.headline6.color),
-              ],
+    return StoreConnector<AppState, AppState>(
+      converter: (store) => store.state,
+      builder: (context, state) {
+        
+        GlobalAppColors colors = state.selectedTheme == SelectedTheme.LIGHT
+            ? GlobalAppColors(
+                mainBackgroundColor: jayFmBlue,
+                mainButtonsColor: jayFmFancyBlack,
+                mainIconsColor: jayFmOrange,
+                mainTextColor: Colors.black)
+            : GlobalAppColors(
+                mainBackgroundColor: jayFmFancyBlack,
+                mainButtonsColor: Colors.grey,
+                mainIconsColor: Colors.blueGrey,
+                mainTextColor: Colors.white);
+
+        return DefaultTabController(
+          length: tabViewsLength,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text("JayFm"),
+              centerTitle: true,
+              backgroundColor: jayFmFancyBlack,
+              iconTheme: IconThemeData(color: Colors.grey),
+              textTheme: darkTextTheme,
+              actions: [tabBarPopUpMenu(context, state)],
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(30.0),
+                child: TabBar(
+                  tabs: [
+                    topBarTab("Live", darkTextTheme.headline6.color),
+                    topBarTab("Browse", darkTextTheme.headline6.color),
+                    topBarTab("Saved", darkTextTheme.headline6.color),
+                  ],
+                ),
+              ),
             ),
+            body: TabBarView(children: [
+              tabViewBackground(liveTabDetails(colors), state),
+              tabViewBackground(browseTabDetails(colors), state),
+              tabViewBackground(savedTabDetails(colors), state),
+            ]),
           ),
-        ),
-      ),
-      body: Container(
-        child: Stack(
-          children: [
-            SizedBox.expand(
-              child: TabBarView(
-                  controller: _topTabController, children: _tabViews),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 }
