@@ -5,3 +5,9 @@ class SelectedThemeAction {
 
   SelectedThemeAction(this.payload);
 }
+
+class PodcastQualityAction {
+  final PodcastQuality payload;
+
+  PodcastQualityAction(this.payload);
+}

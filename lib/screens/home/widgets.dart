@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
+import 'package:jay_fm_flutter/redux/actions.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
+import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 
-Widget liveTabDetails(GlobalAppColors colors) {
+Widget liveTabDetails(GlobalAppColors colors, AppState state, BuildContext context) {
   final double _playButtonDiameter = 200;
 
   return Column(
@@ -62,9 +65,11 @@ Widget liveTabDetails(GlobalAppColors colors) {
               Column(
                 children: [
                   Radio(
-                    onChanged: (value) {},
-                    groupValue: null,
-                    value: null,
+                    onChanged: (value) {
+                      setPodcastQuality(context, value);
+                    },
+                    groupValue: state.podcastQuality,
+                    value: PodcastQuality.LOW,
                   ),
                   Text("LOW", style: defaultTextStyle(colors))
                 ],
@@ -72,9 +77,11 @@ Widget liveTabDetails(GlobalAppColors colors) {
               Column(
                 children: [
                   Radio(
-                    groupValue: null,
-                    onChanged: (Null value) {},
-                    value: null,
+                    groupValue: state.podcastQuality,
+                    onChanged: (value) {
+                      setPodcastQuality(context, value);
+                    },
+                    value: PodcastQuality.MED,
                   ),
                   Text("MED", style: defaultTextStyle(colors))
                 ],
@@ -82,9 +89,11 @@ Widget liveTabDetails(GlobalAppColors colors) {
               Column(
                 children: [
                   Radio(
-                    groupValue: null,
-                    onChanged: (Null value) {},
-                    value: null,
+                    groupValue: state.podcastQuality,
+                    onChanged: (value) {
+                      setPodcastQuality(context, value);
+                    },
+                    value: PodcastQuality.HIGH,
                   ),
                   Text("HIGH", style: defaultTextStyle(colors))
                 ],
@@ -96,6 +105,8 @@ Widget liveTabDetails(GlobalAppColors colors) {
     ],
   );
 }
+
+
 
 /// Provide the browse page as a tab widget
 Widget browseTabDetails(GlobalAppColors colors) {
@@ -135,9 +146,18 @@ Widget browseTabDetails(GlobalAppColors colors) {
                         isScrollable: true,
                         unselectedLabelColor: Colors.black.withOpacity(0.3),
                         tabs: [
-                          browseBarTab("ENTERTAINMENT", defaultTextStyle(colors, TextStyle(fontSize: 10.0))),
-                          browseBarTab("CURRENT AFFAIRS", defaultTextStyle(colors, TextStyle(fontSize: 10.0))),
-                          browseBarTab("IDEOLOGY", defaultTextStyle(colors, TextStyle(fontSize: 10.0))),
+                          browseBarTab(
+                              "ENTERTAINMENT",
+                              defaultTextStyle(
+                                  colors, TextStyle(fontSize: 10.0))),
+                          browseBarTab(
+                              "CURRENT AFFAIRS",
+                              defaultTextStyle(
+                                  colors, TextStyle(fontSize: 10.0))),
+                          browseBarTab(
+                              "IDEOLOGY",
+                              defaultTextStyle(
+                                  colors, TextStyle(fontSize: 10.0))),
                         ],
                       ),
                     ),

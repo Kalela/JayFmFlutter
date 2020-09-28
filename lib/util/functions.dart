@@ -24,6 +24,11 @@ void tabBarPopUpChoiceAction(String choice, BuildContext context) {
   setThemeState(context, choice);
 }
 
+setPodcastQuality(BuildContext context, PodcastQuality value) {
+  StoreProvider.of<AppState>(context)
+                          .dispatch(PodcastQualityAction(value));
+}
+
 ///Helper function for a dynamic switch case with dynamic types
 TValue switchCase2<TOptionType, TValue>(
   TOptionType selectedOption,
