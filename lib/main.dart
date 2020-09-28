@@ -26,14 +26,21 @@ class Root extends StatelessWidget {
   Widget build(BuildContext context) {
     return StoreProvider<AppState>(
       store: store,
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: switchCase2(store.state.selectedTheme,
-            {SelectedTheme.DARK: darkTheme, SelectedTheme.LIGHT: lightTheme}),
-        home: StoreConnector<AppState, AppState>(
-          converter: (store) => store.state,
-          builder: (context, state) => HomePage(),
-        ),
+      child: StoreConnector<AppState, AppState>(
+        converter: (store) => store.state,
+        builder: (context, state) {
+          return MaterialApp(
+            title: 'Flutter Demo',
+            theme: switchCase2(store.state.selectedTheme, {
+              SelectedTheme.DARK: darkTheme,
+              SelectedTheme.LIGHT: lightTheme
+            }),
+            home: StoreConnector<AppState, AppState>(
+              converter: (store) => store.state,
+              builder: (context, state) => HomePage(),
+            ),
+          );
+        },
       ),
     );
   }
