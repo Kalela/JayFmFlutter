@@ -5,6 +5,7 @@ import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/screens/home/widgets.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
+import 'package:jay_fm_flutter/util/stateful_wrapper.dart';
 
 class HomePage extends StatelessWidget {
   final int tabViewsLength = 3;
@@ -14,7 +15,6 @@ class HomePage extends StatelessWidget {
     return StoreConnector<AppState, AppState>(
       converter: (store) => store.state,
       builder: (context, state) {
-
         GlobalAppColors colors = state.selectedTheme == SelectedTheme.LIGHT
             ? GlobalAppColors(
                 mainBackgroundColor: jayFmBlue,
@@ -27,32 +27,38 @@ class HomePage extends StatelessWidget {
                 mainIconsColor: Colors.blueGrey,
                 mainTextColor: Colors.white);
 
-        return DefaultTabController(
-          length: tabViewsLength,
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text("JayFm"),
-              centerTitle: true,
-              backgroundColor: jayFmFancyBlack,
-              iconTheme: IconThemeData(color: Colors.grey),
-              textTheme: darkTextTheme,
-              actions: [tabBarPopUpMenu(context, state)],
-              bottom: PreferredSize(
-                preferredSize: Size.fromHeight(30.0),
-                child: TabBar(
-                  tabs: [
-                    topBarTab("Live", darkTextTheme.headline6.color),
-                    topBarTab("Browse", darkTextTheme.headline6.color),
-                    topBarTab("Saved", darkTextTheme.headline6.color),
-                  ],
+        return StatefulWrapper(
+          onInit: () async {
+          },
+          onDispose: () {},
+          child: DefaultTabController(
+            length: tabViewsLength,
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text("JayFm"),
+                centerTitle: true,
+                backgroundColor: jayFmFancyBlack,
+                iconTheme: IconThemeData(color: Colors.grey),
+                textTheme: darkTextTheme,
+                actions: [tabBarPopUpMenu(context, state)],
+                bottom: PreferredSize(
+                  preferredSize: Size.fromHeight(30.0),
+                  child: TabBar(
+                    tabs: [
+                      topBarTab("Live", darkTextTheme.headline6.color),
+                      topBarTab("Browse", darkTextTheme.headline6.color),
+                      topBarTab("Saved", darkTextTheme.headline6.color),
+                    ],
+                  ),
                 ),
               ),
+              body: TabBarView(children: [
+                tabViewBackground(
+                    liveTabDetails(colors, state, context), state),
+                tabViewBackground(browseTabDetails(colors), state),
+                tabViewBackground(savedTabDetails(colors), state),
+              ]),
             ),
-            body: TabBarView(children: [
-              tabViewBackground(liveTabDetails(colors, state, context), state),
-              tabViewBackground(browseTabDetails(colors), state),
-              tabViewBackground(savedTabDetails(colors), state),
-            ]),
           ),
         );
       },

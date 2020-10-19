@@ -19,6 +19,12 @@ void setThemeState(BuildContext context, String choice) {
   
 }
 
+/// Set podcast players current state
+setPodcastIsPlayingState(BuildContext context, PodcastState state) {
+  StoreProvider.of<AppState>(context)
+          .dispatch(PodcastStateAction(state));
+}
+
 /// Handle selection of an Action from tab bar pop up menu
 void tabBarPopUpChoiceAction(String choice, BuildContext context) {
   setThemeState(context, choice);

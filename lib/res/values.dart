@@ -9,8 +9,10 @@ const List<String> choices = <String>[darkTheme, lightTheme];
 TextStyle defaultTextStyle(GlobalAppColors colors, [textStyle]) {
   if (textStyle != null)
     return TextStyle(color: colors.mainTextColor).merge(textStyle);
-    
+
   return TextStyle(color: colors.mainTextColor);
 }
 
 double topBarHeight = 35.0;
+
+const mainPodcastUrl = "http://stream.zeno.fm/geapkb665rquv";

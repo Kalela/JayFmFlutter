@@ -1,14 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+
 import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/redux/actions.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
+import 'package:just_audio/just_audio.dart';
 
-Widget liveTabDetails(GlobalAppColors colors, AppState state, BuildContext context) {
+Widget liveTabDetails(
+    GlobalAppColors colors, AppState state, BuildContext context) {
   final double _playButtonDiameter = 200;
+
+  state.audioPlayer.playerStateStream.listen((playerState) {
+    print("Current player state is ${playerState.processingState}");
+    if (playerState.playing) {
+      setPodcastIsPlayingState(context, PodcastState.PLAYING);
+    } else {
+      switch (playerState.processingState) {
+        case ProcessingState.none:
+          setPodcastIsPlayingState(context, PodcastState.STOPPED);
+          break;
+        case ProcessingState.loading:
+          setPodcastIsPlayingState(context, PodcastState.LOADING);
+          break;
+        case ProcessingState.buffering:
+          setPodcastIsPlayingState(context, PodcastState.BUFFERING);
+          break;
+        case ProcessingState.ready:
+          setPodcastIsPlayingState(context, PodcastState.READY);
+          break;
+        case ProcessingState.completed:
+          setPodcastIsPlayingState(context, PodcastState.COMPLETED);
+          break;
+      }
+    }
+  });
 
   return Column(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -41,15 +67,60 @@ Widget liveTabDetails(GlobalAppColors colors, AppState state, BuildContext conte
                   ],
                   color: colors.mainButtonsColor),
               child: InkWell(
-                onTap: () {
-                  print("Play tapped");
+                onTap: () async {
+                  try{
+                    await state.audioPlayer.setUrl(mainPodcastUrl);
+                  } catch (e) {
+                    print(e);
+                    setPodcastIsPlayingState(context, PodcastState.ERRORED);
+                  }
+                  
+
+                  if (state.playState == PodcastState.PLAYING) {
+                    setPodcastIsPlayingState(context, PodcastState.LOADING);
+                    await state.audioPlayer.stop();
+                  } else {
+                    await state.audioPlayer.play();
+                  }
                 },
                 child: Center(
-                  child: Icon(
-                    Icons.play_arrow,
-                    color: colors.mainIconsColor,
-                    size: _playButtonDiameter / 2,
-                  ),
+                  child: switchCase2(state.playState, {
+                    PodcastState.PAUSED: Icon(
+                      Icons.play_arrow,
+                      color: colors.mainIconsColor,
+                      size: _playButtonDiameter / 2,
+                    ),
+                    PodcastState.PLAYING: Icon(
+                      Icons.pause,
+                      color: colors.mainIconsColor,
+                      size: _playButtonDiameter / 2,
+                    ),
+                    PodcastState.STOPPED: Icon(
+                      Icons.play_arrow,
+                      color: colors.mainIconsColor,
+                      size: _playButtonDiameter / 2,
+                    ),
+                    PodcastState.LOADING: SizedBox(
+                      height: _playButtonDiameter / 2,
+                      width: _playButtonDiameter / 2,
+                      child: CircularProgressIndicator(),
+                    ),
+                    PodcastState.BUFFERING: SizedBox(
+                      height: _playButtonDiameter / 2,
+                      width: _playButtonDiameter / 2,
+                      child: CircularProgressIndicator(),
+                    ),
+                    PodcastState.READY: Icon(
+                      Icons.play_arrow,
+                      color: colors.mainIconsColor,
+                      size: _playButtonDiameter / 2,
+                    ),
+                    PodcastState.ERRORED: Icon(
+                      Icons.play_arrow,
+                      color: colors.mainIconsColor,
+                      size: _playButtonDiameter / 2,
+                    ),
+                  }),
                 ),
               ),
             ),
@@ -106,12 +177,9 @@ Widget liveTabDetails(GlobalAppColors colors, AppState state, BuildContext conte
   );
 }
 
-
-
 /// Provide the browse page as a tab widget
 Widget browseTabDetails(GlobalAppColors colors) {
   final List<Widget> _tabViews = [
-    Container(),
     Container(),
     Container(),
   ];
@@ -125,7 +193,7 @@ Widget browseTabDetails(GlobalAppColors colors) {
           Container(
             padding: EdgeInsets.only(top: 10, left: 15),
             child: Text(
-              "Browse Categories",
+              "Browse",
               style: defaultTextStyle(colors, TextStyle(fontSize: 25)),
             ),
           ),
@@ -147,15 +215,11 @@ Widget browseTabDetails(GlobalAppColors colors) {
                         unselectedLabelColor: Colors.black.withOpacity(0.3),
                         tabs: [
                           browseBarTab(
-                              "ENTERTAINMENT",
+                              "PODCASTS",
                               defaultTextStyle(
                                   colors, TextStyle(fontSize: 10.0))),
                           browseBarTab(
-                              "CURRENT AFFAIRS",
-                              defaultTextStyle(
-                                  colors, TextStyle(fontSize: 10.0))),
-                          browseBarTab(
-                              "IDEOLOGY",
+                              "FUN-TO-MENTAL",
                               defaultTextStyle(
                                   colors, TextStyle(fontSize: 10.0))),
                         ],

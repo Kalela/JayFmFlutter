@@ -8,6 +8,8 @@ AppState reducer(AppState prevState, dynamic action) {
     newState.selectedTheme = action.payload;
   } else if (action is PodcastQualityAction) {
     newState.podcastQuality = action.payload;
+  } else if (action is PodcastStateAction) {
+    newState.playState = action.payload;
   }
 
   return newState;

@@ -11,3 +11,9 @@ class PodcastQualityAction {
 
   PodcastQualityAction(this.payload);
 }
+
+class PodcastStateAction {
+  final PodcastState payload;
+
+  PodcastStateAction(this.payload);
+}
