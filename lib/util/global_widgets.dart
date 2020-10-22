@@ -134,31 +134,87 @@ Widget nowPlayingFooter(
 }
 
 /// The tab bar pop up menu and button
-Widget tabBarPopUpMenu(BuildContext appContext, AppState state) {
-  return PopupMenuButton<String>(
-    itemBuilder: (context) {
-      return choices.map((String choice) {
-        return PopupMenuItem<String>(
-            value: choice,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  color: switchCase2(state.selectedTheme, {
-                    SelectedTheme.DARK:
-                        choice == darkTheme ? Colors.green : Colors.grey,
-                    SelectedTheme.LIGHT:
-                        choice == lightTheme ? Colors.green : Colors.grey
-                  }),
-                ),
-                Text(choice),
-              ],
-            ));
-      }).toList();
-    },
-    onSelected: (choice) {
-      tabBarPopUpChoiceAction(choice, appContext);
-    },
+Widget tabBarPopUpMenu(GlobalAppColors colors, BuildContext context, AppState state) {
+  return Theme(
+      data: Theme.of(context).copyWith(
+        cardColor: colors.mainBackgroundColor
+      ),
+      child: PopupMenuButton<String>(
+      itemBuilder: (context) {
+        return choices.map((String choice) {
+          return PopupMenuItem<String>(
+              value: choice,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  choice != "" ? Icon( // Use empty choice to render custom widget
+                    Icons.check_circle,
+                    color: switchCase2(state.selectedTheme, {
+                      SelectedTheme.DARK:
+                          choice == darkTheme ? Colors.green : Colors.grey,
+                      SelectedTheme.LIGHT:
+                          choice == lightTheme ? Colors.green : Colors.grey
+                    }),
+                  ): audioQuality(colors, state, context),
+                  Text(choice),
+                ],
+              ));
+        }).toList();
+      },
+      onSelected: (choice) {
+        tabBarPopUpChoiceAction(choice, context);
+      },
+    ),
+  );
+}
+
+/// Audio quality widget
+Widget audioQuality(
+    GlobalAppColors colors, AppState state, BuildContext context) {
+  return Column(
+    children: [
+      Text("AUDIO QUALITY", style: defaultTextStyle(colors)),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Radio(
+                onChanged: (value) {
+                  setPodcastQuality(context, value);
+                },
+                groupValue: state.podcastQuality,
+                value: PodcastQuality.LOW,
+              ),
+              Text("LOW", style: defaultTextStyle(colors))
+            ],
+          ),
+          Column(
+            children: [
+              Radio(
+                groupValue: state.podcastQuality,
+                onChanged: (value) {
+                  setPodcastQuality(context, value);
+                },
+                value: PodcastQuality.MED,
+              ),
+              Text("MED", style: defaultTextStyle(colors))
+            ],
+          ),
+          Column(
+            children: [
+              Radio(
+                groupValue: state.podcastQuality,
+                onChanged: (value) {
+                  setPodcastQuality(context, value);
+                },
+                value: PodcastQuality.HIGH,
+              ),
+              Text("HIGH", style: defaultTextStyle(colors))
+            ],
+          )
+        ],
+      ),
+    ],
   );
 }

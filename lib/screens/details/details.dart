@@ -15,12 +15,24 @@ class DetailsPage extends StatelessWidget {
     return StoreConnector<AppState, AppState>(
       converter: (store) => store.state,
       builder: (context, state) {
+        // TODO: Move app colors to global
+        GlobalAppColors colors = state.selectedTheme == SelectedTheme.LIGHT
+            ? GlobalAppColors(
+                mainBackgroundColor: jayFmBlue,
+                mainButtonsColor: jayFmFancyBlack,
+                mainIconsColor: jayFmOrange,
+                mainTextColor: Colors.black)
+            : GlobalAppColors(
+                mainBackgroundColor: jayFmFancyBlack,
+                mainButtonsColor: Colors.grey,
+                mainIconsColor: Colors.blueGrey,
+                mainTextColor: Colors.white);
         return Scaffold(
           backgroundColor: jayFmBlue,
           appBar: AppBar(
             backgroundColor: jayFmFancyBlack,
             iconTheme: IconThemeData(color: Colors.grey),
-            actions: [tabBarPopUpMenu(context, state)],
+            actions: [tabBarPopUpMenu(colors, context, state)],
           ),
           body: Container(
             padding: EdgeInsets.only(left: 10),

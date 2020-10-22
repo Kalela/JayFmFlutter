@@ -11,31 +11,6 @@ Widget liveTabDetails(
     GlobalAppColors colors, AppState state, BuildContext context) {
   final double _playButtonDiameter = 200;
 
-  state.audioPlayer.playerStateStream.listen((playerState) {
-    print("Current player state is ${playerState.processingState}");
-    if (playerState.playing) {
-      setPodcastIsPlayingState(context, PodcastState.PLAYING);
-    } else {
-      switch (playerState.processingState) {
-        case ProcessingState.none:
-          setPodcastIsPlayingState(context, PodcastState.STOPPED);
-          break;
-        case ProcessingState.loading:
-          setPodcastIsPlayingState(context, PodcastState.LOADING);
-          break;
-        case ProcessingState.buffering:
-          setPodcastIsPlayingState(context, PodcastState.BUFFERING);
-          break;
-        case ProcessingState.ready:
-          setPodcastIsPlayingState(context, PodcastState.READY);
-          break;
-        case ProcessingState.completed:
-          setPodcastIsPlayingState(context, PodcastState.COMPLETED);
-          break;
-      }
-    }
-  });
-
   return Column(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     crossAxisAlignment: CrossAxisAlignment.center,
@@ -48,7 +23,7 @@ Widget liveTabDetails(
           ),
           Text("Jay Fm", style: defaultTextStyle(colors)),
           Padding(
-            padding: EdgeInsets.only(top: 8),
+            padding: EdgeInsets.only(top: 15),
           ),
           Material(
             type: MaterialType.transparency,
@@ -68,13 +43,14 @@ Widget liveTabDetails(
                   color: colors.mainButtonsColor),
               child: InkWell(
                 onTap: () async {
-                  try{
+                  try {
                     await state.audioPlayer.setUrl(mainPodcastUrl);
                   } catch (e) {
                     print(e);
                     setPodcastIsPlayingState(context, PodcastState.ERRORED);
                   }
-                  
+
+                  setAudioStateListener(state, context);
 
                   if (state.playState == PodcastState.PLAYING) {
                     setPodcastIsPlayingState(context, PodcastState.LOADING);
@@ -127,54 +103,36 @@ Widget liveTabDetails(
           ),
         ],
       ),
-      Column(
-        children: [
-          Text("AUDIO QUALITY", style: defaultTextStyle(colors)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
-                children: [
-                  Radio(
-                    onChanged: (value) {
-                      setPodcastQuality(context, value);
-                    },
-                    groupValue: state.podcastQuality,
-                    value: PodcastQuality.LOW,
-                  ),
-                  Text("LOW", style: defaultTextStyle(colors))
-                ],
-              ),
-              Column(
-                children: [
-                  Radio(
-                    groupValue: state.podcastQuality,
-                    onChanged: (value) {
-                      setPodcastQuality(context, value);
-                    },
-                    value: PodcastQuality.MED,
-                  ),
-                  Text("MED", style: defaultTextStyle(colors))
-                ],
-              ),
-              Column(
-                children: [
-                  Radio(
-                    groupValue: state.podcastQuality,
-                    onChanged: (value) {
-                      setPodcastQuality(context, value);
-                    },
-                    value: PodcastQuality.HIGH,
-                  ),
-                  Text("HIGH", style: defaultTextStyle(colors))
-                ],
-              )
-            ],
-          ),
-        ],
-      ),
     ],
   );
+}
+
+/// Set up state listener for the ausio player
+setAudioStateListener(AppState state, BuildContext context) {
+  state.audioPlayer.playerStateStream.listen((playerState) {
+    print("Current player state is ${playerState.processingState}");
+    if (playerState.playing) {
+      setPodcastIsPlayingState(context, PodcastState.PLAYING);
+    } else {
+      switch (playerState.processingState) {
+        case ProcessingState.none:
+          setPodcastIsPlayingState(context, PodcastState.STOPPED);
+          break;
+        case ProcessingState.loading:
+          setPodcastIsPlayingState(context, PodcastState.LOADING);
+          break;
+        case ProcessingState.buffering:
+          setPodcastIsPlayingState(context, PodcastState.BUFFERING);
+          break;
+        case ProcessingState.ready:
+          setPodcastIsPlayingState(context, PodcastState.READY);
+          break;
+        case ProcessingState.completed:
+          setPodcastIsPlayingState(context, PodcastState.COMPLETED);
+          break;
+      }
+    }
+  });
 }
 
 /// Provide the browse page as a tab widget

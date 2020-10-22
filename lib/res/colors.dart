@@ -17,6 +17,7 @@ Color jayFmPurple = Color.fromARGB(200, 149, 11, 205);
 // rgb(171, 91, 76) Maroon
 // rgb(171, 91, 76) Maroon
 
+// TODO: Use redux DI to pass in these colors
 class GlobalAppColors {
   Color mainBackgroundColor;
   Color mainButtonsColor;

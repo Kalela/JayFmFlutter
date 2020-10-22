@@ -15,6 +15,7 @@ class HomePage extends StatelessWidget {
     return StoreConnector<AppState, AppState>(
       converter: (store) => store.state,
       builder: (context, state) {
+        // TODO: Move app colors to global
         GlobalAppColors colors = state.selectedTheme == SelectedTheme.LIGHT
             ? GlobalAppColors(
                 mainBackgroundColor: jayFmBlue,
@@ -30,7 +31,9 @@ class HomePage extends StatelessWidget {
         return StatefulWrapper(
           onInit: () async {
           },
-          onDispose: () {},
+          onDispose: () {
+            //TODO: Dispose audio player on close
+          },
           child: DefaultTabController(
             length: tabViewsLength,
             child: Scaffold(
@@ -40,7 +43,7 @@ class HomePage extends StatelessWidget {
                 backgroundColor: jayFmFancyBlack,
                 iconTheme: IconThemeData(color: Colors.grey),
                 textTheme: darkTextTheme,
-                actions: [tabBarPopUpMenu(context, state)],
+                actions: [tabBarPopUpMenu(colors, context, state)],
                 bottom: PreferredSize(
                   preferredSize: Size.fromHeight(30.0),
                   child: TabBar(
