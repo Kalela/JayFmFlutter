@@ -27,12 +27,14 @@ class DetailsPage extends StatelessWidget {
                 mainButtonsColor: Colors.grey,
                 mainIconsColor: Colors.blueGrey,
                 mainTextColor: Colors.white);
-        return Scaffold(
-          backgroundColor: jayFmBlue,
+        return SharedScaffold(
+          colors: colors,
+          context: context,
+          state: state,
+          // backgroundColor: jayFmBlue,
           appBar: AppBar(
             backgroundColor: jayFmFancyBlack,
             iconTheme: IconThemeData(color: Colors.grey),
-            actions: [tabBarPopUpMenu(colors, context, state)],
           ),
           body: Container(
             padding: EdgeInsets.only(left: 10),

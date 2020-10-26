@@ -36,14 +36,16 @@ class HomePage extends StatelessWidget {
           },
           child: DefaultTabController(
             length: tabViewsLength,
-            child: Scaffold(
+            child: SharedScaffold(
+              colors: colors,
+              context: context,
+              state: state,
               appBar: AppBar(
                 title: Text("JayFm"),
                 centerTitle: true,
                 backgroundColor: jayFmFancyBlack,
                 iconTheme: IconThemeData(color: Colors.grey),
                 textTheme: darkTextTheme,
-                actions: [tabBarPopUpMenu(colors, context, state)],
                 bottom: PreferredSize(
                   preferredSize: Size.fromHeight(30.0),
                   child: TabBar(

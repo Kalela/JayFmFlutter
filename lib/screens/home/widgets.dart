@@ -6,6 +6,7 @@ import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 Widget liveTabDetails(
     GlobalAppColors colors, AppState state, BuildContext context) {
@@ -138,7 +139,13 @@ setAudioStateListener(AppState state, BuildContext context) {
 /// Provide the browse page as a tab widget
 Widget browseTabDetails(GlobalAppColors colors) {
   final List<Widget> _tabViews = [
-    Container(),
+    Container(
+      child: WebView(
+        initialUrl:
+            'https://castbox.fm/channel/About-You-Podcast-id1656696?country=gb',
+        javascriptMode: JavascriptMode.unrestricted,
+      ),
+    ),
     Container(),
   ];
 
@@ -156,15 +163,18 @@ Widget browseTabDetails(GlobalAppColors colors) {
             ),
           ),
           Container(
-            padding: EdgeInsets.only(left: 10),
+            padding: EdgeInsets.only(left: 10, right: 10),
             height: 700,
             child: DefaultTabController(
               length: _tabViews.length,
               child: Container(
                 child: Stack(
                   children: [
-                    SizedBox.expand(
-                      child: TabBarView(children: _tabViews),
+                    Padding(
+                      padding: EdgeInsets.only(top: 40),
+                      child: SizedBox.expand(
+                        child: TabBarView(children: _tabViews),
+                      ),
                     ),
                     SizedBox(
                       height: topBarHeight,

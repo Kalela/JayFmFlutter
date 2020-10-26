@@ -133,39 +133,65 @@ Widget nowPlayingFooter(
       ));
 }
 
-/// The tab bar pop up menu and button
-Widget tabBarPopUpMenu(GlobalAppColors colors, BuildContext context, AppState state) {
-  return Theme(
-      data: Theme.of(context).copyWith(
-        cardColor: colors.mainBackgroundColor
-      ),
-      child: PopupMenuButton<String>(
-      itemBuilder: (context) {
-        return choices.map((String choice) {
-          return PopupMenuItem<String>(
-              value: choice,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  choice != "" ? Icon( // Use empty choice to render custom widget
-                    Icons.check_circle,
-                    color: switchCase2(state.selectedTheme, {
-                      SelectedTheme.DARK:
-                          choice == darkTheme ? Colors.green : Colors.grey,
-                      SelectedTheme.LIGHT:
-                          choice == lightTheme ? Colors.green : Colors.grey
-                    }),
-                  ): audioQuality(colors, state, context),
-                  Text(choice),
-                ],
-              ));
-        }).toList();
-      },
-      onSelected: (choice) {
-        tabBarPopUpChoiceAction(choice, context);
-      },
+/// The drawer pop up menu
+Widget drawerPopUpMenu(
+    {GlobalAppColors colors, BuildContext context, AppState state}) {
+  return Container(
+    color: colors.mainBackgroundColor,
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        DrawerHeader(
+          child: Text('We speak music'),
+          decoration: BoxDecoration(
+            color: colors.mainIconsColor,
+          ),
+        ),
+        Column(
+            children: choices.map((String choice) {
+          return ListTile(
+            onTap: () {
+              setThemeState(context, choice);
+            },
+            leading: Icon(
+              // Use empty choice to render custom widget
+              Icons.check_circle,
+              color: switchCase2(state.selectedTheme, {
+                SelectedTheme.DARK:
+                    choice == darkTheme ? colors.mainIconsColor : Colors.grey,
+                SelectedTheme.LIGHT:
+                    choice == lightTheme ? colors.mainIconsColor : Colors.grey
+              }),
+            ),
+            title: Text(choice, style: TextStyle(color: colors.mainTextColor),),
+          );
+        }).toList()),
+        Divider(color: colors.mainTextColor,),
+        audioQuality(colors, state, context),
+        Divider(color: colors.mainTextColor)
+      ],
     ),
   );
+}
+
+/// Custom scaffold widget for use throughout the application
+class SharedScaffold extends Scaffold {
+  SharedScaffold(
+      {Widget body,
+      AppBar appBar,
+      GlobalAppColors colors,
+      dynamic bottomSheet,
+      BuildContext context,
+      AppState state,
+      Drawer drawer})
+      : super(
+            body: body,
+            appBar: appBar,
+            bottomSheet: bottomSheet,
+            drawer: Drawer(
+              child: drawerPopUpMenu(
+                  colors: colors, context: context, state: state),
+            ));
 }
 
 /// Audio quality widget
