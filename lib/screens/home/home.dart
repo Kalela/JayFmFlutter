@@ -60,7 +60,7 @@ class HomePage extends StatelessWidget {
               body: TabBarView(children: [
                 tabViewBackground(
                     liveTabDetails(colors, state, context), state),
-                tabViewBackground(browseTabDetails(colors), state),
+                tabViewBackground(browseTabDetails(colors, context), state),
                 tabViewBackground(savedTabDetails(colors), state),
               ]),
             ),

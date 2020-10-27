@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
+import 'package:jay_fm_flutter/screens/home/functions.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 Widget liveTabDetails(
     GlobalAppColors colors, AppState state, BuildContext context) {
@@ -108,42 +108,23 @@ Widget liveTabDetails(
   );
 }
 
-/// Set up state listener for the ausio player
-setAudioStateListener(AppState state, BuildContext context) {
-  state.audioPlayer.playerStateStream.listen((playerState) {
-    print("Current player state is ${playerState.processingState}");
-    if (playerState.playing) {
-      setPodcastIsPlayingState(context, PodcastState.PLAYING);
-    } else {
-      switch (playerState.processingState) {
-        case ProcessingState.none:
-          setPodcastIsPlayingState(context, PodcastState.STOPPED);
-          break;
-        case ProcessingState.loading:
-          setPodcastIsPlayingState(context, PodcastState.LOADING);
-          break;
-        case ProcessingState.buffering:
-          setPodcastIsPlayingState(context, PodcastState.BUFFERING);
-          break;
-        case ProcessingState.ready:
-          setPodcastIsPlayingState(context, PodcastState.READY);
-          break;
-        case ProcessingState.completed:
-          setPodcastIsPlayingState(context, PodcastState.COMPLETED);
-          break;
-      }
-    }
-  });
-}
-
 /// Provide the browse page as a tab widget
-Widget browseTabDetails(GlobalAppColors colors) {
+Widget browseTabDetails(GlobalAppColors colors, BuildContext context) {
   final List<Widget> _tabViews = [
     Container(
-      child: WebView(
-        initialUrl:
-            'https://castbox.fm/channel/About-You-Podcast-id1656696?country=gb',
-        javascriptMode: JavascriptMode.unrestricted,
+      child: ListView(
+        children: [
+          ListTile(
+            title: Text(
+              "About You Podcast",
+              style: TextStyle(color: colors.mainTextColor),
+            ),
+            onTap: () {
+              openPodcastEpisodes(
+                  context, "https://anchor.fm/s/81752fc/podcast/rss");
+            },
+          )
+        ],
       ),
     ),
     Container(),
