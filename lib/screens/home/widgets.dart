@@ -7,8 +7,8 @@ import 'package:jay_fm_flutter/screens/home/functions.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 
-Widget liveTabDetails(
-    AppState state, BuildContext context) {
+/// Parent widget of live tab contents
+Widget liveTabDetails(AppState state, BuildContext context) {
   final double _playButtonDiameter = 200;
 
   return Column(
@@ -25,75 +25,67 @@ Widget liveTabDetails(
           Padding(
             padding: EdgeInsets.only(top: 15),
           ),
-          Material(
-            type: MaterialType.transparency,
-            elevation: 0,
-            child: Ink(
+          Container(
               height: _playButtonDiameter,
-              width: _playButtonDiameter + 10,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: state.colors.mainTextColor,
-                      blurRadius: 2.0,
-                      spreadRadius: 0.0,
-                    )
-                  ],
-                  color: state.colors.mainButtonsColor),
-              child: InkWell(
-                onTap: () async {
-                  playPodcast(state, context, mainPodcastUrl);
-                },
-                child: Center(
-                  child: switchCase2(state.playState, {
-                    PodcastState.PAUSED: Icon(
-                      Icons.play_arrow,
-                      color: state.colors.mainIconsColor,
-                      size: _playButtonDiameter / 2,
-                    ),
-                    PodcastState.PLAYING: Icon(
-                      Icons.pause,
-                      color: state.colors.mainIconsColor,
-                      size: _playButtonDiameter / 2,
-                    ),
-                    PodcastState.STOPPED: Icon(
-                      Icons.play_arrow,
-                      color: state.colors.mainIconsColor,
-                      size: _playButtonDiameter / 2,
-                    ),
-                    PodcastState.LOADING: SizedBox(
-                      height: _playButtonDiameter / 2,
-                      width: _playButtonDiameter / 2,
-                      child: CircularProgressIndicator(),
-                    ),
-                    PodcastState.BUFFERING: SizedBox(
-                      height: _playButtonDiameter / 2,
-                      width: _playButtonDiameter / 2,
-                      child: CircularProgressIndicator(),
-                    ),
-                    PodcastState.READY: Icon(
-                      Icons.play_arrow,
-                      color: state.colors.mainIconsColor,
-                      size: _playButtonDiameter / 2,
-                    ),
-                    PodcastState.ERRORED: Icon(
-                      Icons.play_arrow,
-                      color: state.colors.mainIconsColor,
-                      size: _playButtonDiameter / 2,
-                    ),
-                  }),
-                ),
-              ),
-            ),
-          ),
+              width: _playButtonDiameter,
+              child: RawMaterialButton(
+                  onPressed: () {
+                    playPodcast(state, context, mainPodcastUrl);
+                  },
+                  fillColor: state.colors.mainButtonsColor,
+                  shape: CircleBorder(),
+                  elevation: 10.0,
+                  child: livePlayButton(state, _playButtonDiameter)))
         ],
       ),
     ],
   );
 }
 
-/// Provide the browse page as a tab widget
+/// Play button in the middle of live tab
+Widget livePlayButton(AppState state, double playButtonDiameter) {
+  return Center(
+    child: switchCase2(state.playState, {
+      PodcastState.PAUSED: Icon(
+        Icons.play_arrow,
+        color: state.colors.mainIconsColor,
+        size: playButtonDiameter / 2,
+      ),
+      PodcastState.PLAYING: Icon(
+        Icons.pause,
+        color: state.colors.mainIconsColor,
+        size: playButtonDiameter / 2,
+      ),
+      PodcastState.STOPPED: Icon(
+        Icons.play_arrow,
+        color: state.colors.mainIconsColor,
+        size: playButtonDiameter / 2,
+      ),
+      PodcastState.LOADING: SizedBox(
+        height: playButtonDiameter / 2,
+        width: playButtonDiameter / 2,
+        child: CircularProgressIndicator(),
+      ),
+      PodcastState.BUFFERING: SizedBox(
+        height: playButtonDiameter / 2,
+        width: playButtonDiameter / 2,
+        child: CircularProgressIndicator(),
+      ),
+      PodcastState.READY: Icon(
+        Icons.play_arrow,
+        color: state.colors.mainIconsColor,
+        size: playButtonDiameter / 2,
+      ),
+      PodcastState.ERRORED: Icon(
+        Icons.play_arrow,
+        color: state.colors.mainIconsColor,
+        size: playButtonDiameter / 2,
+      ),
+    }),
+  );
+}
+
+/// Parent widget of browse tab contents
 Widget browseTabDetails(AppState state, BuildContext context) {
   List<Widget> podcastTileList = getPodcastList(state, context);
   final List<Widget> _tabViews = [
@@ -166,7 +158,7 @@ Widget browseTabDetails(AppState state, BuildContext context) {
   );
 }
 
-/// Provide the latest page as a widget(depreciated)
+/// Parent widget of latest tab contents(depreciated)
 Widget latestTabDetails(GlobalAppColors colors) {
   return Container(
     child: SingleChildScrollView(
@@ -194,7 +186,7 @@ Widget latestTabDetails(GlobalAppColors colors) {
   );
 }
 
-/// Provide the saved page as a widget
+/// Parent widget of saved tab contents
 Widget savedTabDetails(AppState state) {
   return Container(
     child: SingleChildScrollView(
