@@ -48,19 +48,18 @@ TValue switchCase2<TOptionType, TValue>(
 }
 
 playPodcast(AppState state, BuildContext context, String podCastUrl) async {
-  try {
-    await state.audioPlayer.setUrl(podCastUrl);
-  } catch (e) {
-    print(e);
-    setPodcastIsPlayingState(context, PodcastState.ERRORED);
-  }
-
   setAudioStateListener(state, context);
 
   if (state.playState == PodcastState.PLAYING) {
     setPodcastIsPlayingState(context, PodcastState.LOADING);
     await state.audioPlayer.stop();
   } else {
+    try {
+      await state.audioPlayer.setUrl(podCastUrl);
+    } catch (e) {
+      print(e);
+      setPodcastIsPlayingState(context, PodcastState.ERRORED);
+    }
     await state.audioPlayer.play();
   }
 }
@@ -68,7 +67,6 @@ playPodcast(AppState state, BuildContext context, String podCastUrl) async {
 /// Set up state listener for the audio player
 setAudioStateListener(AppState state, BuildContext context) {
   state.audioPlayer.playerStateStream.listen((playerState) {
-    print("Current player state is ${playerState.processingState}");
     if (playerState.playing) {
       setPodcastIsPlayingState(context, PodcastState.PLAYING);
     } else {

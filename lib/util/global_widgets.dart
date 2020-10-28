@@ -135,16 +135,16 @@ Widget nowPlayingFooter(
 
 /// The drawer pop up menu
 Widget drawerPopUpMenu(
-    {GlobalAppColors colors, BuildContext context, AppState state}) {
+    {AppState state, BuildContext context}) {
   return Container(
-    color: colors.mainBackgroundColor,
+    color: state.colors.mainBackgroundColor,
     child: ListView(
       padding: EdgeInsets.zero,
       children: [
         DrawerHeader(
           child: Text('We speak music'),
           decoration: BoxDecoration(
-            color: colors.mainIconsColor,
+            color: state.colors.mainIconsColor,
           ),
         ),
         Column(
@@ -158,17 +158,17 @@ Widget drawerPopUpMenu(
               Icons.check_circle,
               color: switchCase2(state.selectedTheme, {
                 SelectedTheme.DARK:
-                    choice == darkTheme ? colors.mainIconsColor : Colors.grey,
+                    choice == darkTheme ? state.colors.mainIconsColor : Colors.grey,
                 SelectedTheme.LIGHT:
-                    choice == lightTheme ? colors.mainIconsColor : Colors.grey
+                    choice == lightTheme ? state.colors.mainIconsColor : Colors.grey
               }),
             ),
-            title: Text(choice, style: TextStyle(color: colors.mainTextColor),),
+            title: Text(choice, style: TextStyle(color: state.colors.mainTextColor),),
           );
         }).toList()),
-        Divider(color: colors.mainTextColor,),
-        audioQuality(colors, state, context),
-        Divider(color: colors.mainTextColor)
+        Divider(color: state.colors.mainTextColor,),
+        audioQuality(state, context),
+        Divider(color: state.colors.mainTextColor)
       ],
     ),
   );
@@ -179,7 +179,6 @@ class SharedScaffold extends Scaffold {
   SharedScaffold(
       {Widget body,
       AppBar appBar,
-      GlobalAppColors colors,
       dynamic bottomSheet,
       BuildContext context,
       AppState state,
@@ -190,16 +189,16 @@ class SharedScaffold extends Scaffold {
             bottomSheet: bottomSheet,
             drawer: Drawer(
               child: drawerPopUpMenu(
-                  colors: colors, context: context, state: state),
+                  context: context, state: state),
             ));
 }
 
 /// Audio quality widget
 Widget audioQuality(
-    GlobalAppColors colors, AppState state, BuildContext context) {
+ AppState state, BuildContext context) {
   return Column(
     children: [
-      Text("AUDIO QUALITY", style: defaultTextStyle(colors)),
+      Text("AUDIO QUALITY", style: defaultTextStyle(state)),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -212,7 +211,7 @@ Widget audioQuality(
                 groupValue: state.podcastQuality,
                 value: PodcastQuality.LOW,
               ),
-              Text("LOW", style: defaultTextStyle(colors))
+              Text("LOW", style: defaultTextStyle(state))
             ],
           ),
           Column(
@@ -224,7 +223,7 @@ Widget audioQuality(
                 },
                 value: PodcastQuality.MED,
               ),
-              Text("MED", style: defaultTextStyle(colors))
+              Text("MED", style: defaultTextStyle(state))
             ],
           ),
           Column(
@@ -236,7 +235,7 @@ Widget audioQuality(
                 },
                 value: PodcastQuality.HIGH,
               ),
-              Text("HIGH", style: defaultTextStyle(colors))
+              Text("HIGH", style: defaultTextStyle(state))
             ],
           )
         ],

@@ -6,10 +6,9 @@ import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/screens/home/functions.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 Widget liveTabDetails(
-    GlobalAppColors colors, AppState state, BuildContext context) {
+    AppState state, BuildContext context) {
   final double _playButtonDiameter = 200;
 
   return Column(
@@ -20,9 +19,9 @@ Widget liveTabDetails(
         children: [
           Text(
             "LIVE PLAYING",
-            style: defaultTextStyle(colors, TextStyle(fontSize: 16)),
+            style: defaultTextStyle(state, TextStyle(fontSize: 16)),
           ),
-          Text("Jay Fm", style: defaultTextStyle(colors)),
+          Text("Jay Fm", style: defaultTextStyle(state)),
           Padding(
             padding: EdgeInsets.only(top: 15),
           ),
@@ -36,12 +35,12 @@ Widget liveTabDetails(
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: colors.mainTextColor,
+                      color: state.colors.mainTextColor,
                       blurRadius: 2.0,
                       spreadRadius: 0.0,
                     )
                   ],
-                  color: colors.mainButtonsColor),
+                  color: state.colors.mainButtonsColor),
               child: InkWell(
                 onTap: () async {
                   playPodcast(state, context, mainPodcastUrl);
@@ -50,17 +49,17 @@ Widget liveTabDetails(
                   child: switchCase2(state.playState, {
                     PodcastState.PAUSED: Icon(
                       Icons.play_arrow,
-                      color: colors.mainIconsColor,
+                      color: state.colors.mainIconsColor,
                       size: _playButtonDiameter / 2,
                     ),
                     PodcastState.PLAYING: Icon(
                       Icons.pause,
-                      color: colors.mainIconsColor,
+                      color: state.colors.mainIconsColor,
                       size: _playButtonDiameter / 2,
                     ),
                     PodcastState.STOPPED: Icon(
                       Icons.play_arrow,
-                      color: colors.mainIconsColor,
+                      color: state.colors.mainIconsColor,
                       size: _playButtonDiameter / 2,
                     ),
                     PodcastState.LOADING: SizedBox(
@@ -75,12 +74,12 @@ Widget liveTabDetails(
                     ),
                     PodcastState.READY: Icon(
                       Icons.play_arrow,
-                      color: colors.mainIconsColor,
+                      color: state.colors.mainIconsColor,
                       size: _playButtonDiameter / 2,
                     ),
                     PodcastState.ERRORED: Icon(
                       Icons.play_arrow,
-                      color: colors.mainIconsColor,
+                      color: state.colors.mainIconsColor,
                       size: _playButtonDiameter / 2,
                     ),
                   }),
@@ -95,8 +94,8 @@ Widget liveTabDetails(
 }
 
 /// Provide the browse page as a tab widget
-Widget browseTabDetails(GlobalAppColors colors, BuildContext context) {
-  List<Widget> podcastTileList = getPodcastList(colors, context);
+Widget browseTabDetails(AppState state, BuildContext context) {
+  List<Widget> podcastTileList = getPodcastList(state, context);
   final List<Widget> _tabViews = [
     Container(
       child: ListView.separated(
@@ -122,7 +121,7 @@ Widget browseTabDetails(GlobalAppColors colors, BuildContext context) {
             padding: EdgeInsets.only(top: 10, left: 15),
             child: Text(
               "Browse",
-              style: defaultTextStyle(colors, TextStyle(fontSize: 25)),
+              style: defaultTextStyle(state, TextStyle(fontSize: 25)),
             ),
           ),
           Container(
@@ -148,11 +147,11 @@ Widget browseTabDetails(GlobalAppColors colors, BuildContext context) {
                           browseBarTab(
                               "PODCASTS",
                               defaultTextStyle(
-                                  colors, TextStyle(fontSize: 10.0))),
+                                  state, TextStyle(fontSize: 10.0))),
                           browseBarTab(
                               "FUN-TO-MENTAL",
                               defaultTextStyle(
-                                  colors, TextStyle(fontSize: 10.0))),
+                                  state, TextStyle(fontSize: 10.0))),
                         ],
                       ),
                     ),
@@ -196,7 +195,7 @@ Widget latestTabDetails(GlobalAppColors colors) {
 }
 
 /// Provide the saved page as a widget
-Widget savedTabDetails(GlobalAppColors colors) {
+Widget savedTabDetails(AppState state) {
   return Container(
     child: SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
@@ -207,7 +206,7 @@ Widget savedTabDetails(GlobalAppColors colors) {
             padding: EdgeInsets.only(top: 10, left: 15),
             child: Text(
               "Saved Podcasts",
-              style: defaultTextStyle(colors, TextStyle(fontSize: 25)),
+              style: defaultTextStyle(state, TextStyle(fontSize: 25)),
             ),
           ),
           Container(
@@ -266,9 +265,7 @@ Widget browseBarTab(String text, TextStyle textStyle) {
 
 Widget tabViewBackground(Widget viewContents, AppState state) {
   return Container(
-    color: state.selectedTheme == SelectedTheme.LIGHT
-        ? jayFmBlue
-        : jayFmFancyBlack,
+    color: state.colors.mainBackgroundColor,
     child: viewContents,
   );
 }

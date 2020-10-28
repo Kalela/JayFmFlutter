@@ -15,19 +15,6 @@ class HomePage extends StatelessWidget {
     return StoreConnector<AppState, AppState>(
       converter: (store) => store.state,
       builder: (context, state) {
-        // TODO: Move app colors to global
-        GlobalAppColors colors = state.selectedTheme == SelectedTheme.LIGHT
-            ? GlobalAppColors(
-                mainBackgroundColor: jayFmBlue,
-                mainButtonsColor: jayFmFancyBlack,
-                mainIconsColor: jayFmOrange,
-                mainTextColor: Colors.black)
-            : GlobalAppColors(
-                mainBackgroundColor: jayFmFancyBlack,
-                mainButtonsColor: Colors.grey,
-                mainIconsColor: Colors.blueGrey,
-                mainTextColor: Colors.white);
-
         return StatefulWrapper(
           onInit: () async {
           },
@@ -37,7 +24,6 @@ class HomePage extends StatelessWidget {
           child: DefaultTabController(
             length: tabViewsLength,
             child: SharedScaffold(
-              colors: colors,
               context: context,
               state: state,
               appBar: AppBar(
@@ -59,9 +45,9 @@ class HomePage extends StatelessWidget {
               ),
               body: TabBarView(children: [
                 tabViewBackground(
-                    liveTabDetails(colors, state, context), state),
-                tabViewBackground(browseTabDetails(colors, context), state),
-                tabViewBackground(savedTabDetails(colors), state),
+                    liveTabDetails(state, context), state),
+                tabViewBackground(browseTabDetails(state, context), state),
+                tabViewBackground(savedTabDetails(state), state),
               ]),
             ),
           ),
