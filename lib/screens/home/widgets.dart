@@ -6,7 +6,7 @@ import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/screens/home/functions.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 Widget liveTabDetails(
     GlobalAppColors colors, AppState state, BuildContext context) {
@@ -44,21 +44,7 @@ Widget liveTabDetails(
                   color: colors.mainButtonsColor),
               child: InkWell(
                 onTap: () async {
-                  try {
-                    await state.audioPlayer.setUrl(mainPodcastUrl);
-                  } catch (e) {
-                    print(e);
-                    setPodcastIsPlayingState(context, PodcastState.ERRORED);
-                  }
-
-                  setAudioStateListener(state, context);
-
-                  if (state.playState == PodcastState.PLAYING) {
-                    setPodcastIsPlayingState(context, PodcastState.LOADING);
-                    await state.audioPlayer.stop();
-                  } else {
-                    await state.audioPlayer.play();
-                  }
+                  playPodcast(state, context, mainPodcastUrl);
                 },
                 child: Center(
                   child: switchCase2(state.playState, {
@@ -110,21 +96,17 @@ Widget liveTabDetails(
 
 /// Provide the browse page as a tab widget
 Widget browseTabDetails(GlobalAppColors colors, BuildContext context) {
+  List<Widget> podcastTileList = getPodcastList(colors, context);
   final List<Widget> _tabViews = [
     Container(
-      child: ListView(
-        children: [
-          ListTile(
-            title: Text(
-              "About You Podcast",
-              style: TextStyle(color: colors.mainTextColor),
-            ),
-            onTap: () {
-              openPodcastEpisodes(
-                  context, "https://anchor.fm/s/81752fc/podcast/rss");
-            },
-          )
-        ],
+      child: ListView.separated(
+        itemBuilder: (context, index) {
+          return podcastTileList[index];
+        },
+        itemCount: podcastTileList.length,
+        separatorBuilder: (context, index) => Divider(
+          color: Colors.black,
+        ),
       ),
     ),
     Container(),
@@ -185,7 +167,7 @@ Widget browseTabDetails(GlobalAppColors colors, BuildContext context) {
   );
 }
 
-/// Provide the latest page as a widget(depriciated)
+/// Provide the latest page as a widget(depreciated)
 Widget latestTabDetails(GlobalAppColors colors) {
   return Container(
     child: SingleChildScrollView(
@@ -231,9 +213,11 @@ Widget savedTabDetails(GlobalAppColors colors) {
           Container(
             padding: EdgeInsets.only(left: 10),
             height: 700,
-            child: ListView.builder(itemBuilder: (context, i) {
-              return baseItemCard(i, "Saved Podcast", context);
-            }),
+            child: ListView.builder(
+                itemCount: 3,
+                itemBuilder: (context, i) {
+                  return baseItemCard(i, "Saved Podcast", context);
+                }),
           )
         ],
       ),

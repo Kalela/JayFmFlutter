@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/screens/details/functions.dart';
+import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 import 'package:webfeed/domain/rss_feed.dart';
 
@@ -73,6 +74,8 @@ class DetailsPage extends StatelessWidget {
                             return Center(child: CircularProgressIndicator());
                           }
 
+                          print(snapshot.data);
+
                           return ListView.separated(
                               separatorBuilder: (context, index) => Divider(
                                     color: Colors.black,
@@ -87,7 +90,19 @@ class DetailsPage extends StatelessWidget {
                                     style:
                                         TextStyle(color: colors.mainTextColor),
                                   ),
-                                  trailing: Icon(Icons.play_arrow, color: colors.mainIconsColor, size: 40,),
+                                  leading: Container(
+                                    child: Image.network(snapshot.data.items[i].itunes.image.href),
+                                  ),
+                                  trailing: GestureDetector(
+                                      onTap: () {
+                                        playPodcast(
+                                            state, context, snapshot.data.items[i].enclosure.url);
+                                      },
+                                      child: Icon(
+                                        Icons.play_arrow,
+                                        color: colors.mainIconsColor,
+                                        size: 40,
+                                      )),
                                 );
                               });
                         },

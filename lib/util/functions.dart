@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/redux/actions.dart';
 import 'package:jay_fm_flutter/res/strings.dart';
+import 'package:just_audio/just_audio.dart';
 
 /// set the theme in application state
 void setThemeState(BuildContext context, String choice) {
@@ -46,4 +47,48 @@ TValue switchCase2<TOptionType, TValue>(
   return branches[selectedOption];
 }
 
+playPodcast(AppState state, BuildContext context, String podCastUrl) async {
+  try {
+    await state.audioPlayer.setUrl(podCastUrl);
+  } catch (e) {
+    print(e);
+    setPodcastIsPlayingState(context, PodcastState.ERRORED);
+  }
 
+  setAudioStateListener(state, context);
+
+  if (state.playState == PodcastState.PLAYING) {
+    setPodcastIsPlayingState(context, PodcastState.LOADING);
+    await state.audioPlayer.stop();
+  } else {
+    await state.audioPlayer.play();
+  }
+}
+
+/// Set up state listener for the audio player
+setAudioStateListener(AppState state, BuildContext context) {
+  state.audioPlayer.playerStateStream.listen((playerState) {
+    print("Current player state is ${playerState.processingState}");
+    if (playerState.playing) {
+      setPodcastIsPlayingState(context, PodcastState.PLAYING);
+    } else {
+      switch (playerState.processingState) {
+        case ProcessingState.none:
+          setPodcastIsPlayingState(context, PodcastState.STOPPED);
+          break;
+        case ProcessingState.loading:
+          setPodcastIsPlayingState(context, PodcastState.LOADING);
+          break;
+        case ProcessingState.buffering:
+          setPodcastIsPlayingState(context, PodcastState.BUFFERING);
+          break;
+        case ProcessingState.ready:
+          setPodcastIsPlayingState(context, PodcastState.READY);
+          break;
+        case ProcessingState.completed:
+          setPodcastIsPlayingState(context, PodcastState.COMPLETED);
+          break;
+      }
+    }
+  });
+}
