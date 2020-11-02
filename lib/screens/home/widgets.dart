@@ -1,11 +1,9 @@
-import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/screens/home/functions.dart';
-import 'package:jay_fm_flutter/util/admob_service.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 
@@ -14,9 +12,10 @@ Widget liveTabDetails(AppState state, BuildContext context) {
   final double _playButtonDiameter = 200;
 
   return Column(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
+      Padding(padding: EdgeInsets.only(top: 0)),
       Column(
         children: [
           Text(

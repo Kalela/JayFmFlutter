@@ -26,6 +26,8 @@ AppState reducer(AppState prevState, dynamic action) {
     newState.podcastQuality = action.payload;
   } else if (action is PodcastStateAction) {
     newState.playState = action.payload;
+  } else if (action is DatabaseAction) {
+    newState.database = action.payload;
   }
 
   return newState;

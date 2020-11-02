@@ -2,13 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
-import 'package:jay_fm_flutter/screens/details/functions.dart';
 import 'package:jay_fm_flutter/screens/details/widgets.dart';
-import 'package:jay_fm_flutter/util/admob_service.dart';
-import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 import 'package:jay_fm_flutter/util/stateful_wrapper.dart';
-import 'package:webfeed/domain/rss_feed.dart';
 
 // ignore: must_be_immutable
 class DetailsPage extends StatelessWidget {
@@ -22,7 +18,6 @@ class DetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return StatefulWrapper(
       onInit: () {
-        // AdMobService.hideHomeBannerAd();
       },
       onDispose: () {},
       child: StoreConnector<AppState, AppState>(
@@ -44,12 +39,11 @@ class DetailsPage extends StatelessWidget {
                       ? Container(
                           child: castBoxPodcast(feedUrl),
                         )
-                      : Container(
-                          height: 700,
+                      : SizedBox.expand(
                           child:
                               nonCastBoxPodcast(state.colors, state, feedUrl)),
                 )),
-            bottomSheet: Container(
+            bottomSheet: isCastbox ? null : Container(
               height: 70,
               color: Colors.black,
               child: nowPlayingFooter(jayFmMaroon, Colors.grey, jayFmOrange),

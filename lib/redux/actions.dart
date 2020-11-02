@@ -1,4 +1,5 @@
 import 'package:jay_fm_flutter/models/app_state.dart';
+import 'package:sqflite/sqflite.dart';
 
 class SelectedThemeAction {
   final SelectedTheme payload;
@@ -16,4 +17,10 @@ class PodcastStateAction {
   final PodcastState payload;
 
   PodcastStateAction(this.payload);
+}
+
+class DatabaseAction {
+  final Database payload;
+
+  DatabaseAction(this.payload);
 }
