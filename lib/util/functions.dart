@@ -90,8 +90,3 @@ setAudioStateListener(AppState state, BuildContext context) {
     }
   });
 }
-
-/// Set the boolean if banner ad should be shown
-setShowBannerAd(BuildContext context, bool value) {
-  StoreProvider.of<AppState>(context).dispatch(ShowBannerAdAction(value));
-}

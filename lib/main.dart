@@ -1,5 +1,4 @@
 import 'package:admob_flutter/admob_flutter.dart';
-// import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:jay_fm_flutter/util/admob_service.dart';
@@ -12,16 +11,15 @@ import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/themes.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   final AudioPlayer audioPlayer = AudioPlayer();
 
-  // FirebaseAdMob.instance.initialize(appId: AdMobService.appId);
   Admob.initialize();
   
 
   final _initialState =
-      AppState(selectedTheme: SelectedTheme.DARK, audioPlayer: audioPlayer);
+      AppState(selectedTheme: SelectedTheme.DARK, audioPlayer: audioPlayer, bannerAd: AdmobBanner(adUnitId: AdMobService.getbannerAdUnitId(), adSize: AdmobBannerSize.BANNER));
   final Store<AppState> _store =
       Store<AppState>(reducer, initialState: _initialState);
   runApp(Root(

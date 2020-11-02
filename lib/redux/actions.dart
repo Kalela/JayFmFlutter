@@ -17,9 +17,3 @@ class PodcastStateAction {
 
   PodcastStateAction(this.payload);
 }
-
-class ShowBannerAdAction {
-  final bool payload;
-
-  ShowBannerAdAction(this.payload);
-}

@@ -7,21 +7,22 @@ class AppState {
   PodcastQuality podcastQuality = PodcastQuality.MED;
   AudioPlayer audioPlayer; // TODO: Use singleton pattern for audio player
   PodcastState playState = PodcastState.STOPPED;
-  bool showBannerAd = true;
+  Widget bannerAd;
+
   GlobalAppColors colors = GlobalAppColors(
           mainBackgroundColor: jayFmFancyBlack,
           mainButtonsColor: Colors.grey,
           mainIconsColor: Colors.blueGrey,
           mainTextColor: Colors.white);
 
-  AppState({this.selectedTheme, this.audioPlayer});
+  AppState({this.selectedTheme, this.audioPlayer, this.bannerAd});
 
   AppState.fromAppState(AppState another) {
     selectedTheme = another.selectedTheme;
     podcastQuality = another.podcastQuality;
     playState = another.playState;
     audioPlayer = another.audioPlayer;
-    showBannerAd = another.showBannerAd;
+    bannerAd = another.bannerAd;
   }
 }
 

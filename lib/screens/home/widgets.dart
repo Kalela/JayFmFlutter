@@ -41,7 +41,7 @@ Widget liveTabDetails(AppState state, BuildContext context) {
           
         ],
       ),
-      AdmobBanner(adUnitId: AdMobService.getbannerAdUnitId(), adSize: AdmobBannerSize.BANNER)
+      state.bannerAd
     ],
   );
 }
@@ -92,10 +92,7 @@ Widget livePlayButton(AppState state, double playButtonDiameter) {
 /// Parent widget of browse tab contents
 Widget browseTabDetails(AppState state, BuildContext context) {
   List<Widget> podcastTileList = getPodcastList(state, context);
-  if (!state.showBannerAd) {
-    // AdMobService.hideHomeBannerAd();
-    setShowBannerAd(context, false);
-  }
+
   final List<Widget> _tabViews = [
     Container(
       child: ListView.separated(

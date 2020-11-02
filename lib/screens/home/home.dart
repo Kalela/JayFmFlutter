@@ -1,11 +1,11 @@
 // import 'package:firebase_admob/firebase_admob.dart';
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/screens/home/widgets.dart';
-import 'package:jay_fm_flutter/util/admob_service.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 import 'package:jay_fm_flutter/util/stateful_wrapper.dart';
 
@@ -18,8 +18,7 @@ class HomePage extends StatelessWidget {
       converter: (store) => store.state,
       builder: (context, state) {
         return StatefulWrapper(
-          onInit: () async {
-            // AdMobService.showHomeBannerAd();
+          onInit: () {
           },
           onDispose: () {
           },

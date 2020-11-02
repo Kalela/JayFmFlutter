@@ -26,8 +26,6 @@ AppState reducer(AppState prevState, dynamic action) {
     newState.podcastQuality = action.payload;
   } else if (action is PodcastStateAction) {
     newState.playState = action.payload;
-  } else if (action is ShowBannerAdAction) {
-    newState.showBannerAd = action.payload;
   }
 
   return newState;
