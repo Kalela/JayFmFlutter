@@ -27,4 +27,7 @@ List availablePodcasts = [
   Podcast(name: "African Tech Roundup"),
   Podcast(name: "Deconstructed"),
   Podcast(name: "The Bodybuilding.com Podcast"),
+  Podcast(name: "Garyvee Audio Experience"),
+  Podcast(name: "Global Journalist Radio"),
+  Podcast(name: "1 Million Milionares"),
 ];

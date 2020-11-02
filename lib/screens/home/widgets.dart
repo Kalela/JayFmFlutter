@@ -109,56 +109,52 @@ Widget browseTabDetails(AppState state, BuildContext context) {
   ];
 
   return Container(
-    child: SingleChildScrollView(
-      physics: NeverScrollableScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.only(top: 10, left: 15),
-            child: Text(
-              "Browse",
-              style: defaultTextStyle(state, TextStyle(fontSize: 25)),
-            ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.only(top: 10, left: 15),
+          child: Text(
+            "Browse",
+            style: defaultTextStyle(state, TextStyle(fontSize: 25)),
           ),
-          Container(
-            padding: EdgeInsets.only(left: 10, right: 10),
-            height: 700,
-            child: DefaultTabController(
-              length: _tabViews.length,
-              child: Container(
-                child: Stack(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 40),
-                      child: SizedBox.expand(
-                        child: TabBarView(children: _tabViews),
-                      ),
+        ),
+        Flexible(
+          child: DefaultTabController(
+            length: _tabViews.length,
+            child: Container(
+              padding: EdgeInsets.only(left: 10, right: 10),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 40),
+                    child: SizedBox.expand(
+                      child: TabBarView(children: _tabViews),
                     ),
-                    SizedBox(
-                      height: topBarHeight,
-                      child: TabBar(
-                        isScrollable: true,
-                        unselectedLabelColor: Colors.black.withOpacity(0.3),
-                        tabs: [
-                          browseBarTab(
-                              "PODCASTS",
-                              defaultTextStyle(
-                                  state, TextStyle(fontSize: 10.0))),
-                          browseBarTab(
-                              "FUN-TO-MENTAL",
-                              defaultTextStyle(
-                                  state, TextStyle(fontSize: 10.0))),
-                        ],
-                      ),
+                  ),
+                  SizedBox(
+                    height: topBarHeight,
+                    child: TabBar(
+                      isScrollable: true,
+                      unselectedLabelColor: Colors.black.withOpacity(0.3),
+                      tabs: [
+                        browseBarTab(
+                            "PODCASTS",
+                            defaultTextStyle(
+                                state, TextStyle(fontSize: 10.0))),
+                        browseBarTab(
+                            "FUN-TO-MENTAL",
+                            defaultTextStyle(
+                                state, TextStyle(fontSize: 10.0))),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          )
-        ],
-      ),
+          ),
+        )
+      ],
     ),
   );
 }
