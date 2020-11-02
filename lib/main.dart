@@ -1,7 +1,8 @@
-import 'package:firebase_admob/firebase_admob.dart';
+import 'package:admob_flutter/admob_flutter.dart';
+// import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:jay_fm_flutter/util/ad_manager.dart';
+import 'package:jay_fm_flutter/util/admob_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:redux/redux.dart';
 
@@ -13,10 +14,11 @@ import 'package:jay_fm_flutter/util/functions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // AudioPlayer.logEnabled = false;
   final AudioPlayer audioPlayer = AudioPlayer();
 
-  await _initAdMob();
+  // FirebaseAdMob.instance.initialize(appId: AdMobService.appId);
+  Admob.initialize();
+  
 
   final _initialState =
       AppState(selectedTheme: SelectedTheme.DARK, audioPlayer: audioPlayer);
@@ -27,9 +29,6 @@ void main() async {
   ));
 }
 
-Future<void> _initAdMob() {
-  return FirebaseAdMob.instance.initialize(appId: AdManager.appId);
-}
 
 class Root extends StatelessWidget {
   final Store<AppState> store;

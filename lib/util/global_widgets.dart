@@ -142,9 +142,12 @@ Widget drawerPopUpMenu(
       padding: EdgeInsets.zero,
       children: [
         DrawerHeader(
-          child: Text('We speak music'),
+          // child: Text('We speak music'),
           decoration: BoxDecoration(
-            color: state.colors.mainIconsColor,
+            color: state.colors.mainIconsColor.withOpacity(0.5),
+            image: DecorationImage(
+              image: AssetImage('assets/images/logo.png')
+            )
           ),
         ),
         Column(

@@ -19,18 +19,18 @@ class StatefulWrapper extends StatefulWidget {
 class _StatefulWrapperState extends State<StatefulWrapper> {
   @override
   void initState() {
+    super.initState();
     if (widget.onInit != null) {
       widget.onInit();
     }
-    super.initState();
   }
 
   @override
   void dispose() {
-    super.dispose();
     if (widget.onDispose != null) {
       widget.onDispose();
     }
+    super.dispose();
   }
 
   @override

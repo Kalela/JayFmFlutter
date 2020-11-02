@@ -7,6 +7,7 @@ class AppState {
   PodcastQuality podcastQuality = PodcastQuality.MED;
   AudioPlayer audioPlayer; // TODO: Use singleton pattern for audio player
   PodcastState playState = PodcastState.STOPPED;
+  bool showBannerAd = true;
   GlobalAppColors colors = GlobalAppColors(
           mainBackgroundColor: jayFmFancyBlack,
           mainButtonsColor: Colors.grey,
@@ -20,6 +21,7 @@ class AppState {
     podcastQuality = another.podcastQuality;
     playState = another.playState;
     audioPlayer = another.audioPlayer;
+    showBannerAd = another.showBannerAd;
   }
 }
 

@@ -13,7 +13,9 @@ openPodcastEpisodes(BuildContext context, String feedUrl, bool isCastbox) {
                 title: "Episodes",
                 feedUrl: feedUrl,
                 isCastbox: isCastbox,
-              )));
+              ))).then((value){
+                // AdMobService.showHomeBannerAd();
+              });
 }
 
 /// Get list of all available podcasts

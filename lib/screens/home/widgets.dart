@@ -1,9 +1,11 @@
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/screens/home/functions.dart';
+import 'package:jay_fm_flutter/util/admob_service.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 
@@ -35,9 +37,11 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                   fillColor: state.colors.mainButtonsColor,
                   shape: CircleBorder(),
                   elevation: 10.0,
-                  child: livePlayButton(state, _playButtonDiameter)))
+                  child: livePlayButton(state, _playButtonDiameter))),
+          
         ],
       ),
+      AdmobBanner(adUnitId: AdMobService.getbannerAdUnitId(), adSize: AdmobBannerSize.BANNER)
     ],
   );
 }
@@ -88,6 +92,10 @@ Widget livePlayButton(AppState state, double playButtonDiameter) {
 /// Parent widget of browse tab contents
 Widget browseTabDetails(AppState state, BuildContext context) {
   List<Widget> podcastTileList = getPodcastList(state, context);
+  if (!state.showBannerAd) {
+    // AdMobService.hideHomeBannerAd();
+    setShowBannerAd(context, false);
+  }
   final List<Widget> _tabViews = [
     Container(
       child: ListView.separated(

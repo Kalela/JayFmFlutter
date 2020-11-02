@@ -1,9 +1,6 @@
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
 
-const String FEED_URL =
-     '';
-
 Future<RssFeed> loadFeed(String feedUrl) async {
   print("Starting to load feed");
   try {

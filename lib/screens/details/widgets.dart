@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
@@ -17,8 +18,6 @@ Widget nonCastBoxPodcast(
         return Center(child: CircularProgressIndicator());
       }
 
-      print(snapshot.data);
-
       return ListView.separated(
           separatorBuilder: (context, index) => Divider(
                 color: Colors.black,
@@ -32,7 +31,10 @@ Widget nonCastBoxPodcast(
                 style: TextStyle(color: colors.mainTextColor),
               ),
               leading: Container(
-                child: Image.network(snapshot.data.items[i].itunes.image.href),
+                child: CachedNetworkImage(
+                  placeholder: (context, url) => Image.asset('assets/images/about-you-placeholder.jpg'),
+                  imageUrl: snapshot.data.items[i].itunes.image.href,
+                )
               ),
               trailing: GestureDetector(
                   onTap: () {

@@ -3,7 +3,7 @@ import 'dart:ui';
 // Light Theme
 
 Color jayFmOrange = Color.fromARGB(200, 255, 168, 0);
-Color jayFmBlue = Color.fromARGB(255, 100, 201, 231);
+Color jayFmBlue = Color.fromARGB(255, 100, 201, 231).withOpacity(0.5);
 Color jayFmFancyBlack = Color.fromARGB(255, 49, 49, 49);
 Color jayFmMaroon = Color.fromARGB(255, 171, 91, 76);
 
@@ -17,7 +17,6 @@ Color jayFmPurple = Color.fromARGB(200, 149, 11, 205);
 // rgb(171, 91, 76) Maroon
 // rgb(171, 91, 76) Maroon
 
-// TODO: Use redux DI to pass in these colors
 class GlobalAppColors {
   Color mainBackgroundColor;
   Color mainButtonsColor;

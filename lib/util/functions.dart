@@ -51,7 +51,7 @@ playPodcast(AppState state, BuildContext context, String podCastUrl) async {
   setAudioStateListener(state, context);
 
   if (state.playState == PodcastState.PLAYING) {
-    setPodcastIsPlayingState(context, PodcastState.LOADING);
+    setPodcastIsPlayingState(context, PodcastState.PAUSED);
     await state.audioPlayer.stop();
   } else {
     try {
@@ -89,4 +89,9 @@ setAudioStateListener(AppState state, BuildContext context) {
       }
     }
   });
+}
+
+/// Set the boolean if banner ad should be shown
+setShowBannerAd(BuildContext context, bool value) {
+  StoreProvider.of<AppState>(context).dispatch(ShowBannerAdAction(value));
 }
