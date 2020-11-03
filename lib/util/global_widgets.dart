@@ -49,10 +49,6 @@ Widget baseItemCard(int index, String title, BuildContext context) {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          "09.00 - 10.00",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Text(
                           "Show Name",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, color: Colors.white),
@@ -143,7 +139,6 @@ Widget drawerPopUpMenu(
       children: [
         // ignore: missing_required_param
         DrawerHeader(
-          // child: Text('We speak music'),
           decoration: BoxDecoration(
             color: state.colors.mainIconsColor.withOpacity(0.5),
             image: DecorationImage(

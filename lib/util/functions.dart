@@ -19,6 +19,11 @@ void setThemeState(BuildContext context, String choice) {
   }
 }
 
+/// Set podcast quality
+setPodcastQuality(BuildContext context, PodcastQuality value) {
+  StoreProvider.of<AppState>(context).dispatch(PodcastQualityAction(value));
+}
+
 /// Set podcast players current state
 setPodcastIsPlayingState(BuildContext context, PodcastState state) {
   StoreProvider.of<AppState>(context).dispatch(PodcastStateAction(state));
@@ -27,11 +32,6 @@ setPodcastIsPlayingState(BuildContext context, PodcastState state) {
 /// Handle selection of an Action from tab bar pop up menu
 void tabBarPopUpChoiceAction(String choice, BuildContext context) {
   setThemeState(context, choice);
-}
-
-/// Set podcast quality
-setPodcastQuality(BuildContext context, PodcastQuality value) {
-  StoreProvider.of<AppState>(context).dispatch(PodcastQualityAction(value));
 }
 
 ///Helper function for a dynamic switch case with dynamic types

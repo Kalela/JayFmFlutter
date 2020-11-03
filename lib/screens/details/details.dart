@@ -16,41 +16,36 @@ class DetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StatefulWrapper(
-      onInit: () {
+    return StoreConnector<AppState, AppState>(
+      converter: (store) => store.state,
+      builder: (context, state) {
+        return SharedScaffold(
+          context: context,
+          state: state,
+          appBar: AppBar(
+            backgroundColor: jayFmFancyBlack,
+            iconTheme: IconThemeData(color: Colors.grey),
+            title: Text(title),
+          ),
+          body: Container(
+              padding: EdgeInsets.only(left: 10, right: 9),
+              color: state.colors.mainBackgroundColor,
+              child: Center(
+                child: isCastbox
+                    ? Container(
+                        child: castBoxPodcast(feedUrl),
+                      )
+                    : SizedBox.expand(
+                        child:
+                            nonCastBoxPodcast(state.colors, state, feedUrl)),
+              )),
+          bottomSheet: isCastbox ? null : Container(
+            height: 70,
+            color: Colors.black,
+            child: nowPlayingFooter(jayFmMaroon, Colors.grey, jayFmOrange),
+          ),
+        );
       },
-      onDispose: () {},
-      child: StoreConnector<AppState, AppState>(
-        converter: (store) => store.state,
-        builder: (context, state) {
-          return SharedScaffold(
-            context: context,
-            state: state,
-            appBar: AppBar(
-              backgroundColor: jayFmFancyBlack,
-              iconTheme: IconThemeData(color: Colors.grey),
-              title: Text(title),
-            ),
-            body: Container(
-                padding: EdgeInsets.only(left: 10, right: 9),
-                color: state.colors.mainBackgroundColor,
-                child: Center(
-                  child: isCastbox
-                      ? Container(
-                          child: castBoxPodcast(feedUrl),
-                        )
-                      : SizedBox.expand(
-                          child:
-                              nonCastBoxPodcast(state.colors, state, feedUrl)),
-                )),
-            bottomSheet: isCastbox ? null : Container(
-              height: 70,
-              color: Colors.black,
-              child: nowPlayingFooter(jayFmMaroon, Colors.grey, jayFmOrange),
-            ),
-          );
-        },
-      ),
     );
   }
 }

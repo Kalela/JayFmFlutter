@@ -20,7 +20,7 @@ Widget liveTabDetails(AppState state, BuildContext context) {
         children: [
           Text(
             "LIVE PLAYING",
-            style: defaultTextStyle(state, TextStyle(fontSize: 16)),
+            style: defaultTextStyle(state, TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ),
           Text("Jay Fm", style: defaultTextStyle(state)),
           Padding(
@@ -37,10 +37,10 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                   shape: CircleBorder(),
                   elevation: 10.0,
                   child: livePlayButton(state, _playButtonDiameter))),
-          
         ],
       ),
-      state.bannerAd
+      Container()
+      // state.bannerAd //TODO: Return this
     ],
   );
 }
@@ -137,14 +137,10 @@ Widget browseTabDetails(AppState state, BuildContext context) {
                       isScrollable: true,
                       unselectedLabelColor: Colors.black.withOpacity(0.3),
                       tabs: [
-                        browseBarTab(
-                            "PODCASTS",
-                            defaultTextStyle(
-                                state, TextStyle(fontSize: 10.0))),
-                        browseBarTab(
-                            "FUN-TO-MENTAL",
-                            defaultTextStyle(
-                                state, TextStyle(fontSize: 10.0))),
+                        browseBarTab("PODCASTS",
+                            defaultTextStyle(state, TextStyle(fontSize: 10.0))),
+                        browseBarTab("FUN-TO-MENTAL",
+                            defaultTextStyle(state, TextStyle(fontSize: 10.0))),
                       ],
                     ),
                   ),
