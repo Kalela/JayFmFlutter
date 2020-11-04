@@ -107,7 +107,7 @@ Widget nowPlayingFooter(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "Podcast Title",
+                        "Episode Title",
                         style: TextStyle(fontSize: 18, color: titleColor),
                       ),
                       Text(

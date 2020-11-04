@@ -19,7 +19,7 @@ double topBarHeight = 35.0;
 const mainPodcastUrl = "http://stream.zeno.fm/geapkb665rquv";
 
 List availablePodcasts = [
-  Podcast(name: "The Science of Sex", url: "https://castbox.fm/app/castbox/player/id1408503/id139019454"),
+  Podcast(name: "The Science of Sex", url: '<html><body><iframe allowtransparency="true" src="https://castbox.fm/app/castbox/player/id1408503/id139019454?v=8.22.11&autoplay=0" frameborder="0" width="100%" height="500"></iframe></body></html>'),
   Podcast(name: "Show Reel"),
   Podcast(name: "I Have No Idea What I'm Doing"),
   Podcast(name: "Open Sky Fitness"),
