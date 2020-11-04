@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:jay_fm_flutter/models/app_state.dart';
+import 'package:jay_fm_flutter/models/podcast.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/screens/home/functions.dart';
+import 'package:jay_fm_flutter/util/database_service.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 
@@ -20,7 +22,8 @@ Widget liveTabDetails(AppState state, BuildContext context) {
         children: [
           Text(
             "LIVE PLAYING",
-            style: defaultTextStyle(state, TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: defaultTextStyle(
+                state, TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ),
           Text("Jay Fm", style: defaultTextStyle(state)),
           Padding(
@@ -93,17 +96,7 @@ Widget browseTabDetails(AppState state, BuildContext context) {
   List<Widget> podcastTileList = getPodcastList(state, context);
 
   final List<Widget> _tabViews = [
-    Container(
-      child: ListView.separated(
-        itemBuilder: (context, index) {
-          return podcastTileList[index];
-        },
-        itemCount: podcastTileList.length,
-        separatorBuilder: (context, index) => Divider(
-          color: Colors.black,
-        ),
-      ),
-    ),
+    podcastListView(podcastTileList),
     Container(),
   ];
 
@@ -154,76 +147,43 @@ Widget browseTabDetails(AppState state, BuildContext context) {
   );
 }
 
-/// Parent widget of latest tab contents(depreciated)
-Widget latestTabDetails(GlobalAppColors colors) {
-  return Container(
-    child: SingleChildScrollView(
-      physics: NeverScrollableScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.only(top: 10, left: 15),
-            child: Text(
-              "Latest Podcasts",
-              style: TextStyle(fontSize: 25),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.only(left: 10),
-            height: 700,
-            child: ListView.builder(itemBuilder: (context, i) {
-              return baseItemCard(i, "Podcast Name", context);
-            }),
-          )
-        ],
-      ),
-    ),
-  );
-}
-
 /// Parent widget of saved tab contents
 Widget savedTabDetails(AppState state) {
   return Container(
-    child: SingleChildScrollView(
-      physics: NeverScrollableScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.only(top: 10, left: 15),
-            child: Text(
-              "Saved Podcasts",
-              style: defaultTextStyle(state, TextStyle(fontSize: 25)),
-            ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.only(top: 10, left: 15),
+          child: Text(
+            "Saved Podcasts",
+            style: defaultTextStyle(state, TextStyle(fontSize: 25)),
           ),
-          Container(
-            padding: EdgeInsets.only(left: 10),
-            height: 700,
-            child: ListView.builder(
-                itemCount: 3,
-                itemBuilder: (context, i) {
-                  return baseItemCard(i, "Saved Podcast", context);
-                }),
-          )
-        ],
-      ),
-    ),
-  );
-}
+        ),
+        Flexible(
+          child: FutureBuilder<List<Podcast>>(
+            future: getSavedPodcastsFromTable(state),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List<Widget> tileList = List();
+                for (var podcast in snapshot.data) {
+                  tileList.add(ListTile(
+                    title: Text(podcast.name,
+                        style: TextStyle(color: state.colors.mainTextColor)),
+                    onTap: () {
+                      openPodcastEpisodes(context, podcast);
+                    },
+                  ));
+                }
+                return podcastListView(tileList);
+              }
 
-/// Generate a generic vertical scrollable view
-Widget genericVerticalScrollableTabDetails() {
-  return Container(
-    child: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        child: Container(
-          padding: EdgeInsets.only(left: 10),
-          height: 700,
-          child: ListView.builder(itemBuilder: (context, i) {
-            return baseItemCard(i, "Saved Podcast", context);
-          }),
-        )),
+              return CircularProgressIndicator();
+            },
+          ),
+        )
+      ],
+    ),
   );
 }
 

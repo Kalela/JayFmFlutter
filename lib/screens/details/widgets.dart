@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
@@ -7,7 +5,6 @@ import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/screens/details/functions.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:webfeed/webfeed.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 /// Podcast episodes list built from a company owned resource
 Widget nonCastBoxPodcast(
@@ -53,30 +50,3 @@ Widget nonCastBoxPodcast(
     },
   );
 }
-
-
-
-// /// Podcast episodes list built from a castbox html resource
-// Widget castBoxPodcast(String webviewContent) {
-//   var webView = WebView(
-//     initialUrl:
-//         Uri.dataFromString(webviewContent, mimeType: 'text/html').toString(),
-//     javascriptMode: JavascriptMode.unrestricted,
-//     debuggingEnabled: true,
-//     onWebViewCreated: (webViewController) {
-//       print("I am here");
-//       _controller.complete(webViewController);
-//     },
-//   );
-
-//   return FutureBuilder<WebViewController>(
-//     future: _controller.future,
-//     builder: (context, controller) {
-//       if (controller.hasData) {
-//         return webView;
-//       }
-
-//       return CircularProgressIndicator();
-//     },
-//   );
-// }

@@ -3,21 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
+import 'package:jay_fm_flutter/models/podcast.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/screens/details/widgets.dart';
+import 'package:jay_fm_flutter/util/database_service.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 // ignore: must_be_immutable
 class DetailsPage extends StatelessWidget {
-  final String title;
-  final String feedUrl;
-  final bool isCastbox;
+  final Podcast podcast;
 
-  final Completer<String> urlCompleter =
-      Completer<String>();
+  final Completer<String> urlCompleter = Completer<String>();
 
-  DetailsPage({this.title, this.feedUrl, this.isCastbox});
+  DetailsPage({this.podcast});
 
   @override
   Widget build(BuildContext context) {
@@ -30,51 +29,90 @@ class DetailsPage extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: jayFmFancyBlack,
             iconTheme: IconThemeData(color: Colors.grey),
-            title: Text(title),
+            title: Text(podcast.name),
           ),
           body: Container(
               padding: EdgeInsets.only(left: 10, right: 9),
               color: state.colors.mainBackgroundColor,
-              child: Center(
-                child: isCastbox
-                    ? Container(
-                        child: Column(
-                          children: [
-                            Flexible(
-                              flex: 4,
-                              child: WebView(
-                                initialUrl: Uri.dataFromString(feedUrl,
-                                        mimeType: 'text/html')
-                                    .toString(),
-                                javascriptMode: JavascriptMode.unrestricted,
-                                debuggingEnabled: true,
-                                onPageFinished: (url) {
-                                  urlCompleter.complete(url);
-                                },
-                              ),
-                            ),
-                            Flexible(
-                              flex: 1,
-                              child: FutureBuilder<String>(
-                                future: urlCompleter.future,
-                                builder: (context, controller) {
-                                  if (controller.hasData) {
-                                    return Flexible(
-                                        flex: 1,
-                                        child: state
-                                            .bannerAd
-                                        );
-                                  }
+              child: Stack(
+                children: [
+                  Center(
+                    child: podcast.isCastbox
+                        ? Container(
+                            child: Column(
+                              children: [
+                                Flexible(
+                                  flex: 4,
+                                  child: WebView(
+                                    initialUrl: Uri.dataFromString(
+                                            '<html><body><iframe allowtransparency="true" src="${podcast.url}" frameborder="0" width="100%" height="500"></iframe></body></html>',
+                                            mimeType: 'text/html')
+                                        .toString(),
+                                    javascriptMode: JavascriptMode.unrestricted,
+                                    debuggingEnabled: true,
+                                    onPageFinished: (url) {
+                                      urlCompleter.complete(url);
+                                    },
+                                  ),
+                                ),
+                                Flexible(
+                                  flex: 1,
+                                  child: FutureBuilder<String>(
+                                    future: urlCompleter.future,
+                                    builder: (context, controller) {
+                                      if (controller.hasData) {
+                                        return Flexible(
+                                            flex: 1,
+                                            child: Stack(
+                                              children: [
+                                                state.bannerAd,
+                                              ],
+                                            ));
+                                      }
 
-                                  return CircularProgressIndicator();
-                                },
-                              ),
+                                      return CircularProgressIndicator();
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      )
-                    : SizedBox.expand(
-                        child: nonCastBoxPodcast(state.colors, state, feedUrl)),
+                          )
+                        : SizedBox.expand(
+                            child: nonCastBoxPodcast(
+                                state.colors, state, podcast.url)),
+                  ),
+                  podcast.isCastbox
+                      ? FutureBuilder<String>(
+                          future: urlCompleter.future,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return Positioned(
+                                bottom: 90,
+                                right: 15,
+                                child: FloatingActionButton(
+                                    backgroundColor:
+                                        state.colors.mainButtonsColor,
+                                    child: Icon(Icons.save),
+                                    onPressed: () {
+                                      insertPodcastToTable(state, podcast);
+                                    }),
+                              );
+                            }
+
+                            return Container();
+                          },
+                        )
+                      : Positioned(
+                          bottom: 90,
+                          right: 15,
+                          child: FloatingActionButton(
+                              backgroundColor: state.colors.mainButtonsColor,
+                              child: Icon(Icons.save),
+                              onPressed: () {
+                                insertPodcastToTable(state, podcast);
+                              }),
+                        )
+                ],
               )),
           bottomSheet: Container(
             height: 70,

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/strings.dart';
 import 'package:jay_fm_flutter/res/values.dart';
-import 'package:jay_fm_flutter/screens/details/details.dart';
 import 'package:jay_fm_flutter/util/functions.dart'; // TODO: Find way to remove this import(high order fuctions maybe?)
 
 /// Text colors for dark theme
@@ -12,72 +10,6 @@ const TextTheme darkTextTheme = TextTheme(
     bodyText2: TextStyle(color: Colors.grey),
     bodyText1: TextStyle(color: Colors.grey),
     headline6: TextStyle(color: Colors.grey));
-
-/// Base Item card for podcasts
-Widget baseItemCard(int index, String title, BuildContext context) {
-  return Container(
-    color: jayFmFancyBlack.withOpacity(0.0),
-    height: 120,
-    child: Ink(
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DetailsPage(
-                        title: title,
-                      )));
-        },
-        child: Card(
-          color: jayFmFancyBlack,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    width: 100,
-                  ),
-                  Padding(padding: EdgeInsets.only(left: 20)),
-                  Container(
-                    padding: EdgeInsets.only(top: 30),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          "Show Name",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 5),
-                        ),
-                        Text(
-                          "Presenter names",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                  padding: EdgeInsets.only(right: 10),
-                  child: Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white,
-                  ))
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
-}
 
 /// The now playing footer(typically goes into scaffold bottom)
 Widget nowPlayingFooter(
@@ -130,8 +62,7 @@ Widget nowPlayingFooter(
 }
 
 /// The drawer pop up menu
-Widget drawerPopUpMenu(
-    {AppState state, BuildContext context}) {
+Widget drawerPopUpMenu({AppState state, BuildContext context}) {
   return Container(
     color: state.colors.mainBackgroundColor,
     child: ListView(
@@ -140,11 +71,9 @@ Widget drawerPopUpMenu(
         // ignore: missing_required_param
         DrawerHeader(
           decoration: BoxDecoration(
-            color: state.colors.mainIconsColor.withOpacity(0.5),
-            image: DecorationImage(
-              image: AssetImage('assets/images/logo.png')
-            )
-          ),
+              color: state.colors.mainIconsColor.withOpacity(0.5),
+              image:
+                  DecorationImage(image: AssetImage('assets/images/logo.png'))),
         ),
         Column(
             children: choices.map((String choice) {
@@ -156,16 +85,23 @@ Widget drawerPopUpMenu(
               // Use empty choice to render custom widget
               Icons.check_circle,
               color: switchCase2(state.selectedTheme, {
-                SelectedTheme.DARK:
-                    choice == darkTheme ? state.colors.mainIconsColor : Colors.grey,
-                SelectedTheme.LIGHT:
-                    choice == lightTheme ? state.colors.mainIconsColor : Colors.grey
+                SelectedTheme.DARK: choice == darkTheme
+                    ? state.colors.mainIconsColor
+                    : Colors.grey,
+                SelectedTheme.LIGHT: choice == lightTheme
+                    ? state.colors.mainIconsColor
+                    : Colors.grey
               }),
             ),
-            title: Text(choice, style: TextStyle(color: state.colors.mainTextColor),),
+            title: Text(
+              choice,
+              style: TextStyle(color: state.colors.mainTextColor),
+            ),
           );
         }).toList()),
-        Divider(color: state.colors.mainTextColor,),
+        Divider(
+          color: state.colors.mainTextColor,
+        ),
         audioQuality(state, context),
         Divider(color: state.colors.mainTextColor)
       ],
@@ -187,14 +123,12 @@ class SharedScaffold extends Scaffold {
             appBar: appBar,
             bottomSheet: bottomSheet,
             drawer: Drawer(
-              child: drawerPopUpMenu(
-                  context: context, state: state),
+              child: drawerPopUpMenu(context: context, state: state),
             ));
 }
 
 /// Audio quality widget
-Widget audioQuality(
- AppState state, BuildContext context) {
+Widget audioQuality(AppState state, BuildContext context) {
   return Column(
     children: [
       Text("AUDIO QUALITY", style: defaultTextStyle(state)),
@@ -241,4 +175,19 @@ Widget audioQuality(
       ),
     ],
   );
+}
+
+/// Returns a list tile of podcasts wrapped in a container
+Widget podcastListView(List<Widget> tileList) {
+  return Container(
+      child: ListView.separated(
+        itemBuilder: (context, index) {
+          return tileList[index];
+        },
+        itemCount: tileList.length,
+        separatorBuilder: (context, index) => Divider(
+          color: Colors.black,
+        ),
+      ),
+    );
 }
