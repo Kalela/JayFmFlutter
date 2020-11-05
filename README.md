@@ -1,16 +1,19 @@
-# jay_fm_flutter
+# Jay Fm
 
-JayFm Flutter application.
+JayFm Flutter application. Jay fm is a podcast delivery service currently usable through https://www.jayfm.co/. This project contains source code of it's mobile implementation using flutter. 
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a starting point for the Jay Fm flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## How to install
+1. Make sure you have the latest Flutter version in the stable channel installed on your device. You can follow https://flutter.dev/docs/get-started/install for instructions how.
+2. Set up an emulator or connect a device with debugging turned on to your device.
+3. Run the application.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Contributing
+Jay fm flutter is not an open source project and pull requests will only be considered as possible feedback. Feedback is highly appreciated by submission of issues.
+
+
+
