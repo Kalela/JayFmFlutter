@@ -1,6 +1,6 @@
 # Jay Fm
 
-JayFm Flutter application. Jay fm is a podcast delivery service currently usable through https://www.jayfm.co/. This project contains source code of it's mobile implementation using flutter. 
+JayFm Flutter application. Jay fm is a podcast delivery service currently available at https://www.jayfm.co/. This project contains source code of it's mobile implementation using flutter. 
 
 ## Getting Started
 
