@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/strings.dart';
 import 'package:jay_fm_flutter/res/values.dart';
@@ -177,17 +178,24 @@ Widget audioQuality(AppState state, BuildContext context) {
   );
 }
 
-/// Returns a list tile of podcasts wrapped in a container
-Widget podcastListView(List<Widget> tileList) {
+/// Returns a list tile of podcasts wrapped in a container.
+/// These are the static available podcasts
+Widget allPodcastsListView(List<Widget> tileList) {
   return Container(
-      child: ListView.separated(
-        itemBuilder: (context, index) {
-          return tileList[index];
-        },
-        itemCount: tileList.length,
-        separatorBuilder: (context, index) => Divider(
-          color: Colors.black,
-        ),
+    padding: EdgeInsets.only(top: 16),
+    child: ListView.separated(
+      itemBuilder: (context, index) {
+        return tileList[index];
+      },
+      itemCount: tileList.length,
+      separatorBuilder: (context, index) => Divider(
+        color: Colors.black,
       ),
-    );
+    ),
+  );
+}
+
+/// Show toast message
+showToastMessage(String message) {
+  Fluttertoast.showToast(msg: message);
 }

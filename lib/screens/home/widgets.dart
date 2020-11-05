@@ -1,11 +1,13 @@
+
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/models/podcast.dart';
+import 'package:jay_fm_flutter/services/saved_podcast_controller.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/screens/home/functions.dart';
-import 'package:jay_fm_flutter/util/database_service.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 
@@ -96,7 +98,7 @@ Widget browseTabDetails(AppState state, BuildContext context) {
   List<Widget> podcastTileList = getPodcastList(state, context);
 
   final List<Widget> _tabViews = [
-    podcastListView(podcastTileList),
+    allPodcastsListView(podcastTileList),
     Container(),
   ];
 
@@ -147,6 +149,9 @@ Widget browseTabDetails(AppState state, BuildContext context) {
   );
 }
 
+SavedPodcastController get savedPodcastController =>
+    GetIt.instance<SavedPodcastController>();
+
 /// Parent widget of saved tab contents
 Widget savedTabDetails(AppState state) {
   return Container(
@@ -160,25 +165,47 @@ Widget savedTabDetails(AppState state) {
             style: defaultTextStyle(state, TextStyle(fontSize: 25)),
           ),
         ),
+        Padding(padding: EdgeInsets.only(top: 5)),
         Flexible(
-          child: FutureBuilder<List<Podcast>>(
-            future: getSavedPodcastsFromTable(state),
+          child: StreamBuilder<List<Podcast>>(
+            stream: savedPodcastController.savedPodcasts,
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                List<Widget> tileList = List();
-                for (var podcast in snapshot.data) {
-                  tileList.add(ListTile(
-                    title: Text(podcast.name,
-                        style: TextStyle(color: state.colors.mainTextColor)),
-                    onTap: () {
-                      openPodcastEpisodes(context, podcast);
-                    },
-                  ));
-                }
-                return podcastListView(tileList);
+              print("Snapshot state ${snapshot.connectionState}");
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                  break;
+                case ConnectionState.waiting:
+
+
+                  return Center(child: CircularProgressIndicator());
+                  break;
+                case ConnectionState.active:
+                  // TODO: Handle this case.
+                  break;
+                case ConnectionState.done:
+                  print("Snapshot data ${snapshot.data}");
+                  if (snapshot.data.length > 0) {
+                    return ListView.separated(
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(snapshot.data[index].name,
+                              style:
+                                  TextStyle(color: state.colors.mainTextColor)),
+                          onTap: () {
+                            openPodcastEpisodes(context, snapshot.data[index]);
+                          },
+                        );
+                      },
+                      itemCount: snapshot.data.length,
+                      separatorBuilder: (context, index) => Divider(
+                        color: Colors.black,
+                      ),
+                    );
+                  }
+                  break;
               }
 
-              return CircularProgressIndicator();
+              // return
             },
           ),
         )

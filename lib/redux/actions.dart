@@ -18,9 +18,3 @@ class PodcastStateAction {
 
   PodcastStateAction(this.payload);
 }
-
-class DatabaseAction {
-  final Database payload;
-
-  DatabaseAction(this.payload);
-}

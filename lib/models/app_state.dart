@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 
 class AppState {
   SelectedTheme selectedTheme;
   PodcastQuality podcastQuality = PodcastQuality.MED;
-  AudioPlayer audioPlayer; // TODO: Use singleton pattern for audio player
+  AudioPlayer audioPlayer;
   PodcastState playState = PodcastState.STOPPED;
   Widget bannerAd;
-  Database database;
   SharedPreferences sharedPreferences;
 
   GlobalAppColors colors = GlobalAppColors(
@@ -41,7 +39,6 @@ class AppState {
     playState = another.playState;
     audioPlayer = another.audioPlayer;
     bannerAd = another.bannerAd;
-    database = another.database;
     sharedPreferences = another.sharedPreferences;
     colors = another.colors;
   }

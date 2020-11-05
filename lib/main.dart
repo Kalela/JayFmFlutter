@@ -1,10 +1,12 @@
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:get_it/get_it.dart';
 import 'package:jay_fm_flutter/redux/actions.dart';
 import 'package:jay_fm_flutter/res/strings.dart' as strings;
-import 'package:jay_fm_flutter/util/admob_service.dart';
-import 'package:jay_fm_flutter/util/database_service.dart';
+import 'package:jay_fm_flutter/services/admob_service.dart';
+import 'package:jay_fm_flutter/services/database_service.dart';
+import 'package:jay_fm_flutter/services/saved_podcast_controller.dart';
 import 'package:jay_fm_flutter/util/stateful_wrapper.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:redux/redux.dart';
@@ -22,11 +24,16 @@ void main() async {
 
   Admob.initialize();
   SharedPreferences prefs = await SharedPreferences.getInstance();
+  setUpGetIt();
 
   final _initialState = AppState(
-      selectedTheme: prefs.getInt(strings.appTheme) != null ? SelectedTheme.values[prefs.getInt(strings.appTheme)] : SelectedTheme.DARK,
+      selectedTheme: prefs.getInt(strings.appTheme) != null
+          ? SelectedTheme.values[prefs.getInt(strings.appTheme)]
+          : SelectedTheme.DARK,
       audioPlayer: audioPlayer,
-      podcastQuality: prefs.getInt(strings.podcastQuality) != null ? PodcastQuality.values[prefs.getInt(strings.podcastQuality)] : PodcastQuality.MED,
+      podcastQuality: prefs.getInt(strings.podcastQuality) != null
+          ? PodcastQuality.values[prefs.getInt(strings.podcastQuality)]
+          : PodcastQuality.MED,
       bannerAd: AdmobBanner(
           adUnitId: AdMobService.getbannerAdUnitId(),
           adSize: AdmobBannerSize.BANNER),
@@ -39,8 +46,17 @@ void main() async {
   ));
 }
 
+/// Set up get it DI and service locator
+void setUpGetIt() {
+  GetIt.instance.registerLazySingleton(() => SavedPodcastController());
+  GetIt.instance.registerLazySingleton(() => DatabaseService());
+}
+
 class Root extends StatelessWidget {
   final Store<AppState> store;
+  DatabaseService get databaseService => GetIt.instance<DatabaseService>();
+  SavedPodcastController get savedPodcastController =>
+      GetIt.instance<SavedPodcastController>();
 
   const Root({Key key, this.store}) : super(key: key);
 
@@ -60,12 +76,11 @@ class Root extends StatelessWidget {
             home: StatefulWrapper(
               store: store,
               onInit: () {
-                databaseSetup().then((value) => {
-                  StoreProvider.of<AppState>(context)
-                      .dispatch(DatabaseAction(value))
-                });
+                savedPodcastController.getSavedPodcasts();
               },
-              onDispose: () {},
+              onDispose: () {
+                savedPodcastController.dispose();
+              },
               child: StoreConnector<AppState, AppState>(
                 converter: (store) => store.state,
                 builder: (context, state) => HomePage(),
