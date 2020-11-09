@@ -1,10 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/models/podcast.dart';
-import 'package:jay_fm_flutter/services/saved_podcast_controller.dart';
+import 'package:jay_fm_flutter/services/podcast_stream_controller.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/screens/home/functions.dart';
@@ -149,8 +148,8 @@ Widget browseTabDetails(AppState state, BuildContext context) {
   );
 }
 
-SavedPodcastController get savedPodcastController =>
-    GetIt.instance<SavedPodcastController>();
+PodcastStreamController get savedPodcastController =>
+    GetIt.instance<PodcastStreamController>();
 
 /// Parent widget of saved tab contents
 Widget savedTabDetails(AppState state) {
@@ -169,21 +168,15 @@ Widget savedTabDetails(AppState state) {
         Flexible(
           child: StreamBuilder<List<Podcast>>(
             stream: savedPodcastController.savedPodcasts,
+            initialData: [],
             builder: (context, snapshot) {
-              print("Snapshot state ${snapshot.connectionState}");
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
                   break;
                 case ConnectionState.waiting:
-
-
                   return Center(child: CircularProgressIndicator());
                   break;
                 case ConnectionState.active:
-                  // TODO: Handle this case.
-                  break;
-                case ConnectionState.done:
-                  print("Snapshot data ${snapshot.data}");
                   if (snapshot.data.length > 0) {
                     return ListView.separated(
                       itemBuilder: (context, index) {
@@ -201,11 +194,17 @@ Widget savedTabDetails(AppState state) {
                         color: Colors.black,
                       ),
                     );
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0, left: 10),
+                      child: Text("No podcasts saved for quick access", style: defaultTextStyle(state),),
+                    );
                   }
+                  break;
+                case ConnectionState.done:
                   break;
               }
 
-              // return
             },
           ),
         )

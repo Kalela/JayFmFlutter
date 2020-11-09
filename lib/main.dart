@@ -2,11 +2,11 @@ import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
-import 'package:jay_fm_flutter/redux/actions.dart';
 import 'package:jay_fm_flutter/res/strings.dart' as strings;
 import 'package:jay_fm_flutter/services/admob_service.dart';
 import 'package:jay_fm_flutter/services/database_service.dart';
-import 'package:jay_fm_flutter/services/saved_podcast_controller.dart';
+import 'package:jay_fm_flutter/services/podcasts_service.dart';
+import 'package:jay_fm_flutter/services/podcast_stream_controller.dart';
 import 'package:jay_fm_flutter/util/stateful_wrapper.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:redux/redux.dart';
@@ -48,15 +48,14 @@ void main() async {
 
 /// Set up get it DI and service locator
 void setUpGetIt() {
-  GetIt.instance.registerLazySingleton(() => SavedPodcastController());
+  GetIt.instance.registerLazySingleton(() => PodcastStreamController());
   GetIt.instance.registerLazySingleton(() => DatabaseService());
+  GetIt.instance.registerLazySingleton(() => PodcastsService());
 }
 
 class Root extends StatelessWidget {
   final Store<AppState> store;
-  DatabaseService get databaseService => GetIt.instance<DatabaseService>();
-  SavedPodcastController get savedPodcastController =>
-      GetIt.instance<SavedPodcastController>();
+  PodcastsService get podcastService => GetIt.instance<PodcastsService>();
 
   const Root({Key key, this.store}) : super(key: key);
 
@@ -76,10 +75,10 @@ class Root extends StatelessWidget {
             home: StatefulWrapper(
               store: store,
               onInit: () {
-                savedPodcastController.getSavedPodcasts();
+                podcastService.getAllSavedPodcasts();
               },
               onDispose: () {
-                savedPodcastController.dispose();
+                podcastService.dispose();
               },
               child: StoreConnector<AppState, AppState>(
                 converter: (store) => store.state,

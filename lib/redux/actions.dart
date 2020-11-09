@@ -1,5 +1,4 @@
 import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:sqflite/sqflite.dart';
 
 class SelectedThemeAction {
   final SelectedTheme payload;
