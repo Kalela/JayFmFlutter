@@ -102,7 +102,7 @@ class DetailsPage extends StatelessWidget {
                               );
                             }
 
-                            return Container();
+                            return SizedBox.shrink();
                           },
                         )
                       : Positioned(

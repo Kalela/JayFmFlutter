@@ -19,15 +19,25 @@ Widget nonCastBoxPodcast(
         return Center(child: CircularProgressIndicator());
       }
 
-      return ListView.separated(
-          separatorBuilder: (context, index) => Divider(
-                color: Colors.black,
-              ),
-          itemCount: snapshot.data.items.length,
-          itemBuilder: (context, i) {
+      return CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.only(bottom: 10),
+            sliver: SliverToBoxAdapter(
+              child: Container(
+                  child: Text(
+                snapshot.data.description.split(" Support")[0],
+                style:
+                    defaultTextStyle(state, textStyle: TextStyle(fontSize: 15)),
+              )),
+            ),
+          ),
+          SliverList(
+              delegate: SliverChildBuilderDelegate((context, i) {
             List<String> splitTitle = snapshot.data.items[i].title.split(": ");
-            return ListTile(
-                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+            return ExpansionTile(
+                tilePadding:
+                    EdgeInsets.symmetric(vertical: 10.0, horizontal: 5),
                 title: Text(
                   "${splitTitle[0]}",
                   style: TextStyle(color: colors.mainTextColor),
@@ -42,6 +52,12 @@ Widget nonCastBoxPodcast(
                       Image.asset('assets/images/about-you-placeholder.jpg'),
                   imageUrl: snapshot.data.items[i].itunes.image.href,
                 )),
+                children: [
+                  Text(
+                    snapshot.data.items[i].description.split("---")[0],
+                    style: defaultTextStyle(state),
+                  )
+                ],
                 trailing: GestureDetector(
                   onTap: () {
                     playAudio(context, snapshot.data.items[i].enclosure.url);
@@ -53,7 +69,9 @@ Widget nonCastBoxPodcast(
                   child: playerStateIconBuilder(
                       state, 80, snapshot.data.items[i].enclosure.url),
                 ));
-          });
+          }, childCount: snapshot.data.items.length))
+        ],
+      );
     },
   );
 }

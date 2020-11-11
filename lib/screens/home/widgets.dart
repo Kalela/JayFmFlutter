@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -24,34 +26,43 @@ Widget liveTabDetails(AppState state, BuildContext context) {
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Padding(padding: EdgeInsets.only(top: 0)),
-      Column(
-        children: [
-          Text(
-            "LIVE PLAYING",
-            style: defaultTextStyle(
-                state, TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ),
-          Text("Jay Fm", style: defaultTextStyle(state)),
-          Padding(
-            padding: EdgeInsets.only(top: 15),
-          ),
-          Container(
-              height: _playButtonDiameter,
-              width: _playButtonDiameter,
-              child: RawMaterialButton(
-                  onPressed: () {
-                    playAudio(context, mainPodcastUrl);
-                    setNowPlayingInfo(title: "Jay Fm Live");
-                  },
-                  fillColor: state.colors.mainButtonsColor,
-                  shape: CircleBorder(),
-                  elevation: 10.0,
-                  child: Center(child: playerStateIconBuilder(state, _playButtonDiameter, mainPodcastUrl))
-                  )),
-        ],
-      ),
-      Container()
-      // state.bannerAd //TODO: Return this
+      StreamBuilder<Map<String, dynamic>>(
+          stream: audioPlayer.nowPlaying,
+          builder: (context, snapshot) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  snapshot.data['title'] == 'Jay Fm Live'
+                      ? "LIVE PLAYING"
+                      : "NOW PLAYING",
+                  style: defaultTextStyle(state,
+                      textStyle:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ),
+                Text(snapshot.data['title'].split(": ")[0],
+                    style: defaultTextStyle(state)),
+                Padding(
+                  padding: EdgeInsets.only(top: 50),
+                ),
+                Container(
+                    height: _playButtonDiameter,
+                    width: _playButtonDiameter,
+                    child: RawMaterialButton(
+                        onPressed: () {
+                          playAudio(context, mainPodcastUrl);
+                          setNowPlayingInfo(title: "Jay Fm Live");
+                        },
+                        fillColor: state.colors.mainButtonsColor,
+                        shape: CircleBorder(),
+                        elevation: 10.0,
+                        child: Center(
+                            child: playerStateIconBuilder(
+                                state, _playButtonDiameter, mainPodcastUrl)))),
+              ],
+            );
+          }),
+      state.bannerAd //TODO: Return this
     ],
   );
 }
@@ -73,7 +84,7 @@ Widget browseTabDetails(AppState state, BuildContext context) {
           padding: EdgeInsets.only(top: 10, left: 15),
           child: Text(
             "Browse",
-            style: defaultTextStyle(state, TextStyle(fontSize: 25)),
+            style: defaultTextStyle(state, textStyle: TextStyle(fontSize: 25)),
           ),
         ),
         Flexible(
@@ -95,10 +106,14 @@ Widget browseTabDetails(AppState state, BuildContext context) {
                       isScrollable: true,
                       unselectedLabelColor: Colors.black.withOpacity(0.3),
                       tabs: [
-                        browseBarTab("PODCASTS",
-                            defaultTextStyle(state, TextStyle(fontSize: 10.0))),
-                        browseBarTab("FUN-TO-MENTAL",
-                            defaultTextStyle(state, TextStyle(fontSize: 10.0))),
+                        browseBarTab(
+                            "PODCASTS",
+                            defaultTextStyle(state,
+                                textStyle: TextStyle(fontSize: 10.0))),
+                        browseBarTab(
+                            "FUN-TO-MENTAL",
+                            defaultTextStyle(state,
+                                textStyle: TextStyle(fontSize: 10.0))),
                       ],
                     ),
                   ),
@@ -122,7 +137,7 @@ Widget savedTabDetails(AppState state) {
           padding: EdgeInsets.only(top: 10, left: 15),
           child: Text(
             "Saved Podcasts",
-            style: defaultTextStyle(state, TextStyle(fontSize: 25)),
+            style: defaultTextStyle(state, textStyle: TextStyle(fontSize: 25)),
           ),
         ),
         Padding(padding: EdgeInsets.only(top: 5)),

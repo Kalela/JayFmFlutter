@@ -7,7 +7,7 @@ import 'package:jay_fm_flutter/res/strings.dart';
 const List<String> choices = <String>[darkTheme, lightTheme];
 
 /// Default text styling that is used by all text. Allows dynamic changing of text style based on theme.
-TextStyle defaultTextStyle(AppState state, [textStyle]) {
+TextStyle defaultTextStyle(AppState state, {textStyle}) {
   if (textStyle != null)
     return TextStyle(color: state.colors.mainTextColor).merge(textStyle);
 

@@ -24,7 +24,7 @@ Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
       stream: audioPlayer.nowPlaying,
       builder: (context, snapshot) {
         if (snapshot.data == null) {
-          return Container();
+          return SizedBox.shrink();
         }
         return Container(
             padding: EdgeInsets.all(10),
