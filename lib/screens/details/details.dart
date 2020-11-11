@@ -120,7 +120,7 @@ class DetailsPage extends StatelessWidget {
           bottomSheet: Container(
             height: 70,
             color: Colors.black,
-            child: nowPlayingFooter(jayFmMaroon, Colors.grey, jayFmOrange),
+            child: nowPlayingFooter(state, jayFmMaroon, Colors.grey, jayFmOrange),
           ),
         );
       },

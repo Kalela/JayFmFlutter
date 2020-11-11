@@ -2,6 +2,7 @@ class Podcast {
   String name;
   String url;
   bool isCastbox;
+  bool isSaved;
 
   Podcast({this.name, this.url, this.isCastbox});
 }

@@ -12,8 +12,8 @@ class PodcastQualityAction {
   PodcastQualityAction(this.payload);
 }
 
-class PodcastStateAction {
-  final PodcastState payload;
+class NowPlayingAction {
+  final dynamic payload;
 
-  PodcastStateAction(this.payload);
+  NowPlayingAction(this.payload);
 }

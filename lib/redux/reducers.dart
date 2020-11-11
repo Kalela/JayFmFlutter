@@ -24,8 +24,8 @@ AppState reducer(AppState prevState, dynamic action) {
     }
   } else if (action is PodcastQualityAction) {
     newState.podcastQuality = action.payload;
-  } else if (action is PodcastStateAction) {
-    newState.playState = action.payload;
+  } else if (action is NowPlayingAction) {
+    newState.nowPlaying = action.payload;
   }
 
   return newState;

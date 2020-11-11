@@ -20,7 +20,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final AudioPlayer audioPlayer = AudioPlayer();
 
   Admob.initialize();
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -30,7 +29,6 @@ void main() async {
       selectedTheme: prefs.getInt(strings.appTheme) != null
           ? SelectedTheme.values[prefs.getInt(strings.appTheme)]
           : SelectedTheme.DARK,
-      audioPlayer: audioPlayer,
       podcastQuality: prefs.getInt(strings.podcastQuality) != null
           ? PodcastQuality.values[prefs.getInt(strings.podcastQuality)]
           : PodcastQuality.MED,
@@ -51,6 +49,7 @@ void setUpGetIt() {
   GetIt.instance.registerLazySingleton(() => PodcastStreamController());
   GetIt.instance.registerLazySingleton(() => DatabaseService());
   GetIt.instance.registerLazySingleton(() => PodcastsService());
+  GetIt.instance.registerLazySingleton(() => AudioPlayer());
 }
 
 class Root extends StatelessWidget {

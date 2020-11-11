@@ -1,10 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get_it/get_it.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/res/strings.dart';
 import 'package:jay_fm_flutter/res/values.dart';
-import 'package:jay_fm_flutter/util/functions.dart'; // TODO: Find way to remove this import(high order fuctions maybe?)
+import 'package:jay_fm_flutter/util/functions.dart';
+import 'package:just_audio/just_audio.dart'; // TODO: Find way to remove this import(high order fuctions maybe?)
+
+AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
 
 /// Text colors for dark theme
 const TextTheme darkTextTheme = TextTheme(
@@ -13,53 +18,75 @@ const TextTheme darkTextTheme = TextTheme(
     headline6: TextStyle(color: Colors.grey));
 
 /// The now playing footer(typically goes into scaffold bottom)
-Widget nowPlayingFooter(
-    Color backgroundColor, Color titleColor, Color subtitleColor) {
-  return Container(
-      padding: EdgeInsets.all(10),
-      color: backgroundColor,
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              children: [
-                ClipOval(
-                  child: Container(
-                    color: Colors.red,
-                    height: 50,
-                    width: 50,
+Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
+    Color subtitleColor) {
+  return StreamBuilder<Map<String, dynamic>>(
+      stream: audioPlayer.nowPlaying,
+      builder: (context, snapshot) {
+        if (snapshot.data == null) {
+          return Container();
+        }
+        return Container(
+            padding: EdgeInsets.all(10),
+            color: backgroundColor,
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        ClipOval(
+                          child: Container(
+                            child: CachedNetworkImage(
+                              placeholder: (context, url) => Image.asset(
+                                  'assets/images/about-you-placeholder.jpg'),
+                              imageUrl: snapshot.data['image_url'],
+                            ),
+                            height: 50,
+                            width: 50,
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(left: 10),
+                        ),
+                        Flexible(
+                          child: Container(
+                            padding: EdgeInsets.only(top: 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  snapshot.data['title'],
+                                  style: TextStyle(
+                                      fontSize: 18, color: titleColor),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  snapshot.data['presenters'],
+                                  style: TextStyle(
+                                      fontSize: 15, color: subtitleColor),
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 10),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 4),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        "Episode Title",
-                        style: TextStyle(fontSize: 18, color: titleColor),
-                      ),
-                      Text(
-                        "Presenter",
-                        style: TextStyle(fontSize: 15, color: subtitleColor),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Icon(
-              Icons.play_arrow,
-              color: titleColor,
-              size: 40,
-            ),
-          ],
-        ),
-      ));
+                  GestureDetector(
+                    onTap: () {
+                      playAudio(context, snapshot.data['audio_url']);
+                    },
+                    child: playerStateIconBuilder(
+                        state, 80, snapshot.data['audio_url']),
+                  )
+                ],
+              ),
+            ));
+      });
 }
 
 /// The drawer pop up menu
@@ -198,4 +225,60 @@ Widget allPodcastsListView(List<Widget> tileList) {
 /// Show toast message
 showToastMessage(String message) {
   Fluttertoast.showToast(msg: message);
+}
+
+/// Builds the play button icon based on the current play state
+Widget playerStateIconBuilder(
+    AppState state, double _playButtonDiameter, String url) {
+  return StreamBuilder<PlayerState>(
+    stream: audioPlayer.playerStateStream,
+    builder: (context, snapshot) {
+      if (snapshot.data == null) {
+        return Icon(
+          Icons.play_arrow,
+          color: state.colors.mainIconsColor,
+          size: _playButtonDiameter / 2,
+        );
+      }
+
+      if (snapshot.data.playing &&
+          audioPlayer.nowPlayingMap['audio_url'] == url) {
+        return Icon(
+          Icons.pause,
+          color: state.colors.mainIconsColor,
+          size: _playButtonDiameter / 2,
+        );
+      } else if (!snapshot.data.playing &&
+          audioPlayer.nowPlayingMap['audio_url'] == url) {
+        return switchCase2(snapshot.data.processingState, {
+          ProcessingState.none: Icon(
+            Icons.play_arrow,
+            color: state.colors.mainIconsColor,
+            size: _playButtonDiameter / 2,
+          ),
+          ProcessingState.loading: SizedBox(
+            height: _playButtonDiameter / 2,
+            width: _playButtonDiameter / 2,
+            child: CircularProgressIndicator(),
+          ),
+          ProcessingState.buffering: SizedBox(
+            height: _playButtonDiameter / 2,
+            width: _playButtonDiameter / 2,
+            child: CircularProgressIndicator(),
+          ),
+          ProcessingState.ready: Icon(
+            Icons.play_arrow,
+            color: state.colors.mainIconsColor,
+            size: _playButtonDiameter / 2,
+          ),
+        });
+      } else {
+        return Icon(
+          Icons.play_arrow,
+          color: state.colors.mainIconsColor,
+          size: _playButtonDiameter / 2,
+        );
+      }
+    },
+  );
 }

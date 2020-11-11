@@ -9,6 +9,11 @@ import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/screens/home/functions.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
+import 'package:just_audio/just_audio.dart';
+
+AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
+PodcastStreamController get savedPodcastController =>
+    GetIt.instance<PodcastStreamController>();
 
 /// Parent widget of live tab contents
 Widget liveTabDetails(AppState state, BuildContext context) {
@@ -35,60 +40,19 @@ Widget liveTabDetails(AppState state, BuildContext context) {
               width: _playButtonDiameter,
               child: RawMaterialButton(
                   onPressed: () {
-                    playPodcast(state, context, mainPodcastUrl);
+                    playAudio(context, mainPodcastUrl);
+                    setNowPlayingInfo(title: "Jay Fm Live");
                   },
                   fillColor: state.colors.mainButtonsColor,
                   shape: CircleBorder(),
                   elevation: 10.0,
-                  child: livePlayButton(state, _playButtonDiameter))),
+                  child: Center(child: playerStateIconBuilder(state, _playButtonDiameter, mainPodcastUrl))
+                  )),
         ],
       ),
       Container()
       // state.bannerAd //TODO: Return this
     ],
-  );
-}
-
-/// Play button in the middle of live tab
-Widget livePlayButton(AppState state, double playButtonDiameter) {
-  return Center(
-    child: switchCase2(state.playState, {
-      PodcastState.PAUSED: Icon(
-        Icons.play_arrow,
-        color: state.colors.mainIconsColor,
-        size: playButtonDiameter / 2,
-      ),
-      PodcastState.PLAYING: Icon(
-        Icons.pause,
-        color: state.colors.mainIconsColor,
-        size: playButtonDiameter / 2,
-      ),
-      PodcastState.STOPPED: Icon(
-        Icons.play_arrow,
-        color: state.colors.mainIconsColor,
-        size: playButtonDiameter / 2,
-      ),
-      PodcastState.LOADING: SizedBox(
-        height: playButtonDiameter / 2,
-        width: playButtonDiameter / 2,
-        child: CircularProgressIndicator(),
-      ),
-      PodcastState.BUFFERING: SizedBox(
-        height: playButtonDiameter / 2,
-        width: playButtonDiameter / 2,
-        child: CircularProgressIndicator(),
-      ),
-      PodcastState.READY: Icon(
-        Icons.play_arrow,
-        color: state.colors.mainIconsColor,
-        size: playButtonDiameter / 2,
-      ),
-      PodcastState.ERRORED: Icon(
-        Icons.play_arrow,
-        color: state.colors.mainIconsColor,
-        size: playButtonDiameter / 2,
-      ),
-    }),
   );
 }
 
@@ -148,9 +112,6 @@ Widget browseTabDetails(AppState state, BuildContext context) {
   );
 }
 
-PodcastStreamController get savedPodcastController =>
-    GetIt.instance<PodcastStreamController>();
-
 /// Parent widget of saved tab contents
 Widget savedTabDetails(AppState state) {
   return Container(
@@ -169,6 +130,7 @@ Widget savedTabDetails(AppState state) {
           child: StreamBuilder<List<Podcast>>(
             stream: savedPodcastController.savedPodcasts,
             initialData: [],
+            // ignore: missing_return
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
@@ -196,15 +158,17 @@ Widget savedTabDetails(AppState state) {
                     );
                   } else {
                     return Padding(
-                      padding: const EdgeInsets.only(top: 8.0, left: 10),
-                      child: Text("No podcasts saved for quick access", style: defaultTextStyle(state),),
+                      padding: const EdgeInsets.only(top: 8.0, left: 15),
+                      child: Text(
+                        "No podcasts saved for quick access",
+                        style: defaultTextStyle(state),
+                      ),
                     );
                   }
                   break;
                 case ConnectionState.done:
                   break;
               }
-
             },
           ),
         )
