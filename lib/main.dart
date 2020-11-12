@@ -32,9 +32,6 @@ void main() async {
       podcastQuality: prefs.getInt(strings.podcastQuality) != null
           ? PodcastQuality.values[prefs.getInt(strings.podcastQuality)]
           : PodcastQuality.MED,
-      bannerAd: AdmobBanner(
-          adUnitId: AdMobService.getbannerAdUnitId(),
-          adSize: AdmobBannerSize.BANNER),
       sharedPreferences: prefs);
 
   final Store<AppState> _store =
@@ -50,6 +47,7 @@ void setUpGetIt() {
   GetIt.instance.registerLazySingleton(() => DatabaseService());
   GetIt.instance.registerLazySingleton(() => PodcastsService());
   GetIt.instance.registerLazySingleton(() => AudioPlayer());
+  GetIt.instance.registerLazySingleton(() => AdMobService());
 }
 
 class Root extends StatelessWidget {

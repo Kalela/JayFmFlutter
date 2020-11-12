@@ -1,10 +1,9 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/models/podcast.dart';
+import 'package:jay_fm_flutter/services/admob_service.dart';
 import 'package:jay_fm_flutter/services/podcast_stream_controller.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
@@ -16,6 +15,7 @@ import 'package:just_audio/just_audio.dart';
 AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
 PodcastStreamController get savedPodcastController =>
     GetIt.instance<PodcastStreamController>();
+AdMobService get admobService => GetIt.instance<AdMobService>();
 
 /// Parent widget of live tab contents
 Widget liveTabDetails(AppState state, BuildContext context) {
@@ -32,16 +32,30 @@ Widget liveTabDetails(AppState state, BuildContext context) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  snapshot.data['title'] == 'Jay Fm Live'
-                      ? "LIVE PLAYING"
-                      : "NOW PLAYING",
-                  style: defaultTextStyle(state,
-                      textStyle:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
-                Text(snapshot.data['title'].split(": ")[0],
-                    style: defaultTextStyle(state)),
+                snapshot.data != null
+                    ? Column(children: [
+                        Text(
+                          snapshot.data['title'] == 'Jay Fm Live'
+                              ? "LIVE PLAYING"
+                              : "NOW PLAYING",
+                          style: defaultTextStyle(state,
+                              textStyle: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                        ),
+                        Text(snapshot.data['title'].split(": ")[0],
+                            style: defaultTextStyle(state)),
+                      ])
+                    : Column(
+                        children: [
+                          Text(
+                            "LIVE RADIO",
+                            style: defaultTextStyle(state,
+                                textStyle: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                          Text("Jay Fm Live", style: defaultTextStyle(state)),
+                        ],
+                      ),
                 Padding(
                   padding: EdgeInsets.only(top: 50),
                 ),
@@ -62,7 +76,7 @@ Widget liveTabDetails(AppState state, BuildContext context) {
               ],
             );
           }),
-      state.bannerAd //TODO: Return this
+      admobService.getBannerAd(context)
     ],
   );
 }

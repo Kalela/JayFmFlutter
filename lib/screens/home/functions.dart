@@ -20,7 +20,9 @@ List<Widget> getPodcastList(AppState state, BuildContext context) {
 
   for (Podcast podcast in availablePodcasts) {
     list.add(ListTile(
-      title: Text(podcast.name, style: TextStyle(color: state.colors.mainTextColor)),
+      title: Text(podcast.name, style: defaultTextStyle(state, textStyle: TextStyle(fontWeight: FontWeight.bold))),
+      contentPadding: EdgeInsets.all(8.0),
+      subtitle: podcast.description != null ? Text(podcast.description, style: defaultTextStyle(state),): SizedBox.shrink(),
       onTap: () {
         openPodcastEpisodes(context, podcast);
       },

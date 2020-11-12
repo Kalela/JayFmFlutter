@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:admob_flutter/admob_flutter.dart';
+import 'package:flutter/cupertino.dart';
+
 class AdMobService {
   //TODO: Return ios versions too
 
@@ -17,5 +20,11 @@ class AdMobService {
     } else {
       throw new UnsupportedError("Unsupported platform");
     }
+  }
+
+  AdmobBanner getBannerAd(BuildContext context) {
+    return AdmobBanner(
+        adUnitId: AdMobService.getbannerAdUnitId(),
+        adSize: AdmobBannerSize.SMART_BANNER(context));
   }
 }

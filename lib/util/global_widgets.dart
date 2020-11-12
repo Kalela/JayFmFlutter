@@ -11,12 +11,6 @@ import 'package:just_audio/just_audio.dart'; // TODO: Find way to remove this im
 
 AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
 
-/// Text colors for dark theme
-const TextTheme darkTextTheme = TextTheme(
-    bodyText2: TextStyle(color: Colors.grey),
-    bodyText1: TextStyle(color: Colors.grey),
-    headline6: TextStyle(color: Colors.grey));
-
 /// The now playing footer(typically goes into scaffold bottom)
 Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
     Color subtitleColor) {

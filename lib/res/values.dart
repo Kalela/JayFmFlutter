@@ -22,6 +22,8 @@ List availablePodcasts = [
   Podcast(
       name: "About You",
       url: "https://anchor.fm/s/81752fc/podcast/rss",
+      description:
+          "The podcast is based on the belief that; we give ourselves better odds of winning, when we approach life as a series of projects 'about you'. Join Jamal Abdallah and his team, with weekly special guests as they teach 'us' how to fail better, beat resistance and enjoy the benefits that come from completing a dream project; about you.",
       isCastbox: false),
   Podcast(
       name: "The Science of Sex",

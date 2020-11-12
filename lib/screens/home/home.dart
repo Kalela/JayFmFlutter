@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/screens/home/widgets.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 
@@ -27,16 +26,16 @@ class HomePage extends StatelessWidget {
                 height: 80,
               ),
               centerTitle: true,
-              backgroundColor: jayFmFancyBlack,
-              iconTheme: IconThemeData(color: Colors.grey),
-              textTheme: darkTextTheme,
+              backgroundColor: state.colors.mainBackgroundColor,
+              iconTheme: IconThemeData(color: state.colors.textTheme.bodyText1.color),
+              textTheme: state.colors.textTheme,
               bottom: PreferredSize(
                 preferredSize: Size.fromHeight(30.0),
                 child: TabBar(
                   tabs: [
-                    topBarTab("Live", darkTextTheme.headline6.color),
-                    topBarTab("Browse", darkTextTheme.headline6.color),
-                    topBarTab("Saved", darkTextTheme.headline6.color),
+                    topBarTab("Live", state.colors.textTheme.headline6.color),
+                    topBarTab("Browse", state.colors.textTheme.headline6.color),
+                    topBarTab("Saved", state.colors.textTheme.headline6.color),
                   ],
                 ),
               ),

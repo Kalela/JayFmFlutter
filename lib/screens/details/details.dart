@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
@@ -9,15 +7,12 @@ import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/screens/details/widgets.dart';
 import 'package:jay_fm_flutter/services/podcasts_service.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 // ignore: must_be_immutable
 class DetailsPage extends StatelessWidget {
   final Podcast podcast;
-  
-  PodcastsService get podcastService => GetIt.instance<PodcastsService>();
 
-  final Completer<String> urlCompleter = Completer<String>();
+  PodcastsService get podcastService => GetIt.instance<PodcastsService>();
 
   DetailsPage({this.podcast});
 
@@ -30,8 +25,9 @@ class DetailsPage extends StatelessWidget {
           context: context,
           state: state,
           appBar: AppBar(
-            backgroundColor: jayFmFancyBlack,
-            iconTheme: IconThemeData(color: Colors.grey),
+            backgroundColor: state.colors.mainBackgroundColor,
+            iconTheme:
+                IconThemeData(color: state.colors.textTheme.bodyText1.color),
             title: Text(podcast.name),
           ),
           body: Container(
@@ -41,86 +37,54 @@ class DetailsPage extends StatelessWidget {
                 children: [
                   Center(
                     child: podcast.isCastbox
-                        ? Container(
-                            child: Column(
-                              children: [
-                                Flexible(
-                                  flex: 4,
-                                  child: WebView(
-                                    initialUrl: Uri.dataFromString(
-                                            '<html><body><iframe allowtransparency="true" src="${podcast.url}" frameborder="0" width="100%" height="500"></iframe></body></html>',
-                                            mimeType: 'text/html')
-                                        .toString(),
-                                    javascriptMode: JavascriptMode.unrestricted,
-                                    debuggingEnabled: true,
-                                    onPageFinished: (url) {
-                                      urlCompleter.complete(url);
-                                    },
-                                  ),
-                                ),
-                                Flexible(
-                                  flex: 1,
-                                  child: FutureBuilder<String>(
-                                    future: urlCompleter.future,
-                                    builder: (context, controller) {
-                                      if (controller.hasData) {
-                                        return Flexible(
-                                            flex: 1,
-                                            child: Stack(
-                                              children: [
-                                                state.bannerAd,
-                                              ],
-                                            ));
-                                      }
-
-                                      return CircularProgressIndicator();
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
+                        ? castboxPodcast(podcast)
                         : SizedBox.expand(
-                            child: nonCastBoxPodcast(
-                                state.colors, state, podcast.url)),
+                            child: nonCastBoxPodcast(state, podcast)),
                   ),
-                  podcast.isCastbox
-                      ? FutureBuilder<String>(
-                          future: urlCompleter.future,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return Positioned(
-                                bottom: 90,
-                                right: 15,
-                                child: FloatingActionButton(
-                                    backgroundColor:
-                                        state.colors.mainButtonsColor,
-                                    child: Icon(Icons.save),
-                                    onPressed: () {
-                                      podcastService.savePodcast(podcast);
-                                    }),
-                              );
-                            }
-
-                            return SizedBox.shrink();
-                          },
-                        )
-                      : Positioned(
-                          bottom: 90,
-                          right: 15,
-                          child: FloatingActionButton(
-                              backgroundColor: state.colors.mainButtonsColor,
-                              child: Icon(Icons.save),
-                              onPressed: () {
-                                podcastService.savePodcast(podcast);
-                              }),
-                        )
+                  // podcast.isCastbox
+                  //     ? FutureBuilder<String>(
+                  //         future: urlCompleter.future,
+                  //         builder: (context, snapshot) {
+                  //           if (snapshot.hasData) {
+                  //             return Positioned(
+                  //               bottom: 90,
+                  //               right: 15,
+                  //               child: FloatingActionButton(
+                  //                   backgroundColor:
+                  //                       state.colors.mainButtonsColor,
+                  //                   child: Icon(Icons.save),
+                  //                   onPressed: () {
+                  //                     podcastService.savePodcast(podcast);
+                  //                   }),
+                  //             );
+                  //           }
+                  //           return SizedBox.shrink();
+                  //         },
+                  //       )
+                  //     : Positioned(
+                  //         bottom: 90,
+                  //         right: 15,
+                  //         child: FloatingActionButton(
+                  //             backgroundColor: state.colors.mainButtonsColor,
+                  //             child: Icon(Icons.save),
+                  //             onPressed: () {
+                  //               podcastService.savePodcast(podcast);
+                  //             }),
+                  //       ),
                 ],
               )),
           bottomSheet: Container(
             height: 70,
             color: Colors.black,
-            child: nowPlayingFooter(state, jayFmMaroon, Colors.grey, jayFmOrange),
+            child: StreamBuilder<Object>(
+                stream: audioPlayer.nowPlaying.stream,
+                builder: (context, snapshot) {
+                  if (snapshot.data == null) {
+                    return SizedBox.shrink();
+                  }
+                  return nowPlayingFooter(
+                      state, jayFmMaroon, Colors.grey, jayFmOrange);
+                }),
           ),
         );
       },

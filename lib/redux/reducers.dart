@@ -14,13 +14,17 @@ AppState reducer(AppState prevState, dynamic action) {
           mainBackgroundColor: jayFmFancyBlack,
           mainButtonsColor: Colors.grey,
           mainIconsColor: Colors.blueGrey,
-          mainTextColor: Colors.white);
+          mainTextColor: Colors.white,
+          textTheme: darkTextTheme
+          );
     } else {
       newState.colors = GlobalAppColors(
           mainBackgroundColor: jayFmBlue,
           mainButtonsColor: jayFmFancyBlack,
           mainIconsColor: jayFmOrange,
-          mainTextColor: Colors.black);
+          mainTextColor: Colors.black,
+          textTheme: lightTextTheme
+          );
     }
   } else if (action is PodcastQualityAction) {
     newState.podcastQuality = action.payload;
