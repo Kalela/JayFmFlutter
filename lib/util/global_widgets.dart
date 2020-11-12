@@ -18,7 +18,22 @@ Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
       stream: audioPlayer.nowPlaying,
       builder: (context, snapshot) {
         if (snapshot.data == null) {
-          return SizedBox.shrink();
+          return Container(
+            padding: EdgeInsets.all(10),
+            color: backgroundColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ClipOval(
+                  child: Container(
+                    child: Image.asset('assets/images/about-you-placeholder.jpg'),
+                    height: 50,
+                    width: 50,
+                  ),
+                ),
+              ],
+            ),
+          );
         }
         return Container(
             padding: EdgeInsets.all(10),

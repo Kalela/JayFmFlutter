@@ -4,17 +4,16 @@ import 'package:get_it/get_it.dart';
 import 'package:jay_fm_flutter/models/app_state.dart';
 import 'package:jay_fm_flutter/models/podcast.dart';
 import 'package:jay_fm_flutter/services/admob_service.dart';
-import 'package:jay_fm_flutter/services/podcast_stream_controller.dart';
 import 'package:jay_fm_flutter/res/colors.dart';
 import 'package:jay_fm_flutter/res/values.dart';
 import 'package:jay_fm_flutter/screens/home/functions.dart';
+import 'package:jay_fm_flutter/services/podcasts_service/podcasts_service.dart';
 import 'package:jay_fm_flutter/util/functions.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 import 'package:just_audio/just_audio.dart';
 
 AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
-PodcastStreamController get savedPodcastController =>
-    GetIt.instance<PodcastStreamController>();
+PodcastsService get podcastService => GetIt.instance<PodcastsService>();
 AdMobService get admobService => GetIt.instance<AdMobService>();
 
 /// Parent widget of live tab contents
@@ -157,7 +156,7 @@ Widget savedTabDetails(AppState state) {
         Padding(padding: EdgeInsets.only(top: 5)),
         Flexible(
           child: StreamBuilder<List<Podcast>>(
-            stream: savedPodcastController.savedPodcasts,
+            stream: podcastService.streamController.savedPodcasts,
             initialData: [],
             // ignore: missing_return
             builder: (context, snapshot) {

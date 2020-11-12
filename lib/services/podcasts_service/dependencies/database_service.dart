@@ -6,9 +6,13 @@ import 'package:path/path.dart' as path;
 
 class DatabaseService {
 
+  static Database _database;
+
   /// Set up the database
   Future<Database> get database async {
-    final Future<Database> database = openDatabase(
+    if(_database != null) return _database;
+
+    final Future<Database> db = openDatabase(
       path.join(await getDatabasesPath(), 'jayfm.db'),
       version: 1,
       onCreate: (db, version) async {
@@ -17,7 +21,9 @@ class DatabaseService {
       },
     );
 
-    return database;
+    _database = await db;
+
+    return _database;
   }
 
   /// Insert a new table into the database
@@ -35,5 +41,10 @@ class DatabaseService {
   Future<List<Map>> getAllSavedPodcasts() async {
     Database db = await database;
     return await db.query('Podcast');
+  }
+
+  Future<int> deletePodcast(Podcast podcast) async {
+    Database db = await database;
+    return db.rawDelete('DELETE FROM Podcast WHERE name = ?', [podcast.name]);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:jay_fm_flutter/models/podcast.dart';
-import 'package:jay_fm_flutter/services/database_service.dart';
-import 'package:jay_fm_flutter/services/podcast_stream_controller.dart';
+import 'package:jay_fm_flutter/services/podcasts_service/dependencies/database_service.dart';
+import 'package:jay_fm_flutter/services/podcasts_service/dependencies/podcast_stream_controller.dart';
 import 'package:jay_fm_flutter/util/global_widgets.dart';
 
 class PodcastsService {
@@ -28,8 +28,10 @@ class PodcastsService {
     showToastMessage("Podcast saved");
   }
 
-  /// Get all saved podcasts
-  getAllSavedPodcasts() async {
+  /// Get all saved podcasts.
+  /// Gets saved podcasts from sqflite database and updates the saved podcasts stream.
+  /// Returns the list of added podcasts.
+  Future<List<Podcast>> getAllSavedPodcasts() async {
     List<Map> results = await databaseService.getAllSavedPodcasts();
     List<Podcast> podcasts = List();
 
@@ -41,10 +43,22 @@ class PodcastsService {
         .toList();
 
     streamController.getSavedPodcasts(podcasts);
+
+    return podcasts;
+  }
+
+  deletePodcast(Podcast podcast) async {
+    int result;
+    result = await databaseService.deletePodcast(podcast);
+
+    if(result > 0) {
+      getAllSavedPodcasts(); // Update saved tab stream
+    }
   }
 
   /// Dispose resources
   dispose() {
+    showToastMessage("Removed from saved");
     streamController.dispose();
   }
 }
