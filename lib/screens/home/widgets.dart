@@ -170,13 +170,30 @@ Widget savedTabDetails(AppState state) {
                   if (snapshot.data.length > 0) {
                     return ListView.separated(
                       itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(snapshot.data[index].name,
-                              style:
-                                  TextStyle(color: state.colors.mainTextColor)),
-                          onTap: () {
-                            openPodcastEpisodes(context, snapshot.data[index]);
+                        return Dismissible(
+                          key: Key(snapshot.data[index].name),
+                          background: Container(color: jayFmMaroon, child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(child: Icon(Icons.delete), padding: EdgeInsets.only(left: 10),),
+                              Container(child: Icon(Icons.delete), padding: EdgeInsets.only(right: 10),),
+                            ],
+                          ),),
+                          onDismissed: (direction) {
+                            podcastService.deletePodcast(snapshot.data[index]);
+                            Scaffold.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    "${snapshot.data[index].name} dismissed")));
                           },
+                          child: ListTile(
+                            title: Text(snapshot.data[index].name,
+                                style: TextStyle(
+                                    color: state.colors.mainTextColor)),
+                            onTap: () {
+                              openPodcastEpisodes(
+                                  context, snapshot.data[index]);
+                            },
+                          ),
                         );
                       },
                       itemCount: snapshot.data.length,
