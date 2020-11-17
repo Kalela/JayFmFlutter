@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
-import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/res/strings.dart';
-import 'package:jay_fm_flutter/res/values.dart';
-import 'package:jay_fm_flutter/util/functions.dart';
+import 'package:JayFm/models/app_state.dart';
+import 'package:JayFm/res/strings.dart';
+import 'package:JayFm/res/values.dart';
+import 'package:JayFm/util/functions.dart';
 import 'package:just_audio/just_audio.dart'; // TODO: Find way to remove this import(high order fuctions maybe?)
 
 AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();

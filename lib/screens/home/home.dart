@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/screens/home/widgets.dart';
-import 'package:jay_fm_flutter/util/global_widgets.dart';
+import 'package:JayFm/models/app_state.dart';
+import 'package:JayFm/screens/home/widgets.dart';
+import 'package:JayFm/util/global_widgets.dart';
 
 class HomePage extends StatelessWidget {
   final int tabViewsLength = 3;

@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
-import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/redux/actions.dart';
-import 'package:jay_fm_flutter/res/strings.dart';
-import 'package:jay_fm_flutter/screens/home/widgets.dart';
+import 'package:JayFm/models/app_state.dart';
+import 'package:JayFm/redux/actions.dart';
+import 'package:JayFm/res/strings.dart';
+import 'package:JayFm/screens/home/widgets.dart';
 import 'package:just_audio/just_audio.dart';
 
 AudioPlayer get _audioPlayer => GetIt.instance<AudioPlayer>();

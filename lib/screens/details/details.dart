@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
-import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/models/podcast.dart';
-import 'package:jay_fm_flutter/res/colors.dart';
-import 'package:jay_fm_flutter/res/values.dart';
-import 'package:jay_fm_flutter/screens/details/widgets.dart';
-import 'package:jay_fm_flutter/services/podcasts_service/podcasts_service.dart';
-import 'package:jay_fm_flutter/util/global_widgets.dart';
+import 'package:JayFm/models/app_state.dart';
+import 'package:JayFm/models/podcast.dart';
+import 'package:JayFm/res/colors.dart';
+import 'package:JayFm/res/values.dart';
+import 'package:JayFm/screens/details/widgets.dart';
+import 'package:JayFm/services/podcasts_service/podcasts_service.dart';
+import 'package:JayFm/util/global_widgets.dart';
 
 // ignore: must_be_immutable
 class DetailsPage extends StatelessWidget {

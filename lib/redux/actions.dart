@@ -1,4 +1,4 @@
-import 'package:jay_fm_flutter/models/app_state.dart';
+import 'package:JayFm/models/app_state.dart';
 
 class SelectedThemeAction {
   final SelectedTheme payload;

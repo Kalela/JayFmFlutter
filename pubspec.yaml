@@ -1,4 +1,4 @@
-name: jay_fm_flutter
+name: JayFm
 description: JayFm Flutter application.
 
 # The following line prevents the package from being accidentally published to
@@ -36,6 +36,9 @@ dependencies:
   fluttertoast: ^4.0.0
   get_it: ^5.0.1
   rxdart: ^0.24.1
+  flutter_hooks: ^0.14.1
+  hooks_riverpod: ^0.12.1
+  uuid: ^2.1.0
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/models/podcast.dart';
-import 'package:jay_fm_flutter/res/values.dart';
-import 'package:jay_fm_flutter/screens/details/details.dart';
+import 'package:JayFm/models/app_state.dart';
+import 'package:JayFm/models/podcast.dart';
+import 'package:JayFm/res/values.dart';
+import 'package:JayFm/screens/details/details.dart';
 
 /// Open podcast episodes page
 openPodcastEpisodes(BuildContext context, Podcast podcast) {

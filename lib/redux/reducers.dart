@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/redux/actions.dart';
-import 'package:jay_fm_flutter/res/colors.dart';
+import 'package:JayFm/models/app_state.dart';
+import 'package:JayFm/redux/actions.dart';
+import 'package:JayFm/res/colors.dart';
 
 AppState reducer(AppState prevState, dynamic action) {
   AppState newState = AppState.fromAppState(prevState);

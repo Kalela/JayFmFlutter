@@ -2,20 +2,20 @@ import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
-import 'package:jay_fm_flutter/res/strings.dart' as strings;
-import 'package:jay_fm_flutter/services/admob_service.dart';
-import 'package:jay_fm_flutter/services/podcasts_service/dependencies/database_service.dart';
-import 'package:jay_fm_flutter/services/podcasts_service/podcasts_service.dart';
-import 'package:jay_fm_flutter/services/podcasts_service/dependencies/podcast_stream_controller.dart';
-import 'package:jay_fm_flutter/util/stateful_wrapper.dart';
+import 'package:JayFm/res/strings.dart' as strings;
+import 'package:JayFm/services/admob_service.dart';
+import 'package:JayFm/services/podcasts_service/dependencies/database_service.dart';
+import 'package:JayFm/services/podcasts_service/podcasts_service.dart';
+import 'package:JayFm/services/podcasts_service/dependencies/podcast_stream_controller.dart';
+import 'package:JayFm/util/stateful_wrapper.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:redux/redux.dart';
 
-import 'package:jay_fm_flutter/screens/home/home.dart';
-import 'package:jay_fm_flutter/redux/reducers.dart';
-import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/res/themes.dart';
-import 'package:jay_fm_flutter/util/functions.dart';
+import 'package:JayFm/screens/home/home.dart';
+import 'package:JayFm/redux/reducers.dart';
+import 'package:JayFm/models/app_state.dart';
+import 'package:JayFm/res/themes.dart';
+import 'package:JayFm/util/functions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jay_fm_flutter/models/app_state.dart';
-import 'package:jay_fm_flutter/res/strings.dart';
+import 'package:JayFm/models/app_state.dart';
+import 'package:JayFm/res/strings.dart';
 import 'package:redux/redux.dart';
 
 ///Enable use of stateful widget functionality in stateless widgets

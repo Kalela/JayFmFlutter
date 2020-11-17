@@ -1,4 +1,4 @@
-import 'package:jay_fm_flutter/models/podcast.dart';
+import 'package:JayFm/models/podcast.dart';
 import 'package:rxdart/rxdart.dart';
 
 class PodcastStreamController {

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:jay_fm_flutter/models/podcast.dart';
+import 'package:JayFm/models/podcast.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
 
@@ -17,7 +17,7 @@ class DatabaseService {
       version: 1,
       onCreate: (db, version) async {
         await db.execute(
-            'CREATE TABLE IF NOT EXISTS Podcast (name TEXT, url TEXT, isCastbox INTEGER);');
+            'CREATE TABLE IF NOT EXISTS Podcast (name TEXT, url TEXT, isCastbox INTEGER, description TEXT);');
       },
     );
 
@@ -33,7 +33,7 @@ class DatabaseService {
     Database db = await database;
     await db.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO Podcast(name, isCastbox, url) VALUES("${podcast.name}", "$podcastBoolean", "${podcast.url}")');
+          'INSERT INTO Podcast(name, isCastbox, url, description) VALUES("${podcast.name}", "$podcastBoolean", "${podcast.url}", "${podcast.description}")');
     });
   }
 
