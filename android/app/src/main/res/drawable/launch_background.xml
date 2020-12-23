@@ -4,5 +4,5 @@
     <item android:drawable="@color/jayFmFancyBlack" />
     <!-- 512 * 344
     206 * 172 -->
-    <item android:width="256dp" android:height="172dp" android:drawable="@drawable/logo" android:gravity="center" />
+    <item android:width="256dp" android:height="256dp" android:drawable="@drawable/logo_512" android:gravity="center" />
 </layer-list>
