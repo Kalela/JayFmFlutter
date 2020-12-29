@@ -1,3 +1,6 @@
+import 'package:JayFm/models/global_app_colors.dart';
+import 'package:JayFm/res/colors.dart';
+import 'package:JayFm/res/values.dart';
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -14,8 +17,6 @@ import 'package:redux/redux.dart';
 import 'package:JayFm/screens/home/home.dart';
 import 'package:JayFm/redux/reducers.dart';
 import 'package:JayFm/models/app_state.dart';
-import 'package:JayFm/res/themes.dart';
-import 'package:JayFm/util/functions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -25,14 +26,20 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   setUpGetIt();
 
-  final _initialState = AppState(
-      selectedTheme: prefs.getInt(strings.appTheme) != null
-          ? SelectedTheme.values[prefs.getInt(strings.appTheme)]
-          : SelectedTheme.DARK,
-      podcastQuality: prefs.getInt(strings.podcastQuality) != null
-          ? PodcastQuality.values[prefs.getInt(strings.podcastQuality)]
-          : PodcastQuality.MED,
-      sharedPreferences: prefs);
+  GlobalAppColors colors = darkColors;
+  PodcastQuality quality = PodcastQuality.MED;
+
+  if (prefs.getInt(strings.appTheme) != null) {
+    if (prefs.getInt(strings.appTheme) == 1) {
+      colors = lightColors;
+    }
+  }
+
+  if (prefs.getInt(strings.podcastQuality) != null) {
+    quality = PodcastQuality.values[prefs.getInt(strings.podcastQuality)];
+  }
+
+  final _initialState = AppState(colors, prefs, quality, null);
 
   final Store<AppState> _store =
       Store<AppState>(reducer, initialState: _initialState);
@@ -65,10 +72,12 @@ class Root extends StatelessWidget {
         builder: (context, state) {
           return MaterialApp(
             title: 'Flutter Demo',
-            theme: switchCase2(store.state.selectedTheme, {
-              SelectedTheme.DARK: darkTheme,
-              SelectedTheme.LIGHT: lightTheme
-            }),
+            theme: ThemeData(
+              primarySwatch: state.colors.mainBackgroundColor == jayFmFancyBlack
+                  ? Colors.blueGrey
+                  : Colors.amber,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
             home: StatefulWrapper(
               store: store,
               onInit: () {

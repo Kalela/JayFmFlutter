@@ -1,36 +1,41 @@
-import 'package:flutter/material.dart';
+import 'package:JayFm/models/global_app_colors.dart';
+import 'package:JayFm/models/now_playing_state.dart';
 import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/redux/actions.dart';
 import 'package:JayFm/res/colors.dart';
 
-AppState reducer(AppState prevState, dynamic action) {
-  AppState newState = AppState.fromAppState(prevState);
+AppState reducer(AppState state, dynamic action) => new AppState(
+    themeReducer(state.colors, action),
+    state.sharedPreferences,
+    podcastQualityReducer(state.podcastQuality, action),
+    nowPlayingReducer(state.nowPlaying, action));
 
-  if (action is SelectedThemeAction) {
-    newState.selectedTheme = action.payload;
-    
-    if (action.payload == SelectedTheme.DARK) {
-      newState.colors = GlobalAppColors(
-          mainBackgroundColor: jayFmFancyBlack,
-          mainButtonsColor: Colors.grey,
-          mainIconsColor: Colors.blueGrey,
-          mainTextColor: Colors.white,
-          textTheme: darkTextTheme
-          );
-    } else {
-      newState.colors = GlobalAppColors(
-          mainBackgroundColor: jayFmBlue,
-          mainButtonsColor: jayFmFancyBlack,
-          mainIconsColor: jayFmOrange,
-          mainTextColor: Colors.black,
-          textTheme: lightTextTheme
-          );
-    }
-  } else if (action is PodcastQualityAction) {
-    newState.podcastQuality = action.payload;
-  } else if (action is NowPlayingAction) {
-    newState.nowPlaying = action.payload;
+GlobalAppColors themeReducer(GlobalAppColors colors, dynamic action) {
+  if (!(action is SelectedThemeAction)) {
+    return colors;
+  }
+  print("I am here selected is ${action.payload}");
+
+  if (action.payload == SelectedTheme.LIGHT) {
+    print("returned light");
+    colors = lightColors;
+  } else if (action.payload == SelectedTheme.DARK) {
+    print("returned dark");
+    colors = darkColors;
   }
 
-  return newState;
+  return colors;
+}
+
+PodcastQuality podcastQualityReducer(PodcastQuality quality, dynamic action) {
+  print("podcast quality is ${action.payload}");
+  return action is PodcastQualityAction ? action.payload : quality;
+}
+
+NowPlaying nowPlayingReducer(NowPlaying state, dynamic action) {
+  if (action is NowPlayingAction) {
+    state = action.payload;
+  }
+
+  return state;
 }

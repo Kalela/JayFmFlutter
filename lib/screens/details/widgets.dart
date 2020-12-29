@@ -58,14 +58,14 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
               ],
               trailing: GestureDetector(
                 onTap: () {
-                  playAudio(context, snapshot.data.items[i].enclosure.url);
-                  setNowPlayingInfo(
-                      title: snapshot.data.items[i].title,
-                      presenters: getPresenters(splitTitle),
-                      imageUrl: snapshot.data.items[i].itunes.image.href);
+                  // playAudio(context, snapshot.data.items[i].enclosure.url);
+                  // setNowPlayingInfo(
+                  //     title: snapshot.data.items[i].title,
+                  //     presenters: getPresenters(splitTitle),
+                  //     imageUrl: snapshot.data.items[i].itunes.image.href);
                 },
-                child: playerStateIconBuilder(
-                    state, 80, snapshot.data.items[i].enclosure.url),
+                // child: playerStateIconBuilder(
+                //     state, 80, snapshot.data.items[i].enclosure.url),
               ));
         }, childCount: snapshot.data.items.length)),
       );

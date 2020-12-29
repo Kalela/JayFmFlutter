@@ -1,3 +1,4 @@
+import 'package:JayFm/res/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -7,7 +8,7 @@ import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/res/strings.dart';
 import 'package:JayFm/res/values.dart';
 import 'package:JayFm/util/functions.dart';
-import 'package:just_audio/just_audio.dart'; // TODO: Find way to remove this import(high order fuctions maybe?)
+import 'package:just_audio/just_audio.dart';
 
 AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
 
@@ -16,8 +17,8 @@ Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
     Color subtitleColor) {
   return StreamBuilder<Map<String, dynamic>>(
       stream: audioPlayer.nowPlaying,
-      builder: (context, snapshot) {
-        if (snapshot.data == null) {
+      builder: (context, snap) {
+        if (state.nowPlaying == null) {
           return Container(
             padding: EdgeInsets.all(10),
             color: backgroundColor,
@@ -51,7 +52,7 @@ Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
                             child: CachedNetworkImage(
                               placeholder: (context, url) => Image.asset(
                                   'assets/images/about-you-placeholder.jpg'),
-                              imageUrl: snapshot.data['image_url'],
+                              imageUrl: state.nowPlaying.imageUrl,
                             ),
                             height: 50,
                             width: 50,
@@ -67,13 +68,13 @@ Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Text(
-                                  snapshot.data['title'],
+                                  state.nowPlaying.title,
                                   style: TextStyle(
                                       fontSize: 18, color: titleColor),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
-                                  snapshot.data['presenters'],
+                                  state.nowPlaying.presenters,
                                   style: TextStyle(
                                       fontSize: 15, color: subtitleColor),
                                   overflow: TextOverflow.ellipsis,
@@ -87,10 +88,10 @@ Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
                   ),
                   GestureDetector(
                     onTap: () {
-                      playAudio(context, snapshot.data['audio_url']);
+                      playAudio(context, state.nowPlaying.audioUrl);
                     },
                     child: playerStateIconBuilder(
-                        state, 80, snapshot.data['audio_url']),
+                        state, 80, state.nowPlaying.audioUrl),
                   )
                 ],
               ),
@@ -121,11 +122,11 @@ Widget drawerPopUpMenu({AppState state, BuildContext context}) {
             leading: Icon(
               // Use empty choice to render custom widget
               Icons.check_circle,
-              color: switchCase2(state.selectedTheme, {
-                SelectedTheme.DARK: choice == darkTheme
+              color: switchCase2(state.colors.mainBackgroundColor, {
+                jayFmFancyBlack: choice == darkTheme
                     ? state.colors.mainIconsColor
                     : Colors.grey,
-                SelectedTheme.LIGHT: choice == lightTheme
+                jayFmBlue: choice == lightTheme
                     ? state.colors.mainIconsColor
                     : Colors.grey
               }),

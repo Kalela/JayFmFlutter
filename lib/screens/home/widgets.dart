@@ -25,57 +25,57 @@ Widget liveTabDetails(AppState state, BuildContext context) {
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Padding(padding: EdgeInsets.only(top: 0)),
-      StreamBuilder<Map<String, dynamic>>(
-          stream: audioPlayer.nowPlaying,
-          builder: (context, snapshot) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                snapshot.data != null
-                    ? Column(children: [
-                        Text(
-                          snapshot.data['title'] == 'Jay Fm Live'
-                              ? "LIVE PLAYING"
-                              : "NOW PLAYING",
-                          style: defaultTextStyle(state,
-                              textStyle: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                        ),
-                        Text(snapshot.data['title'].split(": ")[0],
-                            style: defaultTextStyle(state)),
-                      ])
-                    : Column(
-                        children: [
-                          Text(
-                            "LIVE RADIO",
-                            style: defaultTextStyle(state,
-                                textStyle: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
-                          ),
-                          Text("Jay Fm Live", style: defaultTextStyle(state)),
-                        ],
-                      ),
-                Padding(
-                  padding: EdgeInsets.only(top: 50),
-                ),
-                Container(
-                    height: _playButtonDiameter,
-                    width: _playButtonDiameter,
-                    child: RawMaterialButton(
-                        onPressed: () {
-                          playAudio(context, mainPodcastUrl);
-                          setNowPlayingInfo(title: "Jay Fm Live");
-                        },
-                        fillColor: state.colors.mainButtonsColor,
-                        shape: CircleBorder(),
-                        elevation: 10.0,
-                        child: Center(
-                            child: playerStateIconBuilder(
-                                state, _playButtonDiameter, mainPodcastUrl)))),
-              ],
-            );
-          }),
-      admobService.getBannerAd(context)
+      // StreamBuilder<Map<String, dynamic>>(
+      //     stream: audioPlayer.nowPlaying,
+      //     builder: (context, snap) {
+      //       return Column(
+      //         crossAxisAlignment: CrossAxisAlignment.center,
+      //         children: [
+      //           snapshot.data != null
+      //               ? Column(children: [
+      //                   Text(
+      //                     snapshot.data['title'] == 'Jay Fm Live'
+      //                         ? "LIVE PLAYING"
+      //                         : "NOW PLAYING",
+      //                     style: defaultTextStyle(state,
+      //                         textStyle: TextStyle(
+      //                             fontSize: 16, fontWeight: FontWeight.bold)),
+      //                   ),
+      //                   Text(snapshot.data['title'].split(": ")[0],
+      //                       style: defaultTextStyle(state)),
+      //                 ])
+      //               : Column(
+      //                   children: [
+      //                     Text(
+      //                       "LIVE RADIO",
+      //                       style: defaultTextStyle(state,
+      //                           textStyle: TextStyle(
+      //                               fontSize: 16, fontWeight: FontWeight.bold)),
+      //                     ),
+      //                     Text("Jay Fm Live", style: defaultTextStyle(state)),
+      //                   ],
+      //                 ),
+      //           Padding(
+      //             padding: EdgeInsets.only(top: 50),
+      //           ),
+      //           Container(
+      //               height: _playButtonDiameter,
+      //               width: _playButtonDiameter,
+      //               child: RawMaterialButton(
+      //                   onPressed: () {
+      //                     playAudio(context, mainPodcastUrl);
+      //                     setNowPlayingInfo(title: "Jay Fm Live");
+      //                   },
+      //                   fillColor: state.colors.mainButtonsColor,
+      //                   shape: CircleBorder(),
+      //                   elevation: 10.0,
+      //                   child: Center(
+      //                       child: playerStateIconBuilder(
+      //                           state, _playButtonDiameter, mainPodcastUrl)))),
+      //         ],
+      //       );
+      //     }),
+      // admobService.getBannerAd(context)
     ],
   );
 }

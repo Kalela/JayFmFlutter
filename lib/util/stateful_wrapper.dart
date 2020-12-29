@@ -1,3 +1,4 @@
+import 'package:JayFm/res/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/res/strings.dart';
@@ -48,7 +49,7 @@ class _StatefulWrapperState extends State<StatefulWrapper>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      widget.store.state.sharedPreferences.setInt(appTheme, widget.store.state.selectedTheme.index);
+      widget.store.state.sharedPreferences.setInt(appTheme, widget.store.state.colors.mainBackgroundColor == jayFmFancyBlack ? 0 : 1);
       widget.store.state.sharedPreferences.setInt(podcastQuality, widget.store.state.podcastQuality.index);
     }
   }
