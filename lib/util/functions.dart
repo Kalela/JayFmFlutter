@@ -1,3 +1,5 @@
+import 'package:JayFm/models/now_playing_state.dart';
+import 'package:JayFm/res/values.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
@@ -46,33 +48,4 @@ TValue switchCase2<TOptionType, TValue>(
   return branches[selectedOption];
 }
 
-/// Play audio provided by [audioUrl]
-playAudio(BuildContext context, String audioUrl) async {
-  if (_audioPlayer.playing &&
-      _audioPlayer.nowPlayingMap['audio_url'] == audioUrl) {
-    _audioPlayer.nowPlayingMap['audio_url'] = null;
-    await _audioPlayer.pause();
-    return;
-  }
 
-  if (_audioPlayer.playing) await _audioPlayer.pause();
-  _audioPlayer.nowPlayingMap['audio_url'] = audioUrl;
-  _audioPlayer.setVolume(1.0);
-  try {
-    await _audioPlayer.setUrl(audioUrl);
-  } catch (e) {
-    print(e);
-  }
-  await _audioPlayer.play();
-}
-
-/// Set information of the currently playing podcast/episode
-setNowPlayingInfo(
-    {String title,
-    String presenters = "Jay Fm",
-    String imageUrl =
-        "https://static.wixstatic.com/media/194ff5_d06f982159334744802a83b7d33a94ec~mv2_d_4489_3019_s_4_2.png/v1/fill/w_250,h_147,al_c,q_95/Finaly-PNG-LOGO.webp"}) {
-  audioPlayer.nowPlayingMap['title'] = title;
-  audioPlayer.nowPlayingMap['presenters'] = presenters;
-  audioPlayer.nowPlayingMap['image_url'] = imageUrl;
-}

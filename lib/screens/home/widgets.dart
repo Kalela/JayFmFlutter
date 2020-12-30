@@ -1,3 +1,4 @@
+import 'package:JayFm/models/now_playing_state.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -8,11 +9,11 @@ import 'package:JayFm/res/colors.dart';
 import 'package:JayFm/res/values.dart';
 import 'package:JayFm/screens/home/functions.dart';
 import 'package:JayFm/services/podcasts_service/podcasts_service.dart';
-import 'package:JayFm/util/functions.dart';
+import 'package:JayFm/services/player_service/player_service.dart';
 import 'package:JayFm/util/global_widgets.dart';
-import 'package:just_audio/just_audio.dart';
 
-AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
+JayFmPlayerService get audioPlayerService =>
+    GetIt.instance<JayFmPlayerService>();
 PodcastsService get podcastService => GetIt.instance<PodcastsService>();
 AdMobService get admobService => GetIt.instance<AdMobService>();
 
@@ -25,57 +26,56 @@ Widget liveTabDetails(AppState state, BuildContext context) {
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Padding(padding: EdgeInsets.only(top: 0)),
-      // StreamBuilder<Map<String, dynamic>>(
-      //     stream: audioPlayer.nowPlaying,
-      //     builder: (context, snap) {
-      //       return Column(
-      //         crossAxisAlignment: CrossAxisAlignment.center,
-      //         children: [
-      //           snapshot.data != null
-      //               ? Column(children: [
-      //                   Text(
-      //                     snapshot.data['title'] == 'Jay Fm Live'
-      //                         ? "LIVE PLAYING"
-      //                         : "NOW PLAYING",
-      //                     style: defaultTextStyle(state,
-      //                         textStyle: TextStyle(
-      //                             fontSize: 16, fontWeight: FontWeight.bold)),
-      //                   ),
-      //                   Text(snapshot.data['title'].split(": ")[0],
-      //                       style: defaultTextStyle(state)),
-      //                 ])
-      //               : Column(
-      //                   children: [
-      //                     Text(
-      //                       "LIVE RADIO",
-      //                       style: defaultTextStyle(state,
-      //                           textStyle: TextStyle(
-      //                               fontSize: 16, fontWeight: FontWeight.bold)),
-      //                     ),
-      //                     Text("Jay Fm Live", style: defaultTextStyle(state)),
-      //                   ],
-      //                 ),
-      //           Padding(
-      //             padding: EdgeInsets.only(top: 50),
-      //           ),
-      //           Container(
-      //               height: _playButtonDiameter,
-      //               width: _playButtonDiameter,
-      //               child: RawMaterialButton(
-      //                   onPressed: () {
-      //                     playAudio(context, mainPodcastUrl);
-      //                     setNowPlayingInfo(title: "Jay Fm Live");
-      //                   },
-      //                   fillColor: state.colors.mainButtonsColor,
-      //                   shape: CircleBorder(),
-      //                   elevation: 10.0,
-      //                   child: Center(
-      //                       child: playerStateIconBuilder(
-      //                           state, _playButtonDiameter, mainPodcastUrl)))),
-      //         ],
-      //       );
-      //     }),
-      // admobService.getBannerAd(context)
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          state.nowPlaying != null
+              ? Column(children: [
+                  Text(
+                    state.nowPlaying.title == 'Jay Fm Live'
+                        ? "LIVE PLAYING"
+                        : "NOW PLAYING",
+                    style: defaultTextStyle(state,
+                        textStyle: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
+                  Text(state.nowPlaying.title.split(": ")[0],
+                      style: defaultTextStyle(state)),
+                ])
+              : Column(
+                  children: [
+                    Text(
+                      "LIVE RADIO",
+                      style: defaultTextStyle(state,
+                          textStyle: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                    Text("Jay Fm Live", style: defaultTextStyle(state)),
+                  ],
+                ),
+          Padding(
+            padding: EdgeInsets.only(top: 50),
+          ),
+          Container(
+              height: _playButtonDiameter,
+              width: _playButtonDiameter,
+              child: RawMaterialButton(
+                  onPressed: () {
+                    audioPlayerService.playAudio(
+                        context,
+                        mainPodcastUrl,
+                        NowPlaying("imageUrl", "Jay Fm Live", "presenters",
+                            "audioUrl", false));
+                  },
+                  fillColor: state.colors.mainButtonsColor,
+                  shape: CircleBorder(),
+                  elevation: 10.0,
+                  child: Center(
+                      child: playerStateIconBuilder(
+                          state, _playButtonDiameter, mainPodcastUrl)))),
+        ],
+      ),
+      admobService.getBannerAd(context)
     ],
   );
 }
@@ -172,13 +172,22 @@ Widget savedTabDetails(AppState state) {
                       itemBuilder: (context, index) {
                         return Dismissible(
                           key: Key(snapshot.data[index].name),
-                          background: Container(color: jayFmMaroon, child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(child: Icon(Icons.delete), padding: EdgeInsets.only(left: 10),),
-                              Container(child: Icon(Icons.delete), padding: EdgeInsets.only(right: 10),),
-                            ],
-                          ),),
+                          background: Container(
+                            color: jayFmMaroon,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  child: Icon(Icons.delete),
+                                  padding: EdgeInsets.only(left: 10),
+                                ),
+                                Container(
+                                  child: Icon(Icons.delete),
+                                  padding: EdgeInsets.only(right: 10),
+                                ),
+                              ],
+                            ),
+                          ),
                           onDismissed: (direction) {
                             podcastService.deletePodcast(snapshot.data[index]);
                             Scaffold.of(context).showSnackBar(SnackBar(

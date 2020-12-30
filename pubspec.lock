@@ -145,7 +145,7 @@ packages:
       name: flutter_hooks
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.14.1"
+    version: "0.15.0"
   flutter_launcher_icons:
     dependency: "direct main"
     description:
@@ -160,13 +160,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.0"
-  flutter_riverpod:
-    dependency: transitive
-    description:
-      name: flutter_riverpod
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.12.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -184,13 +177,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.1"
-  freezed_annotation:
-    dependency: transitive
-    description:
-      name: freezed_annotation
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.12.0"
   get_it:
     dependency: "direct main"
     description:
@@ -198,13 +184,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.0.3"
-  hooks_riverpod:
-    dependency: "direct main"
-    description:
-      name: hooks_riverpod
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.12.1"
   http:
     dependency: "direct main"
     description:
@@ -233,13 +212,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.1"
-  json_annotation:
-    dependency: transitive
-    description:
-      name: json_annotation
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.1.1"
   just_audio:
     dependency: "direct main"
     description:
@@ -380,13 +352,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.0+3"
-  riverpod:
-    dependency: transitive
-    description:
-      name: riverpod
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.12.1"
   rxdart:
     dependency: "direct main"
     description:
@@ -469,13 +434,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0-nullsafety.1"
-  state_notifier:
-    dependency: transitive
-    description:
-      name: state_notifier
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.6.0"
   stream_channel:
     dependency: transitive
     description:

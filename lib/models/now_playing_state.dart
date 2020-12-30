@@ -3,6 +3,7 @@ class NowPlaying {
   final String title;
   final String presenters;
   final String audioUrl;
+  final bool paused;
 
-  NowPlaying(this.imageUrl, this.title, this.presenters, this.audioUrl);
+  NowPlaying(this.imageUrl, this.title, this.presenters, this.audioUrl, this.paused);
 }

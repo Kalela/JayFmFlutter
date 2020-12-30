@@ -1,6 +1,5 @@
 import 'package:JayFm/models/global_app_colors.dart';
 import 'package:JayFm/res/colors.dart';
-import 'package:JayFm/res/values.dart';
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -9,6 +8,7 @@ import 'package:JayFm/res/strings.dart' as strings;
 import 'package:JayFm/services/admob_service.dart';
 import 'package:JayFm/services/podcasts_service/dependencies/database_service.dart';
 import 'package:JayFm/services/podcasts_service/podcasts_service.dart';
+import 'package:JayFm/services/player_service/player_service.dart';
 import 'package:JayFm/services/podcasts_service/dependencies/podcast_stream_controller.dart';
 import 'package:JayFm/util/stateful_wrapper.dart';
 import 'package:just_audio/just_audio.dart';
@@ -55,6 +55,7 @@ void setUpGetIt() {
   GetIt.instance.registerLazySingleton(() => PodcastsService());
   GetIt.instance.registerLazySingleton(() => AudioPlayer());
   GetIt.instance.registerLazySingleton(() => AdMobService());
+  GetIt.instance.registerLazySingleton(() => JayFmPlayerService());
 }
 
 class Root extends StatelessWidget {

@@ -1,7 +1,10 @@
+import 'package:JayFm/models/now_playing_state.dart';
 import 'package:JayFm/res/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
@@ -9,25 +12,29 @@ import 'package:JayFm/res/strings.dart';
 import 'package:JayFm/res/values.dart';
 import 'package:JayFm/util/functions.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:JayFm/services/player_service/player_service.dart';
 
-AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
+JayFmPlayerService get audioPlayerService =>
+    GetIt.instance<JayFmPlayerService>();
 
 /// The now playing footer(typically goes into scaffold bottom)
-Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
-    Color subtitleColor) {
-  return StreamBuilder<Map<String, dynamic>>(
-      stream: audioPlayer.nowPlaying,
-      builder: (context, snap) {
+class NowPlayingFooter extends HookWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StoreConnector<AppState, AppState>(
+      converter: (store) => store.state,
+      builder: (context, state) {
         if (state.nowPlaying == null) {
           return Container(
             padding: EdgeInsets.all(10),
-            color: backgroundColor,
+            color: jayFmMaroon,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 ClipOval(
                   child: Container(
-                    child: Image.asset('assets/images/about-you-placeholder.jpg'),
+                    child:
+                        Image.asset('assets/images/about-you-placeholder.jpg'),
                     height: 50,
                     width: 50,
                   ),
@@ -38,7 +45,7 @@ Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
         }
         return Container(
             padding: EdgeInsets.all(10),
-            color: backgroundColor,
+            color: jayFmMaroon,
             child: Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -70,13 +77,13 @@ Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
                                 Text(
                                   state.nowPlaying.title,
                                   style: TextStyle(
-                                      fontSize: 18, color: titleColor),
+                                      fontSize: 18, color: Colors.grey),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
                                   state.nowPlaying.presenters,
                                   style: TextStyle(
-                                      fontSize: 15, color: subtitleColor),
+                                      fontSize: 15, color: jayFmOrange),
                                   overflow: TextOverflow.ellipsis,
                                 )
                               ],
@@ -88,15 +95,26 @@ Widget nowPlayingFooter(AppState state, Color backgroundColor, Color titleColor,
                   ),
                   GestureDetector(
                     onTap: () {
-                      playAudio(context, state.nowPlaying.audioUrl);
+                      audioPlayerService.playAudio(context, state.nowPlaying.audioUrl, state.nowPlaying);
                     },
-                    child: playerStateIconBuilder(
-                        state, 80, state.nowPlaying.audioUrl),
+                    child: state.nowPlaying == null
+                        ? Icon(
+                            Icons.play_arrow,
+                            color: state.colors.mainIconsColor,
+                            size: 40,
+                          )
+                        : Icon(
+                            Icons.pause,
+                            color: state.colors.mainIconsColor,
+                            size: 40,
+                          ),
                   )
                 ],
               ),
             ));
-      });
+      },
+    );
+  }
 }
 
 /// The drawer pop up menu
@@ -241,7 +259,7 @@ showToastMessage(String message) {
 Widget playerStateIconBuilder(
     AppState state, double _playButtonDiameter, String url) {
   return StreamBuilder<PlayerState>(
-    stream: audioPlayer.playerStateStream,
+    stream: audioPlayerService.audioPlayer.playerStateStream,
     builder: (context, snapshot) {
       if (snapshot.data == null) {
         return Icon(
@@ -251,15 +269,13 @@ Widget playerStateIconBuilder(
         );
       }
 
-      if (snapshot.data.playing &&
-          audioPlayer.nowPlayingMap['audio_url'] == url) {
+      if (snapshot.data.playing) {
         return Icon(
           Icons.pause,
           color: state.colors.mainIconsColor,
           size: _playButtonDiameter / 2,
         );
-      } else if (!snapshot.data.playing &&
-          audioPlayer.nowPlayingMap['audio_url'] == url) {
+      } else if (!snapshot.data.playing) {
         return switchCase2(snapshot.data.processingState, {
           ProcessingState.none: Icon(
             Icons.play_arrow,

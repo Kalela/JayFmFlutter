@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'package:JayFm/models/now_playing_state.dart';
+import 'package:JayFm/util/global_widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -8,12 +9,13 @@ import 'package:JayFm/models/podcast.dart';
 import 'package:JayFm/res/values.dart';
 import 'package:JayFm/screens/details/functions.dart';
 import 'package:JayFm/services/admob_service.dart';
-import 'package:JayFm/util/functions.dart';
-import 'package:JayFm/util/global_widgets.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:JayFm/services/player_service/player_service.dart';
 
 AdMobService get admobService => GetIt.instance<AdMobService>();
+JayFmPlayerService get audioPlayerService =>
+    GetIt.instance<JayFmPlayerService>();
 final Completer<String> urlCompleter = Completer<String>();
 
 /// Podcast episodes list built from company owned resource
@@ -31,7 +33,7 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
 
       return SliverPadding(
         padding: EdgeInsets.only(bottom: 70),
-              sliver: SliverList(
+        sliver: SliverList(
             delegate: SliverChildBuilderDelegate((context, i) {
           List<String> splitTitle = snapshot.data.items[i].title.split(": ");
           return ExpansionTile(
@@ -58,14 +60,18 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
               ],
               trailing: GestureDetector(
                 onTap: () {
-                  // playAudio(context, snapshot.data.items[i].enclosure.url);
-                  // setNowPlayingInfo(
-                  //     title: snapshot.data.items[i].title,
-                  //     presenters: getPresenters(splitTitle),
-                  //     imageUrl: snapshot.data.items[i].itunes.image.href);
+                  audioPlayerService.playAudio(
+                      context,
+                      snapshot.data.items[i].enclosure.url,
+                      NowPlaying(
+                          snapshot.data.items[i].itunes.image.href,
+                          snapshot.data.items[i].title,
+                          getPresenters(splitTitle),
+                          snapshot.data.items[i].enclosure.url,
+                          false));
                 },
-                // child: playerStateIconBuilder(
-                //     state, 80, snapshot.data.items[i].enclosure.url),
+                child: playerStateIconBuilder(
+                    state, 80, snapshot.data.items[i].enclosure.url),
               ));
         }, childCount: snapshot.data.items.length)),
       );
@@ -76,7 +82,7 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
 Widget castboxPodcast(Podcast podcast) {
   return SliverPadding(
     padding: EdgeInsets.only(bottom: 70),
-      sliver: SliverList(
+    sliver: SliverList(
         delegate: SliverChildListDelegate([
       Container(
         height: 500,
