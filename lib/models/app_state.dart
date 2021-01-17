@@ -6,11 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppState {
   final PodcastQuality podcastQuality;
   final SharedPreferences sharedPreferences;
-  final NowPlaying nowPlaying;
 
   final GlobalAppColors colors;
 
-  AppState(this.colors, this.sharedPreferences, this.podcastQuality, this.nowPlaying);
+  AppState(this.colors, this.sharedPreferences, this.podcastQuality);
 }
 
 enum SelectedTheme { DARK, LIGHT }

@@ -64,14 +64,14 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
                       context,
                       snapshot.data.items[i].enclosure.url,
                       NowPlaying(
-                          snapshot.data.items[i].itunes.image.href,
-                          snapshot.data.items[i].title,
-                          getPresenters(splitTitle),
-                          snapshot.data.items[i].enclosure.url,
-                          false));
+                        snapshot.data.items[i].itunes.image.href,
+                        snapshot.data.items[i].title,
+                        getPresenters(splitTitle),
+                        snapshot.data.items[i].enclosure.url,
+                      ));
                 },
-                child: playerStateIconBuilder(
-                    state, 80, snapshot.data.items[i].enclosure.url),
+                child: PlayerStateIconBuilder(
+                    80, snapshot.data.items[i].enclosure.url, state),
               ));
         }, childCount: snapshot.data.items.length)),
       );

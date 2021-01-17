@@ -1,11 +1,12 @@
 import 'package:JayFm/models/now_playing_state.dart';
 import 'package:JayFm/res/colors.dart';
+import 'package:JayFm/screens/now_playing/now_playing_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+// import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/res/strings.dart';
@@ -19,12 +20,15 @@ JayFmPlayerService get audioPlayerService =>
 
 /// The now playing footer(typically goes into scaffold bottom)
 class NowPlayingFooter extends HookWidget {
+  final AppState state;
+
+  NowPlayingFooter(this.state);
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, AppState>(
-      converter: (store) => store.state,
-      builder: (context, state) {
-        if (state.nowPlaying == null) {
+    return StreamBuilder<NowPlaying>(
+      stream: audioPlayerService.nowPlayingStream,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
           return Container(
             padding: EdgeInsets.all(10),
             color: jayFmMaroon,
@@ -43,75 +47,85 @@ class NowPlayingFooter extends HookWidget {
             ),
           );
         }
-        return Container(
-            padding: EdgeInsets.all(10),
-            color: jayFmMaroon,
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ClipOval(
-                          child: Container(
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) => Image.asset(
-                                  'assets/images/about-you-placeholder.jpg'),
-                              imageUrl: state.nowPlaying.imageUrl,
-                            ),
-                            height: 50,
-                            width: 50,
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(left: 10),
-                        ),
-                        Flexible(
-                          child: Container(
-                            padding: EdgeInsets.only(top: 4),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  state.nowPlaying.title,
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.grey),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  state.nowPlaying.presenters,
-                                  style: TextStyle(
-                                      fontSize: 15, color: jayFmOrange),
-                                  overflow: TextOverflow.ellipsis,
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      audioPlayerService.playAudio(context, state.nowPlaying.audioUrl, state.nowPlaying);
-                    },
-                    child: state.nowPlaying == null
-                        ? Icon(
-                            Icons.play_arrow,
-                            color: state.colors.mainIconsColor,
-                            size: 40,
-                          )
-                        : Icon(
-                            Icons.pause,
-                            color: state.colors.mainIconsColor,
-                            size: 40,
-                          ),
-                  )
-                ],
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => NowPlayingPage(),
               ),
-            ));
+            );
+          },
+          child: Container(
+              padding: EdgeInsets.all(10),
+              color: jayFmMaroon,
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          ClipOval(
+                            child: Container(
+                              child: CachedNetworkImage(
+                                placeholder: (context, url) => Image.asset(
+                                    'assets/images/about-you-placeholder.jpg'),
+                                imageUrl: snapshot.data.imageUrl,
+                              ),
+                              height: 50,
+                              width: 50,
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 10),
+                          ),
+                          Flexible(
+                            child: Container(
+                              padding: EdgeInsets.only(top: 4),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    snapshot.data.title,
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.grey),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    snapshot.data.presenters,
+                                    style: TextStyle(
+                                        fontSize: 15, color: jayFmOrange),
+                                    overflow: TextOverflow.ellipsis,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        audioPlayerService.playAudio(context,
+                            snapshot.data.audioUrl, snapshot.data);
+                      },
+                      child: snapshot.data == null
+                          ? Icon(
+                              Icons.play_arrow,
+                              color: state.colors.mainIconsColor,
+                              size: 40,
+                            )
+                          : Icon(
+                              Icons.pause,
+                              color: state.colors.mainIconsColor,
+                              size: 40,
+                            ),
+                    )
+                  ],
+                ),
+              )),
+        );
       },
     );
   }
@@ -251,60 +265,128 @@ Widget allPodcastsListView(List<Widget> tileList) {
 }
 
 /// Show toast message
-showToastMessage(String message) {
-  Fluttertoast.showToast(msg: message);
+// showToastMessage(String message) {
+//   Fluttertoast.showToast(msg: message);
+// }
+
+class PlayerStateIconBuilder extends StatelessWidget {
+  final double _playButtonDiameter;
+  final String url;
+  final AppState state;
+
+  PlayerStateIconBuilder(this._playButtonDiameter, this.url, this.state);
+  @override
+  Widget build(BuildContext context) {
+    print("building");
+    print("building url is $url");
+    return StreamBuilder<NowPlaying>(
+      stream: audioPlayerService.nowPlayingStream,
+      builder: (context, snapshotNowPlaying) {
+        print("building now playing ${snapshotNowPlaying.data}");
+        return StreamBuilder<PlayerState>(
+          stream: audioPlayerService.audioPlayer.playerStateStream,
+          builder: (context, snapshot) {
+            if (snapshot.data == null) {
+              return Icon(
+                Icons.play_arrow,
+                color: state.colors.mainIconsColor,
+                size: _playButtonDiameter / 2,
+              );
+            }
+
+            if (snapshot.data.playing && url == snapshotNowPlaying.data.audioUrl) {
+              return Icon(
+                Icons.pause,
+                color: state.colors.mainIconsColor,
+                size: _playButtonDiameter / 2,
+              );
+            } else if (!snapshot.data.playing) {
+              return switchCase2(snapshot.data.processingState, {
+                ProcessingState.idle: Icon(
+                  Icons.play_arrow,
+                  color: state.colors.mainIconsColor,
+                  size: _playButtonDiameter / 2,
+                ),
+                ProcessingState.loading: SizedBox(
+                  height: _playButtonDiameter / 2,
+                  width: _playButtonDiameter / 2,
+                  child: CircularProgressIndicator(),
+                ),
+                ProcessingState.buffering: SizedBox(
+                  height: _playButtonDiameter / 2,
+                  width: _playButtonDiameter / 2,
+                  child: CircularProgressIndicator(),
+                ),
+                ProcessingState.ready: Icon(
+                  Icons.play_arrow,
+                  color: state.colors.mainIconsColor,
+                  size: _playButtonDiameter / 2,
+                ),
+              });
+            } else {
+              return Icon(
+                Icons.play_arrow,
+                color: state.colors.mainIconsColor,
+                size: _playButtonDiameter / 2,
+              );
+            }
+          },
+        );
+      },
+    );
+  }
 }
 
-/// Builds the play button icon based on the current play state
-Widget playerStateIconBuilder(
-    AppState state, double _playButtonDiameter, String url) {
-  return StreamBuilder<PlayerState>(
-    stream: audioPlayerService.audioPlayer.playerStateStream,
-    builder: (context, snapshot) {
-      if (snapshot.data == null) {
-        return Icon(
-          Icons.play_arrow,
-          color: state.colors.mainIconsColor,
-          size: _playButtonDiameter / 2,
-        );
-      }
+//
+// Widget PlayerStateIconBuilder(
+//     AppState state, double _playButtonDiameter, String url) {
+//   return StreamBuilder<PlayerState>(
+//     stream: audioPlayerService.audioPlayer.playerStateStream,
+//     builder: (context, snapshot) {
+//       if (snapshot.data == null) {
+//         return Icon(
+//           Icons.play_arrow,
+//           color: state.colors.mainIconsColor,
+//           size: _playButtonDiameter / 2,
+//         );
+//       }
 
-      if (snapshot.data.playing) {
-        return Icon(
-          Icons.pause,
-          color: state.colors.mainIconsColor,
-          size: _playButtonDiameter / 2,
-        );
-      } else if (!snapshot.data.playing) {
-        return switchCase2(snapshot.data.processingState, {
-          ProcessingState.none: Icon(
-            Icons.play_arrow,
-            color: state.colors.mainIconsColor,
-            size: _playButtonDiameter / 2,
-          ),
-          ProcessingState.loading: SizedBox(
-            height: _playButtonDiameter / 2,
-            width: _playButtonDiameter / 2,
-            child: CircularProgressIndicator(),
-          ),
-          ProcessingState.buffering: SizedBox(
-            height: _playButtonDiameter / 2,
-            width: _playButtonDiameter / 2,
-            child: CircularProgressIndicator(),
-          ),
-          ProcessingState.ready: Icon(
-            Icons.play_arrow,
-            color: state.colors.mainIconsColor,
-            size: _playButtonDiameter / 2,
-          ),
-        });
-      } else {
-        return Icon(
-          Icons.play_arrow,
-          color: state.colors.mainIconsColor,
-          size: _playButtonDiameter / 2,
-        );
-      }
-    },
-  );
-}
+//       if (snapshot.data.playing) {
+//         return Icon(
+//           Icons.pause,
+//           color: state.colors.mainIconsColor,
+//           size: _playButtonDiameter / 2,
+//         );
+//       } else if (!snapshot.data.playing) {
+//         return switchCase2(snapshot.data.processingState, {
+//           ProcessingState.idle: Icon(
+//             Icons.play_arrow,
+//             color: state.colors.mainIconsColor,
+//             size: _playButtonDiameter / 2,
+//           ),
+//           ProcessingState.loading: SizedBox(
+//             height: _playButtonDiameter / 2,
+//             width: _playButtonDiameter / 2,
+//             child: CircularProgressIndicator(),
+//           ),
+//           ProcessingState.buffering: SizedBox(
+//             height: _playButtonDiameter / 2,
+//             width: _playButtonDiameter / 2,
+//             child: CircularProgressIndicator(),
+//           ),
+//           ProcessingState.ready: Icon(
+//             Icons.play_arrow,
+//             color: state.colors.mainIconsColor,
+//             size: _playButtonDiameter / 2,
+//           ),
+//         });
+//       } else {
+//         return Icon(
+//           Icons.play_arrow,
+//           color: state.colors.mainIconsColor,
+//           size: _playButtonDiameter / 2,
+//         );
+//       }
+//     },
+//   );
+// }

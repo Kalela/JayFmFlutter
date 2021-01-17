@@ -39,7 +39,7 @@ void main() async {
     quality = PodcastQuality.values[prefs.getInt(strings.podcastQuality)];
   }
 
-  final _initialState = AppState(colors, prefs, quality, null);
+  final _initialState = AppState(colors, prefs, quality);
 
   final Store<AppState> _store =
       Store<AppState>(reducer, initialState: _initialState);

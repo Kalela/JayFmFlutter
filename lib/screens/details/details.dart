@@ -99,7 +99,7 @@ class DetailsPage extends StatelessWidget {
                 ),
               )),
           bottomSheet: Container(
-              height: 70, color: Colors.black, child: NowPlayingFooter()),
+              height: 70, color: Colors.black, child: NowPlayingFooter(state)),
         );
       },
     );

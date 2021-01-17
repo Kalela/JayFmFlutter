@@ -1,24 +1,36 @@
-import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/models/now_playing_state.dart';
-import 'package:JayFm/redux/actions.dart';
-import 'package:JayFm/res/values.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
 
 class JayFmPlayerService {
   AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
+  ConcatenatingAudioSource playlist;
+  final _nowPlayingStream = BehaviorSubject<NowPlaying>();
+  Stream<NowPlaying> get nowPlayingStream => _nowPlayingStream.stream;
+
+  Function(NowPlaying) get changeNowPlaying => _nowPlayingStream.sink.add;
+
+  JayFmPlayerService({this.playlist}) {
+    _init(playlist);
+  }
+
+  _init(ConcatenatingAudioSource playlist) async {
+    final session = await AudioSession.instance;
+    await session.configure(AudioSessionConfiguration.speech());
+  }
 
   /// Play audio provided by [audioUrl]
-  playAudio(
-      BuildContext context, String audioUrl, NowPlaying nowPlaying) async {
-    if (audioPlayer.playing) {
+  playAudio(BuildContext context, String audioUrl, NowPlaying nowPlaying,
+      [ConcatenatingAudioSource playlist]) async {
+    var previouslyPlaying = await this.nowPlayingStream.first;
+    if (audioPlayer.playing && previouslyPlaying.audioUrl != audioUrl) {
       await audioPlayer.pause();
       nowPlaying = NowPlaying(nowPlaying.imageUrl, nowPlaying.title,
-          nowPlaying.presenters, nowPlaying.audioUrl, true);
-      StoreProvider.of<AppState>(context)
-          .dispatch(NowPlayingAction(nowPlaying));
+          nowPlaying.presenters, nowPlaying.audioUrl);
+      this.changeNowPlaying(nowPlaying);
       return;
     }
 
@@ -30,8 +42,8 @@ class JayFmPlayerService {
     }
     await audioPlayer.play();
     nowPlaying = NowPlaying(nowPlaying.imageUrl, nowPlaying.title,
-          nowPlaying.presenters, nowPlaying.audioUrl, false);
-    StoreProvider.of<AppState>(context).dispatch(NowPlayingAction(nowPlaying));
+        nowPlaying.presenters, nowPlaying.audioUrl);
+    this.changeNowPlaying(nowPlaying);
   }
 
   // /// Set information of the currently playing podcast/episode
@@ -44,4 +56,9 @@ class JayFmPlayerService {
   //   StoreProvider.of<AppState>(context).dispatch(
   //       NowPlayingAction(NowPlaying(imageUrl, title, presenters, audioUrl)));
   // }
+
+  dispose() {
+    _nowPlayingStream.close();
+    audioPlayer.dispose();
+  }
 }

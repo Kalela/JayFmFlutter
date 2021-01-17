@@ -26,55 +26,66 @@ Widget liveTabDetails(AppState state, BuildContext context) {
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Padding(padding: EdgeInsets.only(top: 0)),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          state.nowPlaying != null
-              ? Column(children: [
-                  Text(
-                    state.nowPlaying.title == 'Jay Fm Live'
-                        ? "LIVE PLAYING"
-                        : "NOW PLAYING",
-                    style: defaultTextStyle(state,
-                        textStyle: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                  ),
-                  Text(state.nowPlaying.title.split(": ")[0],
-                      style: defaultTextStyle(state)),
-                ])
-              : Column(
-                  children: [
-                    Text(
-                      "LIVE RADIO",
-                      style: defaultTextStyle(state,
-                          textStyle: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
-                    ),
-                    Text("Jay Fm Live", style: defaultTextStyle(state)),
-                  ],
+      StreamBuilder<NowPlaying>(
+          stream: audioPlayerService.nowPlayingStream,
+          builder: (context, snapshot) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                snapshot.data != null
+                    ? Column(children: [
+                        Text(
+                          snapshot.data.title == 'Jay Fm Live'
+                              ? "LIVE PLAYING"
+                              : "NOW PLAYING",
+                          style: defaultTextStyle(state,
+                              textStyle: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                        ),
+                        Text(snapshot.data.title.split(": ")[0],
+                            style: defaultTextStyle(state)),
+                      ])
+                    : Column(
+                        children: [
+                          Text(
+                            "LIVE RADIO",
+                            style: defaultTextStyle(state,
+                                textStyle: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                          Text("Jay Fm Live", style: defaultTextStyle(state)),
+                        ],
+                      ),
+                Padding(
+                  padding: EdgeInsets.only(top: 50),
                 ),
-          Padding(
-            padding: EdgeInsets.only(top: 50),
-          ),
-          Container(
-              height: _playButtonDiameter,
-              width: _playButtonDiameter,
-              child: RawMaterialButton(
-                  onPressed: () {
-                    audioPlayerService.playAudio(
-                        context,
-                        mainPodcastUrl,
-                        NowPlaying("imageUrl", "Jay Fm Live", "presenters",
-                            "audioUrl", false));
-                  },
-                  fillColor: state.colors.mainButtonsColor,
-                  shape: CircleBorder(),
-                  elevation: 10.0,
-                  child: Center(
-                      child: playerStateIconBuilder(
-                          state, _playButtonDiameter, mainPodcastUrl)))),
-        ],
-      ),
+                Container(
+                  height: _playButtonDiameter,
+                  width: _playButtonDiameter,
+                  child: RawMaterialButton(
+                    onPressed: () {
+                      audioPlayerService.playAudio(
+                          context,
+                          mainPodcastUrl,
+                          NowPlaying(
+                            "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/1257463/1257463-1544431099377-b5cff27e66947.jpg",
+                            "Jay Fm Live",
+                            "presenters",
+                            mainPodcastUrl,
+                          ));
+                    },
+                    fillColor: state.colors.mainButtonsColor,
+                    shape: CircleBorder(),
+                    elevation: 10.0,
+                    child: Center(
+                      child: PlayerStateIconBuilder(
+                          _playButtonDiameter, mainPodcastUrl, state),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }),
       admobService.getBannerAd(context)
     ],
   );
