@@ -1,3 +1,4 @@
+import 'package:JayFm/models/audio_meta_data.dart';
 import 'package:JayFm/models/now_playing_state.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -11,6 +12,7 @@ import 'package:JayFm/screens/home/functions.dart';
 import 'package:JayFm/services/podcasts_service/podcasts_service.dart';
 import 'package:JayFm/services/player_service/player_service.dart';
 import 'package:JayFm/util/global_widgets.dart';
+import 'package:just_audio/just_audio.dart';
 
 JayFmPlayerService get audioPlayerService =>
     GetIt.instance<JayFmPlayerService>();
@@ -26,25 +28,42 @@ Widget liveTabDetails(AppState state, BuildContext context) {
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Padding(padding: EdgeInsets.only(top: 0)),
-      StreamBuilder<NowPlaying>(
-          stream: audioPlayerService.nowPlayingStream,
+      StreamBuilder<SequenceState>(
+          stream: audioPlayerService.audioPlayer.sequenceStateStream,
           builder: (context, snapshot) {
+            final state2 = snapshot.data;
+            var metadata;
+            if (state2 != null) {
+              metadata = state2.currentSource.tag as AudioMetadata;
+            }
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 snapshot.data != null
-                    ? Column(children: [
-                        Text(
-                          snapshot.data.title == 'Jay Fm Live'
-                              ? "LIVE PLAYING"
-                              : "NOW PLAYING",
-                          style: defaultTextStyle(state,
-                              textStyle: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                        ),
-                        Text(snapshot.data.title.split(": ")[0],
-                            style: defaultTextStyle(state)),
-                      ])
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                            Text(
+                              metadata.title == 'Jay FM LIVE'
+                                  ? "LIVE PLAYING"
+                                  : "NOW PLAYING",
+                              style: defaultTextStyle(state,
+                                  textStyle: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 10),
+                            ),
+                            Center(
+                                child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 30.0),
+                              child: Text(metadata.presenters,
+                                  style: defaultTextStyle(state)),
+                            )),
+                          ])
                     : Column(
                         children: [
                           Text(
@@ -62,26 +81,75 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                 Container(
                   height: _playButtonDiameter,
                   width: _playButtonDiameter,
-                  child: RawMaterialButton(
-                    onPressed: () {
-                      audioPlayerService.playAudio(
-                          context,
-                          mainPodcastUrl,
-                          NowPlaying(
-                            "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/1257463/1257463-1544431099377-b5cff27e66947.jpg",
-                            "Jay Fm Live",
-                            "presenters",
-                            mainPodcastUrl,
-                          ));
-                    },
-                    fillColor: state.colors.mainButtonsColor,
-                    shape: CircleBorder(),
-                    elevation: 10.0,
-                    child: Center(
-                      child: PlayerStateIconBuilder(
-                          _playButtonDiameter, mainPodcastUrl, state),
-                    ),
-                  ),
+                  child: StreamBuilder<SequenceState>(
+                      stream:
+                          audioPlayerService.audioPlayer.sequenceStateStream,
+                      builder: (context, sequenceSnapshot) {
+                        return StreamBuilder<PlayerState>(
+                            stream: audioPlayerService
+                                .audioPlayer.playerStateStream,
+                            builder: (context, playerStateSnapshot) {
+                              return RawMaterialButton(
+                                onPressed: () async {
+                                  var playlist =
+                                      ConcatenatingAudioSource(children: [
+                                    AudioSource.uri(
+                                      Uri.parse(mainPodcastUrl),
+                                      tag: AudioMetadata(
+                                        presenters: "Jay FM",
+                                        artwork:
+                                            "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/1257463/1257463-1544431099377-b5cff27e66947.jpg",
+                                        title: "Jay FM LIVE",
+                                      ),
+                                    )
+                                  ]);
+                                  if (sequenceSnapshot.data != null) {
+                                    if (sequenceSnapshot
+                                            .data.sequence[0].tag.title !=
+                                        playlist.children[0].sequence[0].tag
+                                            .title) {
+                                      // Check if the playing playlist and the new playlist are the same
+                                      await audioPlayerService
+                                          .setPlaylist(playlist);
+                                    }
+
+                                    if (sequenceSnapshot
+                                                .data.currentSource.tag.title ==
+                                            playlist.children[0].sequence[0].tag
+                                                .title &&
+                                        playerStateSnapshot.data.playing) {
+                                      await audioPlayerService.audioPlayer
+                                          .pause();
+                                    } else {
+                                      await audioPlayerService.audioPlayer
+                                          .seek(Duration.zero, index: 0);
+                                      await audioPlayerService.audioPlayer
+                                          .play();
+                                    }
+                                  } else {
+                                    await audioPlayerService
+                                        .setPlaylist(playlist);
+                                    await audioPlayerService.audioPlayer
+                                        .seek(Duration.zero, index: 0);
+                                    await audioPlayerService.audioPlayer.play();
+                                  }
+                                },
+                                fillColor: state.colors.mainButtonsColor,
+                                shape: CircleBorder(),
+                                elevation: 10.0,
+                                child: Center(
+                                  child: PlayerStateIconBuilder(
+                                      _playButtonDiameter,
+                                      AudioMetadata(
+                                        presenters: "Jay FM",
+                                        artwork: "",
+                                        title: "Jay FM LIVE",
+                                      ),
+                                      state),
+                                ),
+                              );
+                            });
+                      }),
                 ),
               ],
             );

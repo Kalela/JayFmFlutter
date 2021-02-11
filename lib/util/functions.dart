@@ -1,13 +1,11 @@
-import 'package:JayFm/models/now_playing_state.dart';
-import 'package:JayFm/res/values.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/redux/actions.dart';
 import 'package:JayFm/res/strings.dart';
-import 'package:JayFm/screens/home/widgets.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 AudioPlayer get _audioPlayer => GetIt.instance<AudioPlayer>();
 
@@ -48,4 +46,13 @@ TValue switchCase2<TOptionType, TValue>(
   return branches[selectedOption];
 }
 
-
+launchApp(url) async {
+  if (await canLaunch(url)) {
+    await launch(
+      url,
+      universalLinksOnly: true,
+    );
+  } else {
+    throw 'There was a problem to open the url: $url';
+  }
+}

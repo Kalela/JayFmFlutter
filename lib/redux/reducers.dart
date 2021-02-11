@@ -13,13 +13,10 @@ GlobalAppColors themeReducer(GlobalAppColors colors, dynamic action) {
   if (!(action is SelectedThemeAction)) {
     return colors;
   }
-  print("I am here selected is ${action.payload}");
 
   if (action.payload == SelectedTheme.LIGHT) {
-    print("returned light");
     colors = lightColors;
   } else if (action.payload == SelectedTheme.DARK) {
-    print("returned dark");
     colors = darkColors;
   }
 
@@ -27,6 +24,5 @@ GlobalAppColors themeReducer(GlobalAppColors colors, dynamic action) {
 }
 
 PodcastQuality podcastQualityReducer(PodcastQuality quality, dynamic action) {
-  print("podcast quality is ${action.payload}");
   return action is PodcastQualityAction ? action.payload : quality;
 }

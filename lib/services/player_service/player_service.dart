@@ -8,54 +8,29 @@ import 'package:rxdart/rxdart.dart';
 class JayFmPlayerService {
   AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
   ConcatenatingAudioSource playlist;
-  final _nowPlayingStream = BehaviorSubject<NowPlaying>();
+  final _nowPlayingStream = ReplaySubject<NowPlaying>();
+
+  /// Currently playing
   Stream<NowPlaying> get nowPlayingStream => _nowPlayingStream.stream;
 
   Function(NowPlaying) get changeNowPlaying => _nowPlayingStream.sink.add;
 
-  JayFmPlayerService({this.playlist}) {
-    _init(playlist);
+  JayFmPlayerService() {
+    _init();
   }
 
-  _init(ConcatenatingAudioSource playlist) async {
+  _init() async {
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration.speech());
   }
 
-  /// Play audio provided by [audioUrl]
-  playAudio(BuildContext context, String audioUrl, NowPlaying nowPlaying,
-      [ConcatenatingAudioSource playlist]) async {
-    var previouslyPlaying = await this.nowPlayingStream.first;
-    if (audioPlayer.playing && previouslyPlaying.audioUrl != audioUrl) {
-      await audioPlayer.pause();
-      nowPlaying = NowPlaying(nowPlaying.imageUrl, nowPlaying.title,
-          nowPlaying.presenters, nowPlaying.audioUrl);
-      this.changeNowPlaying(nowPlaying);
-      return;
-    }
-
-    audioPlayer.setVolume(1.0);
+  Future setPlaylist(ConcatenatingAudioSource playlist) async {
     try {
-      await audioPlayer.setUrl(audioUrl);
-    } catch (e) {
-      print(e);
+      await audioPlayer.setAudioSource(playlist);
+    } on Exception catch (e) {
+      print("An error occured $e");
     }
-    await audioPlayer.play();
-    nowPlaying = NowPlaying(nowPlaying.imageUrl, nowPlaying.title,
-        nowPlaying.presenters, nowPlaying.audioUrl);
-    this.changeNowPlaying(nowPlaying);
   }
-
-  // /// Set information of the currently playing podcast/episode
-  // setNowPlayingInfo(BuildContext context,
-  //     {String title,
-  //     String presenters = "Jay Fm",
-  //     String imageUrl =
-  //         "https://static.wixstatic.com/media/194ff5_d06f982159334744802a83b7d33a94ec~mv2_d_4489_3019_s_4_2.png/v1/fill/w_250,h_147,al_c,q_95/Finaly-PNG-LOGO.webp",
-  //     String audioUrl = mainPodcastUrl}) {
-  //   StoreProvider.of<AppState>(context).dispatch(
-  //       NowPlayingAction(NowPlaying(imageUrl, title, presenters, audioUrl)));
-  // }
 
   dispose() {
     _nowPlayingStream.close();

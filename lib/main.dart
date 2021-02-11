@@ -1,6 +1,7 @@
 import 'package:JayFm/models/global_app_colors.dart';
 import 'package:JayFm/res/colors.dart';
 import 'package:admob_flutter/admob_flutter.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
@@ -89,7 +90,8 @@ class Root extends StatelessWidget {
               },
               child: StoreConnector<AppState, AppState>(
                 converter: (store) => store.state,
-                builder: (context, state) => HomePage(),
+                builder: (context, state) =>
+                    AudioServiceWidget(child: HomePage()),
               ),
             ),
           );
