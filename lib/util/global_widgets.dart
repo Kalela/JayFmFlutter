@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:JayFm/models/audio_meta_data.dart';
 import 'package:JayFm/res/colors.dart';
 import 'package:JayFm/screens/now_playing/now_playing_screen.dart';
+import 'package:JayFm/util/audio_player_task.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -26,13 +28,13 @@ class NowPlayingFooter extends HookWidget {
   NowPlayingFooter(this.state);
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<SequenceState>(
-      stream: audioPlayerService.audioPlayer.sequenceStateStream,
-      builder: (context, snapshot) {
-        return StreamBuilder<PlayerState>(
-            stream: audioPlayerService.audioPlayer.playerStateStream,
+    return StreamBuilder<QueueState>(
+      stream: queueStateStream,
+      builder: (context, sequenceSnapshot) {
+        return StreamBuilder<PlaybackState>(
+            stream: AudioService.playbackStateStream,
             builder: (context, playerStateSnapshot) {
-              if (!snapshot.hasData) {
+              if (!sequenceSnapshot.hasData) {
                 return Container(
                   padding: EdgeInsets.all(10),
                   color: jayFmMaroon,
@@ -52,10 +54,7 @@ class NowPlayingFooter extends HookWidget {
                 );
               }
 
-              final state2 = snapshot.data;
-              final metadata = state2.currentSource.tag as AudioMetadata;
-
-              if (state2?.sequence?.isEmpty ?? true)
+              if (sequenceSnapshot?.data?.queue?.isEmpty ?? true)
                 return Container(
                   padding: EdgeInsets.all(10),
                   color: jayFmMaroon,
@@ -76,11 +75,11 @@ class NowPlayingFooter extends HookWidget {
 
               return GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => NowPlayingPage(),
-                    ),
-                  );
+                  // Navigator.of(context).push(
+                  //   MaterialPageRoute(
+                  //     builder: (context) => NowPlayingPage(),
+                  //   ),
+                  // );
                 },
                 child: Container(
                     padding: EdgeInsets.all(10),
@@ -98,7 +97,8 @@ class NowPlayingFooter extends HookWidget {
                                     child: CachedNetworkImage(
                                       placeholder: (context, url) => Image.asset(
                                           'assets/images/about-you-placeholder.jpg'),
-                                      imageUrl: metadata.artwork,
+                                      imageUrl: sequenceSnapshot
+                                          .data.mediaItem.artUri,
                                       errorWidget: (context, error, stack) =>
                                           Image.asset(
                                               'assets/images/about-you-placeholder.jpg'),
@@ -118,13 +118,14 @@ class NowPlayingFooter extends HookWidget {
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
-                                          metadata.title,
+                                          sequenceSnapshot.data.mediaItem.title,
                                           style: TextStyle(
                                               fontSize: 18, color: Colors.grey),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          metadata.presenters,
+                                          sequenceSnapshot
+                                              .data.mediaItem.artist,
                                           style: TextStyle(
                                               fontSize: 15, color: jayFmOrange),
                                           overflow: TextOverflow.ellipsis,
@@ -136,17 +137,19 @@ class NowPlayingFooter extends HookWidget {
                               ],
                             ),
                           ),
-                          metadata != null && playerStateSnapshot.data != null
+                          sequenceSnapshot?.data?.mediaItem != null &&
+                                  playerStateSnapshot.data != null
                               ? GestureDetector(
-                                  onTap: metadata != null &&
-                                          playerStateSnapshot.data != null
-                                      ? playerStateSnapshot.data.playing
-                                          ? audioPlayerService.audioPlayer.pause
-                                          : audioPlayerService.audioPlayer.play
-                                      : null,
+                                  onTap:
+                                      sequenceSnapshot.data.mediaItem != null &&
+                                              playerStateSnapshot.data != null
+                                          ? playerStateSnapshot.data.playing
+                                              ? audioPlayerService.pauseAudio()
+                                              : audioPlayerService.playAudio2()
+                                          : null,
                                   child: PlayerStateIconBuilder(
                                     80,
-                                    metadata,
+                                    sequenceSnapshot.data.mediaItem,
                                     state,
                                   ),
                                 )
@@ -243,8 +246,7 @@ Widget drawerPopUpMenu({AppState state, BuildContext context}) {
                   ),
                   GestureDetector(
                     onTap: () {
-                      launchApp(
-                          "https://www.instagram.com/jay_fm_/");
+                      launchApp("https://www.instagram.com/jay_fm_/");
                     },
                     child: Image.asset(
                       "assets/images/ig.png",
@@ -360,19 +362,21 @@ Widget allPodcastsListView(List<Widget> tileList) {
 
 class PlayerStateIconBuilder extends StatelessWidget {
   final double _playButtonDiameter;
-  final AudioMetadata data;
+  final MediaItem data;
   final AppState state;
 
   PlayerStateIconBuilder(this._playButtonDiameter, this.data, this.state);
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<PlayerState>(
-      stream: audioPlayerService.audioPlayer.playerStateStream,
-      builder: (context, snapshot) {
-        return StreamBuilder<SequenceState>(
-          stream: audioPlayerService.audioPlayer.sequenceStateStream,
+    return StreamBuilder<PlaybackState>(
+      stream: AudioService.playbackStateStream,
+      builder: (context, playbackSnapshot) {
+        return StreamBuilder<QueueState>(
+          stream: queueStateStream,
           builder: (context, sequenceSnapshot) {
-            if (snapshot.data == null) {
+            print("snapshot is ${playbackSnapshot.data}");
+            print("snapshot is ${sequenceSnapshot.data}");
+            if (playbackSnapshot.data == null) {
               return Icon(
                 Icons.play_arrow,
                 color: state.colors.mainIconsColor,
@@ -380,13 +384,14 @@ class PlayerStateIconBuilder extends StatelessWidget {
               );
             }
 
-            if (snapshot.data.playing) {
-              final metadata =
-                  sequenceSnapshot.data.currentSource.tag as AudioMetadata;
-              if (snapshot.data.processingState == ProcessingState.loading ||
-                  snapshot.data.processingState == ProcessingState.buffering) {
+            if (playbackSnapshot.data.playing) {
+              final MediaItem metadata = sequenceSnapshot.data.mediaItem;
+              if (playbackSnapshot.data.processingState ==
+                      AudioProcessingState.connecting ||
+                  playbackSnapshot.data.processingState ==
+                      AudioProcessingState.buffering) {
                 if (data.title == metadata.title &&
-                    data.presenters == metadata.presenters) {
+                    data.artist == metadata.artist) {
                   return SizedBox(
                     height: _playButtonDiameter / 2,
                     width: _playButtonDiameter / 2,
@@ -395,32 +400,72 @@ class PlayerStateIconBuilder extends StatelessWidget {
                 }
               }
               if (data.title == metadata.title &&
-                  data.presenters == metadata.presenters) {
+                  data.artist == metadata.artist) {
                 return Icon(
                   Icons.pause,
                   color: state.colors.mainIconsColor,
                   size: _playButtonDiameter / 2,
                 );
               }
-            } else if (!snapshot.data.playing) {
-              return switchCase2(snapshot.data.processingState, {
-                ProcessingState.idle: Icon(
+            } else if (!playbackSnapshot.data.playing) {
+              return switchCase2(playbackSnapshot.data.processingState, {
+                AudioProcessingState.none: Icon(
                   Icons.play_arrow,
                   color: state.colors.mainIconsColor,
                   size: _playButtonDiameter / 2,
                 ),
-                ProcessingState.loading: SizedBox(
-                  height: _playButtonDiameter / 2,
-                  width: _playButtonDiameter / 2,
-                  child: CircularProgressIndicator(),
-                ),
-                ProcessingState.buffering: SizedBox(
-                  height: _playButtonDiameter / 2,
-                  width: _playButtonDiameter / 2,
-                  child: CircularProgressIndicator(),
-                ),
-                ProcessingState.ready: Icon(
+                AudioProcessingState.ready: Icon(
                   Icons.play_arrow,
+                  color: state.colors.mainIconsColor,
+                  size: _playButtonDiameter / 2,
+                ),
+                AudioProcessingState.connecting: SizedBox(
+                  height: _playButtonDiameter / 2,
+                  width: _playButtonDiameter / 2,
+                  child: CircularProgressIndicator(),
+                ),
+                AudioProcessingState.buffering: SizedBox(
+                  height: _playButtonDiameter / 2,
+                  width: _playButtonDiameter / 2,
+                  child: CircularProgressIndicator(),
+                ),
+                AudioProcessingState.fastForwarding: SizedBox(
+                  height: _playButtonDiameter / 2,
+                  width: _playButtonDiameter / 2,
+                  child: CircularProgressIndicator(),
+                ),
+                AudioProcessingState.rewinding: SizedBox(
+                  height: _playButtonDiameter / 2,
+                  width: _playButtonDiameter / 2,
+                  child: CircularProgressIndicator(),
+                ),
+                AudioProcessingState.skippingToPrevious: SizedBox(
+                  height: _playButtonDiameter / 2,
+                  width: _playButtonDiameter / 2,
+                  child: CircularProgressIndicator(),
+                ),
+                AudioProcessingState.skippingToNext: SizedBox(
+                  height: _playButtonDiameter / 2,
+                  width: _playButtonDiameter / 2,
+                  child: CircularProgressIndicator(),
+                ),
+                AudioProcessingState.skippingToQueueItem: SizedBox(
+                  height: _playButtonDiameter / 2,
+                  width: _playButtonDiameter / 2,
+                  child: CircularProgressIndicator(),
+                ),
+                AudioProcessingState.completed: Icon(
+                  Icons.play_arrow,
+                  color: state.colors.mainIconsColor,
+                  size: _playButtonDiameter / 2,
+                ),
+                AudioProcessingState.stopped: Icon(
+                  Icons.play_arrow,
+                  color: state.colors.mainIconsColor,
+                  size: _playButtonDiameter / 2,
+                ),
+                AudioProcessingState.error: Icon(
+                  Icons.error,
                   color: state.colors.mainIconsColor,
                   size: _playButtonDiameter / 2,
                 ),

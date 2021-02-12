@@ -1,5 +1,6 @@
 import 'package:JayFm/models/global_app_colors.dart';
 import 'package:JayFm/res/colors.dart';
+import 'package:JayFm/util/audio_player_task.dart';
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,6 @@ void setUpGetIt() {
   GetIt.instance.registerLazySingleton(() => PodcastStreamController());
   GetIt.instance.registerLazySingleton(() => DatabaseService());
   GetIt.instance.registerLazySingleton(() => PodcastsService());
-  GetIt.instance.registerLazySingleton(() => AudioPlayer());
   GetIt.instance.registerLazySingleton(() => AdMobService());
   GetIt.instance.registerLazySingleton(() => JayFmPlayerService());
 }
@@ -80,18 +80,29 @@ class Root extends StatelessWidget {
                   : Colors.amber,
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
-            home: StatefulWrapper(
-              store: store,
-              onInit: () {
-                podcastService.getAllSavedPodcasts();
-              },
-              onDispose: () {
-                podcastService.dispose();
-              },
-              child: StoreConnector<AppState, AppState>(
-                converter: (store) => store.state,
-                builder: (context, state) =>
-                    AudioServiceWidget(child: HomePage()),
+            home: AudioServiceWidget(
+              child: StatefulWrapper(
+                store: store,
+                onInit: () async {
+                  var started = await AudioService.start(
+                    backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
+                    androidNotificationChannelName: 'Jay FM Audio Service',
+                    // Enable this if you want the Android service to exit the foreground state on pause.
+                    //androidStopForegroundOnPause: true,
+                    androidNotificationColor: 0xFF2196f3,
+                    androidNotificationIcon: 'mipmap/ic_launcher',
+                    androidEnableQueue: true,
+                  );
+                  print("started is $started");
+                  podcastService.getAllSavedPodcasts();
+                },
+                onDispose: () {
+                  podcastService.dispose();
+                },
+                child: StoreConnector<AppState, AppState>(
+                  converter: (store) => store.state,
+                  builder: (context, state) => HomePage(),
+                ),
               ),
             ),
           );
@@ -99,4 +110,9 @@ class Root extends StatelessWidget {
       ),
     );
   }
+}
+
+// NOTE: Your entrypoint MUST be a top-level function.
+void _audioPlayerTaskEntrypoint() async {
+  AudioServiceBackground.run(() => AudioPlayerTask());
 }
