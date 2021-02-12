@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:JayFm/models/audio_meta_data.dart';
 import 'package:JayFm/models/now_playing_state.dart';
+import 'package:JayFm/util/audio_player_task.dart';
+import 'package:JayFm/util/functions.dart';
 import 'package:JayFm/util/global_widgets.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -62,12 +65,11 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
                   style: defaultTextStyle(state),
                 )
               ],
-              trailing: StreamBuilder<SequenceState>(
-                  stream: audioPlayerService.audioPlayer.sequenceStateStream,
+              trailing: StreamBuilder<QueueState>(
+                  stream: queueStateStream,
                   builder: (context, sequenceSnapshot) {
-                    return StreamBuilder<PlayerState>(
-                        stream:
-                            audioPlayerService.audioPlayer.playerStateStream,
+                    return StreamBuilder<PlaybackState>(
+                        stream: AudioService.playbackStateStream,
                         builder: (context, playerStateSnapshot) {
                           return GestureDetector(
                             onTap: () async {
@@ -86,8 +88,7 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
                               ]);
 
                               if (sequenceSnapshot.data != null) {
-                                if (sequenceSnapshot
-                                        .data.sequence[0].tag.title !=
+                                if (sequenceSnapshot.data.queue[0].title !=
                                     playlist
                                         .children[0].sequence[0].tag.title) {
                                   // Check if the playing playlist and the new playlist are the same
@@ -95,22 +96,21 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
                                       .setPlaylist(playlist);
                                 }
 
-                                if (sequenceSnapshot
-                                            .data.currentSource.tag.title ==
+                                if (sequenceSnapshot.data.mediaItem.title ==
                                         playlist.children[i].sequence[0].tag
                                             .title &&
                                     playerStateSnapshot.data.playing) {
-                                  await audioPlayerService.audioPlayer.pause();
+                                  await audioPlayerService.pauseAudio();
                                 } else {
-                                  await audioPlayerService.audioPlayer
-                                      .seek(Duration.zero, index: i);
-                                  await audioPlayerService.audioPlayer.play();
+                                  await audioPlayerService
+                                      .playItem(playlist.children[0]);
+                                  await audioPlayerService.playAudio2();
                                 }
                               } else {
                                 await audioPlayerService.setPlaylist(playlist);
-                                await audioPlayerService.audioPlayer
-                                    .seek(Duration.zero, index: i);
-                                await audioPlayerService.audioPlayer.play();
+                                await audioPlayerService
+                                    .playItem(playlist.children[0]);
+                                await audioPlayerService.playAudio2();
                               }
                             },
                             child: Container(
@@ -118,12 +118,16 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
                               width: 40,
                               child: PlayerStateIconBuilder(
                                   80,
-                                  AudioMetadata(
-                                    presenters: snapshot.data.items[i].title
+                                  MediaItem(
+                                    id: snapshot.data.items[i].title
                                         .split(": ")[0],
-                                    artwork: snapshot
+                                    artUri: snapshot
                                         .data.items[i].itunes.image.href,
                                     title: snapshot.data.items[i].title,
+                                    album: snapshot.data.items[i].title,
+                                    artist: getPresenters(snapshot
+                                        .data.items[i].title
+                                        .split(": ")),
                                   ),
                                   state),
                             ),

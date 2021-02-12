@@ -1,5 +1,8 @@
 import 'package:JayFm/models/audio_meta_data.dart';
 import 'package:JayFm/models/now_playing_state.dart';
+import 'package:JayFm/util/audio_player_task.dart';
+import 'package:JayFm/util/functions.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -13,6 +16,7 @@ import 'package:JayFm/services/podcasts_service/podcasts_service.dart';
 import 'package:JayFm/services/player_service/player_service.dart';
 import 'package:JayFm/util/global_widgets.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
 
 JayFmPlayerService get audioPlayerService =>
     GetIt.instance<JayFmPlayerService>();
@@ -28,24 +32,20 @@ Widget liveTabDetails(AppState state, BuildContext context) {
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Padding(padding: EdgeInsets.only(top: 0)),
-      StreamBuilder<SequenceState>(
-          stream: audioPlayerService.audioPlayer.sequenceStateStream,
+      StreamBuilder<QueueState>(
+          stream: queueStateStream,
           builder: (context, snapshot) {
-            final state2 = snapshot.data;
-            var metadata;
-            if (state2 != null) {
-              metadata = state2.currentSource.tag as AudioMetadata;
-            }
-
+            print("data is ${snapshot.data}");
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                snapshot.data != null
+                snapshot?.data?.mediaItem != null
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                             Text(
-                              metadata.title == 'Jay FM LIVE'
+                              snapshot.data.mediaItem.title ==
+                                      'Jay FM LIVE'
                                   ? "LIVE PLAYING"
                                   : "NOW PLAYING",
                               style: defaultTextStyle(state,
@@ -60,7 +60,7 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                                 child: Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 30.0),
-                              child: Text(metadata.presenters,
+                              child: Text(snapshot.data.mediaItem.artist,
                                   style: defaultTextStyle(state)),
                             )),
                           ])
@@ -81,13 +81,11 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                 Container(
                   height: _playButtonDiameter,
                   width: _playButtonDiameter,
-                  child: StreamBuilder<SequenceState>(
-                      stream:
-                          audioPlayerService.audioPlayer.sequenceStateStream,
+                  child: StreamBuilder<QueueState>(
+                      stream: queueStateStream,
                       builder: (context, sequenceSnapshot) {
-                        return StreamBuilder<PlayerState>(
-                            stream: audioPlayerService
-                                .audioPlayer.playerStateStream,
+                        return StreamBuilder<PlaybackState>(
+                            stream: AudioService.playbackStateStream,
                             builder: (context, playerStateSnapshot) {
                               return RawMaterialButton(
                                 onPressed: () async {
@@ -103,9 +101,9 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                                       ),
                                     )
                                   ]);
-                                  if (sequenceSnapshot.data != null) {
-                                    if (sequenceSnapshot
-                                            .data.sequence[0].tag.title !=
+                                  audioPlayerService.playAudio(playlist);
+                                  if (sequenceSnapshot.data.queue.isNotEmpty) {
+                                    if (sequenceSnapshot.data.queue[0].title !=
                                         playlist.children[0].sequence[0].tag
                                             .title) {
                                       // Check if the playing playlist and the new playlist are the same
@@ -113,25 +111,24 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                                           .setPlaylist(playlist);
                                     }
 
-                                    if (sequenceSnapshot
-                                                .data.currentSource.tag.title ==
+                                    if (sequenceSnapshot.data.mediaItem.title ==
                                             playlist.children[0].sequence[0].tag
                                                 .title &&
                                         playerStateSnapshot.data.playing) {
-                                      await audioPlayerService.audioPlayer
-                                          .pause();
+                                      await audioPlayerService.pauseAudio();
                                     } else {
-                                      await audioPlayerService.audioPlayer
-                                          .seek(Duration.zero, index: 0);
-                                      await audioPlayerService.audioPlayer
-                                          .play();
+                                      await audioPlayerService
+                                          .playItem(playlist.children[0]);
+                                      await audioPlayerService
+                                          .playAudio(playlist);
                                     }
                                   } else {
                                     await audioPlayerService
                                         .setPlaylist(playlist);
-                                    await audioPlayerService.audioPlayer
-                                        .seek(Duration.zero, index: 0);
-                                    await audioPlayerService.audioPlayer.play();
+                                    await audioPlayerService
+                                        .playItem(playlist.children[0]);
+                                    await audioPlayerService
+                                        .playAudio(playlist);
                                   }
                                 },
                                 fillColor: state.colors.mainButtonsColor,
@@ -140,9 +137,10 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                                 child: Center(
                                   child: PlayerStateIconBuilder(
                                       _playButtonDiameter,
-                                      AudioMetadata(
-                                        presenters: "Jay FM",
-                                        artwork: "",
+                                      MediaItem(
+                                        artist: "Jay FM",
+                                        id: "Jay FM",
+                                        album: "Jay FM",
                                         title: "Jay FM LIVE",
                                       ),
                                       state),
