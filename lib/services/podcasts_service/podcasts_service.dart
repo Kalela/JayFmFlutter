@@ -2,7 +2,6 @@ import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/podcast.dart';
 import 'package:JayFm/services/podcasts_service/dependencies/database_service.dart';
 import 'package:JayFm/services/podcasts_service/dependencies/podcast_stream_controller.dart';
-import 'package:JayFm/util/global_widgets.dart';
 
 class PodcastsService {
   PodcastStreamController get streamController =>
@@ -11,9 +10,7 @@ class PodcastsService {
 
   /// Perform instructions to save a podcast
   savePodcast(Podcast podcast) async {
-    List<Podcast> podcasts = List();
-    // TODO: Find an efficient way of using streams to perform this get. Use riverpod for saved podcasts. That way, you dont need a builder widget for it.
-    _databaseService.insertPodcastToTable(podcast).then((value1) => {
+    List<Podcast> podcasts = List();    _databaseService.insertPodcastToTable(podcast).then((value1) => {
           _databaseService.getAllSavedPodcasts().then((value2) {
             podcasts = value2
                 .map((entry) => Podcast(
@@ -25,7 +22,7 @@ class PodcastsService {
           })
         });
 
-    showToastMessage("Podcast saved");
+    // showToastMessage("Podcast saved");
   }
 
   /// Get all saved podcasts.
@@ -58,7 +55,7 @@ class PodcastsService {
 
   /// Dispose resources
   dispose() {
-    showToastMessage("Removed from saved");
+    // showToastMessage("Removed from saved");
     streamController.dispose();
   }
 }

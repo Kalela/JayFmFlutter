@@ -3,7 +3,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/models/podcast.dart';
-import 'package:JayFm/res/colors.dart';
 import 'package:JayFm/res/values.dart';
 import 'package:JayFm/screens/details/widgets.dart';
 import 'package:JayFm/services/podcasts_service/podcasts_service.dart';
@@ -100,10 +99,7 @@ class DetailsPage extends StatelessWidget {
                 ),
               )),
           bottomSheet: Container(
-              height: 70,
-              color: Colors.black,
-              child: nowPlayingFooter(
-                  state, jayFmMaroon, Colors.grey, jayFmOrange)),
+              height: 70, color: Colors.black, child: NowPlayingFooter(state)),
         );
       },
     );

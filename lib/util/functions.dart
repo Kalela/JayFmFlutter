@@ -4,8 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/redux/actions.dart';
 import 'package:JayFm/res/strings.dart';
-import 'package:JayFm/screens/home/widgets.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 AudioPlayer get _audioPlayer => GetIt.instance<AudioPlayer>();
 
@@ -46,33 +46,13 @@ TValue switchCase2<TOptionType, TValue>(
   return branches[selectedOption];
 }
 
-/// Play audio provided by [audioUrl]
-playAudio(BuildContext context, String audioUrl) async {
-  if (_audioPlayer.playing &&
-      _audioPlayer.nowPlayingMap['audio_url'] == audioUrl) {
-    _audioPlayer.nowPlayingMap['audio_url'] = null;
-    await _audioPlayer.pause();
-    return;
+launchApp(url) async {
+  if (await canLaunch(url)) {
+    await launch(
+      url,
+      universalLinksOnly: true,
+    );
+  } else {
+    throw 'There was a problem to open the url: $url';
   }
-
-  if (_audioPlayer.playing) await _audioPlayer.pause();
-  _audioPlayer.nowPlayingMap['audio_url'] = audioUrl;
-  _audioPlayer.setVolume(1.0);
-  try {
-    await _audioPlayer.setUrl(audioUrl);
-  } catch (e) {
-    print(e);
-  }
-  await _audioPlayer.play();
-}
-
-/// Set information of the currently playing podcast/episode
-setNowPlayingInfo(
-    {String title,
-    String presenters = "Jay Fm",
-    String imageUrl =
-        "https://static.wixstatic.com/media/194ff5_d06f982159334744802a83b7d33a94ec~mv2_d_4489_3019_s_4_2.png/v1/fill/w_250,h_147,al_c,q_95/Finaly-PNG-LOGO.webp"}) {
-  audioPlayer.nowPlayingMap['title'] = title;
-  audioPlayer.nowPlayingMap['presenters'] = presenters;
-  audioPlayer.nowPlayingMap['image_url'] = imageUrl;
 }

@@ -1,4 +1,5 @@
 import 'package:JayFm/models/app_state.dart';
+import 'package:JayFm/models/now_playing_state.dart';
 
 class SelectedThemeAction {
   final SelectedTheme payload;
@@ -13,7 +14,7 @@ class PodcastQualityAction {
 }
 
 class NowPlayingAction {
-  final dynamic payload;
+  final NowPlaying payload;
 
   NowPlayingAction(this.payload);
 }
