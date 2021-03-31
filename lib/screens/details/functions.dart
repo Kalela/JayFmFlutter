@@ -1,10 +1,10 @@
-import 'package:webfeed/webfeed.dart';
+import 'package:dart_rss/domain/rss_feed.dart';
 import 'package:http/http.dart' as http;
 
 Future<RssFeed> loadFeed(String feedUrl) async {
   try {
     final client = http.Client();
-    final response = await client.get(feedUrl);
+    final response = await client.get(Uri.parse(feedUrl));
     return RssFeed.parse(response.body);
   } catch (e) {
     print(e);

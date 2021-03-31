@@ -16,7 +16,6 @@ import 'package:JayFm/services/podcasts_service/podcasts_service.dart';
 import 'package:JayFm/services/player_service/player_service.dart';
 import 'package:JayFm/util/global_widgets.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:rxdart/rxdart.dart';
 
 JayFmPlayerService get audioPlayerService =>
     GetIt.instance<JayFmPlayerService>();
@@ -35,7 +34,6 @@ Widget liveTabDetails(AppState state, BuildContext context) {
       StreamBuilder<QueueState>(
           stream: queueStateStream,
           builder: (context, snapshot) {
-            print("data is ${snapshot.data}");
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -44,17 +42,13 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                             Text(
-                              snapshot.data.mediaItem.title ==
-                                      'Jay FM LIVE'
+                              snapshot.data.mediaItem.title == 'Jay FM LIVE'
                                   ? "LIVE PLAYING"
                                   : "NOW PLAYING",
                               style: defaultTextStyle(state,
                                   textStyle: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold)),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 10),
                             ),
                             Center(
                                 child: Padding(
@@ -78,82 +72,56 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                 Padding(
                   padding: EdgeInsets.only(top: 50),
                 ),
-                Container(
-                  height: _playButtonDiameter,
-                  width: _playButtonDiameter,
-                  child: StreamBuilder<QueueState>(
-                      stream: queueStateStream,
-                      builder: (context, sequenceSnapshot) {
-                        return StreamBuilder<PlaybackState>(
-                            stream: AudioService.playbackStateStream,
-                            builder: (context, playerStateSnapshot) {
-                              return RawMaterialButton(
-                                onPressed: () async {
-                                  var playlist =
-                                      ConcatenatingAudioSource(children: [
-                                    AudioSource.uri(
-                                      Uri.parse(mainPodcastUrl),
-                                      tag: AudioMetadata(
-                                        presenters: "Jay FM",
-                                        artwork:
-                                            "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/1257463/1257463-1544431099377-b5cff27e66947.jpg",
-                                        title: "Jay FM LIVE",
-                                      ),
-                                    )
-                                  ]);
-                                  audioPlayerService.playAudio(playlist);
-                                  if (sequenceSnapshot.data.queue.isNotEmpty) {
-                                    if (sequenceSnapshot.data.queue[0].title !=
-                                        playlist.children[0].sequence[0].tag
-                                            .title) {
-                                      // Check if the playing playlist and the new playlist are the same
-                                      await audioPlayerService
-                                          .setPlaylist(playlist);
-                                    }
-
-                                    if (sequenceSnapshot.data.mediaItem.title ==
-                                            playlist.children[0].sequence[0].tag
-                                                .title &&
-                                        playerStateSnapshot.data.playing) {
-                                      await audioPlayerService.pauseAudio();
-                                    } else {
-                                      await audioPlayerService
-                                          .playItem(playlist.children[0]);
-                                      await audioPlayerService
-                                          .playAudio(playlist);
-                                    }
-                                  } else {
-                                    await audioPlayerService
-                                        .setPlaylist(playlist);
-                                    await audioPlayerService
-                                        .playItem(playlist.children[0]);
-                                    await audioPlayerService
-                                        .playAudio(playlist);
-                                  }
-                                },
-                                fillColor: state.colors.mainButtonsColor,
-                                shape: CircleBorder(),
-                                elevation: 10.0,
-                                child: Center(
-                                  child: PlayerStateIconBuilder(
-                                      _playButtonDiameter,
-                                      MediaItem(
-                                        artist: "Jay FM",
-                                        id: "Jay FM",
-                                        album: "Jay FM",
-                                        title: "Jay FM LIVE",
-                                      ),
-                                      state),
-                                ),
-                              );
-                            });
-                      }),
-                ),
+                playButton(state, _playButtonDiameter),
               ],
             );
           }),
       admobService.getBannerAd(context)
     ],
+  );
+}
+
+Widget playButton(AppState state, double _playButtonDiameter) {
+  return Container(
+    height: _playButtonDiameter,
+    width: _playButtonDiameter,
+    child: StreamBuilder<QueueState>(
+        stream: queueStateStream,
+        builder: (context, queueStateSnapshot) {
+          return RawMaterialButton(
+            onPressed: () async {
+              var playlist = ConcatenatingAudioSource(children: [
+                AudioSource.uri(
+                  Uri.parse(mainPodcastUrl),
+                  tag: AudioMetadata(
+                      presenters: "Jay FM",
+                      artwork:
+                          "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/1257463/1257463-1544431099377-b5cff27e66947.jpg",
+                      title: "Jay FM LIVE",
+                      url: mainPodcastUrl),
+                )
+              ]);
+
+              QueueState queueState = queueStateSnapshot.data;
+
+              checkAudioPlayProcess(queueState, playlist, 0);
+            },
+            fillColor: state.colors.mainButtonsColor,
+            shape: CircleBorder(),
+            elevation: 10.0,
+            child: Center(
+              child: Container(
+                child: PlayerStateIconBuilder(
+                    _playButtonDiameter,
+                    MediaItem(
+                        id: mainPodcastUrl,
+                        album: "Jay FM",
+                        title: "Jay FM LIVE"),
+                    state),
+              ),
+            ),
+          );
+        }),
   );
 }
 
@@ -267,7 +235,7 @@ Widget savedTabDetails(AppState state) {
                           ),
                           onDismissed: (direction) {
                             podcastService.deletePodcast(snapshot.data[index]);
-                            Scaffold.of(context).showSnackBar(SnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text(
                                     "${snapshot.data[index].name} dismissed")));
                           },

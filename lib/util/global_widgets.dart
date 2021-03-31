@@ -1,21 +1,17 @@
 import 'dart:io';
 
-import 'package:JayFm/models/audio_meta_data.dart';
 import 'package:JayFm/res/colors.dart';
-import 'package:JayFm/screens/now_playing/now_playing_screen.dart';
 import 'package:JayFm/util/audio_player_task.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-// import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/res/strings.dart';
 import 'package:JayFm/res/values.dart';
 import 'package:JayFm/util/functions.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:JayFm/services/player_service/player_service.dart';
 
 JayFmPlayerService get audioPlayerService =>
@@ -98,7 +94,7 @@ class NowPlayingFooter extends HookWidget {
                                       placeholder: (context, url) => Image.asset(
                                           'assets/images/about-you-placeholder.jpg'),
                                       imageUrl: sequenceSnapshot
-                                          .data.mediaItem.artUri,
+                                          .data.mediaItem.artUri.path,
                                       errorWidget: (context, error, stack) =>
                                           Image.asset(
                                               'assets/images/about-you-placeholder.jpg'),
@@ -144,8 +140,14 @@ class NowPlayingFooter extends HookWidget {
                                       sequenceSnapshot.data.mediaItem != null &&
                                               playerStateSnapshot.data != null
                                           ? playerStateSnapshot.data.playing
-                                              ? audioPlayerService.pauseAudio()
-                                              : audioPlayerService.playAudio2()
+                                              ? () async {
+                                                  await audioPlayerService
+                                                      .pauseAudio();
+                                                }
+                                              : () async {
+                                                  await audioPlayerService
+                                                      .playAudio();
+                                                }
                                           : null,
                                   child: PlayerStateIconBuilder(
                                     80,
@@ -368,117 +370,111 @@ class PlayerStateIconBuilder extends StatelessWidget {
   PlayerStateIconBuilder(this._playButtonDiameter, this.data, this.state);
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<PlaybackState>(
-      stream: AudioService.playbackStateStream,
-      builder: (context, playbackSnapshot) {
-        return StreamBuilder<QueueState>(
-          stream: queueStateStream,
-          builder: (context, sequenceSnapshot) {
-            print("snapshot is ${playbackSnapshot.data}");
-            print("snapshot is ${sequenceSnapshot.data}");
-            if (playbackSnapshot.data == null) {
-              return Icon(
-                Icons.play_arrow,
-                color: state.colors.mainIconsColor,
-                size: _playButtonDiameter / 2,
+    return StreamBuilder<QueueState>(
+      stream: queueStateStream,
+      builder: (context, queueSnapshot) {
+        if (queueSnapshot.data == null) {
+          return Icon(
+            Icons.play_arrow,
+            color: state.colors.mainIconsColor,
+            size: _playButtonDiameter / 2,
+          );
+        }
+
+        if (queueSnapshot.data.playbackState.playing) {
+          final MediaItem metadata = queueSnapshot.data.mediaItem;
+          if (queueSnapshot.data.playbackState.processingState ==
+                  AudioProcessingState.connecting ||
+              queueSnapshot.data.playbackState.processingState ==
+                  AudioProcessingState.buffering) {
+            if (data.title == metadata.title &&
+                data.artist == metadata.artist) {
+              return SizedBox(
+                height: _playButtonDiameter / 2,
+                width: _playButtonDiameter / 2,
+                child: CircularProgressIndicator(),
               );
             }
-
-            if (playbackSnapshot.data.playing) {
-              final MediaItem metadata = sequenceSnapshot.data.mediaItem;
-              if (playbackSnapshot.data.processingState ==
-                      AudioProcessingState.connecting ||
-                  playbackSnapshot.data.processingState ==
-                      AudioProcessingState.buffering) {
-                if (data.title == metadata.title &&
-                    data.artist == metadata.artist) {
-                  return SizedBox(
-                    height: _playButtonDiameter / 2,
-                    width: _playButtonDiameter / 2,
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              }
-              if (data.title == metadata.title &&
-                  data.artist == metadata.artist) {
-                return Icon(
-                  Icons.pause,
-                  color: state.colors.mainIconsColor,
-                  size: _playButtonDiameter / 2,
-                );
-              }
-            } else if (!playbackSnapshot.data.playing) {
-              return switchCase2(playbackSnapshot.data.processingState, {
-                AudioProcessingState.none: Icon(
-                  Icons.play_arrow,
-                  color: state.colors.mainIconsColor,
-                  size: _playButtonDiameter / 2,
-                ),
-                AudioProcessingState.ready: Icon(
-                  Icons.play_arrow,
-                  color: state.colors.mainIconsColor,
-                  size: _playButtonDiameter / 2,
-                ),
-                AudioProcessingState.connecting: SizedBox(
-                  height: _playButtonDiameter / 2,
-                  width: _playButtonDiameter / 2,
-                  child: CircularProgressIndicator(),
-                ),
-                AudioProcessingState.buffering: SizedBox(
-                  height: _playButtonDiameter / 2,
-                  width: _playButtonDiameter / 2,
-                  child: CircularProgressIndicator(),
-                ),
-                AudioProcessingState.fastForwarding: SizedBox(
-                  height: _playButtonDiameter / 2,
-                  width: _playButtonDiameter / 2,
-                  child: CircularProgressIndicator(),
-                ),
-                AudioProcessingState.rewinding: SizedBox(
-                  height: _playButtonDiameter / 2,
-                  width: _playButtonDiameter / 2,
-                  child: CircularProgressIndicator(),
-                ),
-                AudioProcessingState.skippingToPrevious: SizedBox(
-                  height: _playButtonDiameter / 2,
-                  width: _playButtonDiameter / 2,
-                  child: CircularProgressIndicator(),
-                ),
-                AudioProcessingState.skippingToNext: SizedBox(
-                  height: _playButtonDiameter / 2,
-                  width: _playButtonDiameter / 2,
-                  child: CircularProgressIndicator(),
-                ),
-                AudioProcessingState.skippingToQueueItem: SizedBox(
-                  height: _playButtonDiameter / 2,
-                  width: _playButtonDiameter / 2,
-                  child: CircularProgressIndicator(),
-                ),
-                AudioProcessingState.completed: Icon(
-                  Icons.play_arrow,
-                  color: state.colors.mainIconsColor,
-                  size: _playButtonDiameter / 2,
-                ),
-                AudioProcessingState.stopped: Icon(
-                  Icons.play_arrow,
-                  color: state.colors.mainIconsColor,
-                  size: _playButtonDiameter / 2,
-                ),
-                AudioProcessingState.error: Icon(
-                  Icons.error,
-                  color: state.colors.mainIconsColor,
-                  size: _playButtonDiameter / 2,
-                ),
-              });
-            }
-
-            return Container(
-                child: Icon(
+          }
+          if (data.title == metadata.title && data.artist == metadata.artist) {
+            return Icon(
+              Icons.pause,
+              color: state.colors.mainIconsColor,
+              size: _playButtonDiameter / 2,
+            );
+          }
+        } else if (!queueSnapshot.data.playbackState.playing) {
+          print("playback is not playing");
+          return switchCase2(queueSnapshot.data.playbackState.processingState, {
+            AudioProcessingState.none: Icon(
               Icons.play_arrow,
               color: state.colors.mainIconsColor,
               size: _playButtonDiameter / 2,
-            ));
-          },
+            ),
+            AudioProcessingState.ready: Icon(
+              Icons.play_arrow,
+              color: state.colors.mainIconsColor,
+              size: _playButtonDiameter / 2,
+            ),
+            AudioProcessingState.connecting: SizedBox(
+              height: _playButtonDiameter / 2,
+              width: _playButtonDiameter / 2,
+              child: CircularProgressIndicator(),
+            ),
+            AudioProcessingState.buffering: SizedBox(
+              height: _playButtonDiameter / 2,
+              width: _playButtonDiameter / 2,
+              child: CircularProgressIndicator(),
+            ),
+            AudioProcessingState.fastForwarding: SizedBox(
+              height: _playButtonDiameter / 2,
+              width: _playButtonDiameter / 2,
+              child: CircularProgressIndicator(),
+            ),
+            AudioProcessingState.rewinding: SizedBox(
+              height: _playButtonDiameter / 2,
+              width: _playButtonDiameter / 2,
+              child: CircularProgressIndicator(),
+            ),
+            AudioProcessingState.skippingToPrevious: SizedBox(
+              height: _playButtonDiameter / 2,
+              width: _playButtonDiameter / 2,
+              child: CircularProgressIndicator(),
+            ),
+            AudioProcessingState.skippingToNext: SizedBox(
+              height: _playButtonDiameter / 2,
+              width: _playButtonDiameter / 2,
+              child: CircularProgressIndicator(),
+            ),
+            AudioProcessingState.skippingToQueueItem: SizedBox(
+              height: _playButtonDiameter / 2,
+              width: _playButtonDiameter / 2,
+              child: CircularProgressIndicator(),
+            ),
+            AudioProcessingState.completed: Icon(
+              Icons.play_arrow,
+              color: state.colors.mainIconsColor,
+              size: _playButtonDiameter / 2,
+            ),
+            AudioProcessingState.stopped: Icon(
+              Icons.play_arrow,
+              color: state.colors.mainIconsColor,
+              size: _playButtonDiameter / 2,
+            ),
+            AudioProcessingState.error: Icon(
+              Icons.error,
+              color: state.colors.mainIconsColor,
+              size: _playButtonDiameter / 2,
+            ),
+          });
+        }
+
+        return Container(
+          child: Icon(
+            Icons.play_arrow,
+            color: state.colors.mainIconsColor,
+            size: _playButtonDiameter / 2,
+          ),
         );
       },
     );

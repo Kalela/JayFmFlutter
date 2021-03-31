@@ -1,16 +1,15 @@
+import 'package:JayFm/services/player_service/player_service.dart';
 import 'package:JayFm/util/audio_player_task.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/redux/actions.dart';
 import 'package:JayFm/res/strings.dart';
+import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-AudioPlayer get _audioPlayer => GetIt.instance<AudioPlayer>();
 
 /// set the theme in application state
 void setThemeState(BuildContext context, String choice) {
@@ -63,7 +62,48 @@ launchApp(url) async {
 /// A stream reporting the combined state of the current queue and the current
 /// media item within that queue.
 Stream<QueueState> get queueStateStream =>
-    Rx.combineLatest2<List<MediaItem>, MediaItem, QueueState>(
+    Rx.combineLatest3<List<MediaItem>, MediaItem, PlaybackState, QueueState>(
         AudioService.queueStream,
         AudioService.currentMediaItemStream,
-        (queue, mediaItem) => QueueState(queue, mediaItem));
+        AudioService.playbackStateStream,
+        (queue, mediaItem, playbackState) =>
+            QueueState(queue, mediaItem, playbackState)).asBroadcastStream();
+
+JayFmPlayerService get audioPlayerService =>
+    GetIt.instance<JayFmPlayerService>();
+
+checkAudioPlayProcess(QueueState queueStateSnapshot,
+    ConcatenatingAudioSource playlist, int i) async {
+  if (queueStateSnapshot != null) {
+    print("queue state functions ${queueStateSnapshot.queue}");
+    if (queueStateSnapshot.queue.isEmpty) {
+      // Check if the playlist is an empty list
+      await audioPlayerService.setPlaylist(playlist);
+      if (i != 0) {
+        audioPlayerService.playAudio();
+      } else {
+        await audioPlayerService.playItem(playlist.children[i]);
+      }
+      return;
+    }
+
+    if (queueStateSnapshot.queue[0].title !=
+        playlist.children[0].sequence[0].tag.title) {
+      // Check if the playing playlist and the new playlist are not the same
+      await audioPlayerService.setPlaylist(playlist);
+    }
+
+    if (queueStateSnapshot.mediaItem.title ==
+            playlist.children[i].sequence[0].tag.title &&
+        queueStateSnapshot.playbackState.playing) {
+      // Check if the playing playlist and the new playlist are the same
+      await audioPlayerService.pauseAudio();
+    } else {
+      await audioPlayerService.playItem(playlist.children[0]);
+    }
+  } else {
+    print("I am here");
+    await audioPlayerService.setPlaylist(playlist);
+    await audioPlayerService.playItem(playlist.children[0]);
+  }
+}

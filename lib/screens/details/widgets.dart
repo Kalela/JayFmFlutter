@@ -6,6 +6,7 @@ import 'package:JayFm/util/functions.dart';
 import 'package:JayFm/util/global_widgets.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dart_rss/domain/rss_feed.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
@@ -14,7 +15,6 @@ import 'package:JayFm/res/values.dart';
 import 'package:JayFm/screens/details/functions.dart';
 import 'package:JayFm/services/admob_service.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:webfeed/webfeed.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:JayFm/services/player_service/player_service.dart';
 
@@ -43,97 +43,72 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
             delegate: SliverChildBuilderDelegate((context, i) {
           List<String> splitTitle = snapshot.data.items[i].title.split(": ");
           return ExpansionTile(
-              tilePadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5),
-              title: Text(
-                "${splitTitle[0]}",
-                style: TextStyle(color: state.colors.mainTextColor),
+            tilePadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5),
+            title: Text(
+              "${splitTitle[0]}",
+              style: TextStyle(color: state.colors.mainTextColor),
+            ),
+            subtitle: Text(
+              getPresenters(splitTitle),
+              style: defaultTextStyle(state),
+            ),
+            leading: Container(
+              child: CachedNetworkImage(
+                placeholder: (context, url) =>
+                    Image.asset('assets/images/about-you-placeholder.jpg'),
+                imageUrl: snapshot.data.items[i].itunes.image.href,
               ),
-              subtitle: Text(
-                getPresenters(splitTitle),
+            ),
+            children: [
+              Text(
+                snapshot.data.items[i].description.split("---")[0],
                 style: defaultTextStyle(state),
-              ),
-              leading: Container(
-                child: CachedNetworkImage(
-                  placeholder: (context, url) =>
-                      Image.asset('assets/images/about-you-placeholder.jpg'),
-                  imageUrl: snapshot.data.items[i].itunes.image.href,
-                ),
-              ),
-              children: [
-                Text(
-                  snapshot.data.items[i].description.split("---")[0],
-                  style: defaultTextStyle(state),
-                )
-              ],
-              trailing: StreamBuilder<QueueState>(
-                  stream: queueStateStream,
-                  builder: (context, sequenceSnapshot) {
-                    return StreamBuilder<PlaybackState>(
-                        stream: AudioService.playbackStateStream,
-                        builder: (context, playerStateSnapshot) {
-                          return GestureDetector(
-                            onTap: () async {
-                              var playlist =
-                                  ConcatenatingAudioSource(children: [
-                                for (var episode in snapshot.data.items) ...[
-                                  AudioSource.uri(
-                                    Uri.parse(episode.enclosure.url),
-                                    tag: AudioMetadata(
-                                      presenters: getPresenters(splitTitle),
-                                      artwork: episode.itunes.image.href,
-                                      title: splitTitle[0],
-                                    ),
-                                  )
-                                ]
-                              ]);
+              )
+            ],
+            trailing: StreamBuilder<QueueState>(
+              stream: queueStateStream,
+              builder: (context, queueStateSnapshot) {
+                return GestureDetector(
+                  onTap: () async {
+                    var playlist = ConcatenatingAudioSource(children: [
+                      for (var episode in snapshot.data.items) ...[
+                        AudioSource.uri(
+                          Uri.parse(episode.enclosure.url),
+                          tag: AudioMetadata(
+                            presenters: getPresenters(splitTitle),
+                            artwork: episode.itunes.image.href,
+                            title: splitTitle[0],
+                            url: episode.enclosure.url,
+                          ),
+                        )
+                      ]
+                    ]);
 
-                              if (sequenceSnapshot.data != null) {
-                                if (sequenceSnapshot.data.queue[0].title !=
-                                    playlist
-                                        .children[0].sequence[0].tag.title) {
-                                  // Check if the playing playlist and the new playlist are the same
-                                  await audioPlayerService
-                                      .setPlaylist(playlist);
-                                }
+                    QueueState queueState = queueStateSnapshot.data;
+                    print("queue state ${queueState.mediaItem}");
 
-                                if (sequenceSnapshot.data.mediaItem.title ==
-                                        playlist.children[i].sequence[0].tag
-                                            .title &&
-                                    playerStateSnapshot.data.playing) {
-                                  await audioPlayerService.pauseAudio();
-                                } else {
-                                  await audioPlayerService
-                                      .playItem(playlist.children[0]);
-                                  await audioPlayerService.playAudio2();
-                                }
-                              } else {
-                                await audioPlayerService.setPlaylist(playlist);
-                                await audioPlayerService
-                                    .playItem(playlist.children[0]);
-                                await audioPlayerService.playAudio2();
-                              }
-                            },
-                            child: Container(
-                              height: 40,
-                              width: 40,
-                              child: PlayerStateIconBuilder(
-                                  80,
-                                  MediaItem(
-                                    id: snapshot.data.items[i].title
-                                        .split(": ")[0],
-                                    artUri: snapshot
-                                        .data.items[i].itunes.image.href,
-                                    title: snapshot.data.items[i].title,
-                                    album: snapshot.data.items[i].title,
-                                    artist: getPresenters(snapshot
-                                        .data.items[i].title
-                                        .split(": ")),
-                                  ),
-                                  state),
-                            ),
-                          );
-                        });
-                  }));
+                    checkAudioPlayProcess(queueState, playlist, i);
+                  },
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    child: PlayerStateIconBuilder(
+                        80,
+                        MediaItem(
+                          id: snapshot.data.items[i].title.split(": ")[0],
+                          artUri: Uri.parse(
+                              snapshot.data.items[i].itunes.image.href),
+                          title: snapshot.data.items[i].title,
+                          album: snapshot.data.items[i].title,
+                          artist: getPresenters(
+                              snapshot.data.items[i].title.split(": ")),
+                        ),
+                        state),
+                  ),
+                );
+              },
+            ),
+          );
         }, childCount: snapshot.data.items.length)),
       );
     },

@@ -7,9 +7,12 @@ import 'package:just_audio/just_audio.dart';
 class AudioPlayerTask extends BackgroundAudioTask {
   AudioPlayer _player = new AudioPlayer();
   AudioProcessingState _skipState;
+  Seeker _seeker;
+
   int get index => _player.currentIndex;
   List<MediaItem> queue = [];
   StreamSubscription<PlaybackEvent> _eventSubscription;
+  MediaItem get mediaItem => index == null ? null : queue[index];
 
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
@@ -24,47 +27,26 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _eventSubscription = _player.playbackEventStream.listen((event) {
       _broadcastState();
     });
-  }
 
-  @override
-  Future<void> onPlay() async {
-    print("service play called");
-    _player.play();
-  }
+    // Special processing for state transitions.
+    _player.processingStateStream.listen((state) {
+      switch (state) {
+        case ProcessingState.completed:
+          // In this example, the service stops when reaching the end.
+          onStop();
+          break;
+        case ProcessingState.ready:
+          // If we just came from skipping between tracks, clear the skip
+          // state now that we're ready to play.
+          _skipState = null;
+          break;
+        default:
+          break;
+      }
+    });
 
-  @override
-  Future<void> onPause() async {
-    print("service pause called");
-    _player.pause();
-  }
-
-  @override
-  Future<void> onStop() async {
-    print("service stopped called");
-    await _player.stop();
-    await _player.dispose();
-    _eventSubscription.cancel();
-    await _broadcastState();
-    await super.onStop();
-  }
-
-  @override
-  Future<void> onUpdateQueue(List<MediaItem> queue) async {
-    print("service updating queue");
-    this.queue = queue;
-    try {
-      _player.setAudioSource(ConcatenatingAudioSource(
-        children:
-            queue.map((item) => AudioSource.uri(Uri.parse(item.id))).toList(),
-      ));
-    } catch (e) {
-      print("Error is $e");
-    }
-  }
-
-  @override
-  Future<void> onPlayMediaItem(MediaItem mediaItem) async {
-    _player.seek(Duration.zero, index: queue.indexOf(mediaItem));
+    // Load and broadcast the queue
+    AudioServiceBackground.setQueue(queue);
   }
 
   @override
@@ -86,6 +68,68 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _player.seek(Duration.zero, index: newIndex);
     // Demonstrate custom events.
     AudioServiceBackground.sendCustomEvent('skip to $newIndex');
+  }
+
+  @override
+  Future<void> onPlay() async {
+    print("service onPlay");
+    print("service play called");
+    _player.play();
+  }
+
+  @override
+  Future<void> onPause() async {
+    print("service pause called");
+    _player.pause();
+  }
+
+  @override
+  Future<void> onSeekTo(Duration position) => _player.seek(position);
+
+  @override
+  Future<void> onFastForward() => _seekRelative(fastForwardInterval);
+
+  @override
+  Future<void> onRewind() => _seekRelative(-rewindInterval);
+
+  @override
+  Future<void> onSeekForward(bool begin) async => _seekContinuously(begin, 1);
+
+  @override
+  Future<void> onSeekBackward(bool begin) async => _seekContinuously(begin, -1);
+
+  @override
+  Future<void> onStop() async {
+    print("service stopped called");
+    await _player.dispose();
+    _eventSubscription.cancel();
+    // It is important to wait for this state to be broadcast before we shut
+    // down the task. If we don't, the background task will be destroyed before
+    // the message gets sent to the UI.
+    await _broadcastState();
+    // Shut down this task
+    await super.onStop();
+  }
+
+  @override
+  Future<void> onUpdateQueue(List<MediaItem> queue) async {
+    print("service updating queue");
+    this.queue = queue;
+    try {
+      _player.setAudioSource(ConcatenatingAudioSource(
+        children: queue.map((item) {
+          return AudioSource.uri(Uri.parse(item.id));
+        }).toList(),
+      ));
+    } catch (e) {
+      print("Error is $e");
+    }
+  }
+
+  @override
+  Future<void> onPlayMediaItem(MediaItem mediaItem) async {
+    print("service onPlayMediaItem");
+    _player.seek(Duration.zero, index: queue.indexOf(mediaItem));
   }
 
   /// Maps just_audio's processing state into into audio_service's playing
@@ -130,11 +174,69 @@ class AudioPlayerTask extends BackgroundAudioTask {
       speed: _player.speed,
     );
   }
+
+  /// Jumps away from the current position by [offset].
+  Future<void> _seekRelative(Duration offset) async {
+    var newPosition = _player.position + offset;
+    // Make sure we don't jump out of bounds.
+    if (newPosition < Duration.zero) newPosition = Duration.zero;
+    if (newPosition > mediaItem.duration) newPosition = mediaItem.duration;
+    // Perform the jump via a seek.
+    await _player.seek(newPosition);
+  }
+
+  /// Begins or stops a continuous seek in [direction]. After it begins it will
+  /// continue seeking forward or backward by 10 seconds within the audio, at
+  /// intervals of 1 second in app time.
+  void _seekContinuously(bool begin, int direction) {
+    _seeker?.stop();
+    if (begin) {
+      _seeker = Seeker(_player, Duration(seconds: 10 * direction),
+          Duration(seconds: 1), mediaItem)
+        ..start();
+    }
+  }
 }
 
 class QueueState {
   final List<MediaItem> queue;
   final MediaItem mediaItem;
+  final PlaybackState playbackState;
 
-  QueueState(this.queue, this.mediaItem);
+  QueueState(this.queue, this.mediaItem, this.playbackState);
+
+  @override
+  String toString() {
+    return "Queue state: queue = ${this.queue}, mediaItem = ${this.mediaItem}, playbackState = ${this.playbackState.processingState}";
+  }
+}
+
+class Seeker {
+  final AudioPlayer player;
+  final Duration positionInterval;
+  final Duration stepInterval;
+  final MediaItem mediaItem;
+  bool _running = false;
+
+  Seeker(
+    this.player,
+    this.positionInterval,
+    this.stepInterval,
+    this.mediaItem,
+  );
+
+  start() async {
+    _running = true;
+    while (_running) {
+      Duration newPosition = player.position + positionInterval;
+      if (newPosition < Duration.zero) newPosition = Duration.zero;
+      if (newPosition > mediaItem.duration) newPosition = mediaItem.duration;
+      player.seek(newPosition);
+      await Future.delayed(stepInterval);
+    }
+  }
+
+  stop() {
+    _running = false;
+  }
 }

@@ -1,62 +1,47 @@
-
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 
 class JayFmPlayerService {
-
+  /// Update the playlist queue
   Future setPlaylist(ConcatenatingAudioSource playlist) async {
-    List<MediaItem> queue = new List();
+    List<MediaItem> queue = [];
     try {
       for (AudioSource episode in playlist.children) {
+        print("service data provided is ${episode.sequence[0].tag}");
         MediaItem item = MediaItem(
-          id: episode.sequence[0].tag.title,
+          id: episode.sequence[0].tag.url,
           album: episode.sequence[0].tag.presenters,
-          artUri: episode.sequence[0].tag.artwork,
+          artUri: Uri.parse(episode.sequence[0].tag.artwork),
           artist: episode.sequence[0].tag.presenters,
           title: episode.sequence[0].tag.title,
         );
         queue.add(item);
       }
+      print("updating playlist");
       AudioService.updateQueue(queue);
     } on Exception catch (e) {
       print("An error occured $e");
     }
   }
 
-  pauseAudio() {
-    AudioService.pause();
+  /// Pause audio
+  Future pauseAudio() async {
+    await AudioService.pause();
   }
 
-  playAudio2() {
-    AudioService.play();
+  /// Play queued audio
+  Future playAudio() async {
+    await AudioService.play();
   }
 
-  playItem(AudioSource source) {
+  /// Play a single audio source
+  Future playItem(AudioSource source) async {
     MediaItem item = MediaItem(
         id: source.sequence[0].tag.title,
         album: source.sequence[0].tag.presenters,
         title: source.sequence[0].tag.title,
         artist: source.sequence[0].tag.presenters);
     AudioService.playMediaItem(item);
-    playAudio2();
-  }
-
-  playAudio(ConcatenatingAudioSource playlist) async {
-    List<MediaItem> queue = new List();
-
-    for (AudioSource episode in playlist.children) {
-      MediaItem item = MediaItem(
-          id: episode.sequence[0].tag.title,
-          album: episode.sequence[0].tag.presenters,
-          artist: episode.sequence[0].tag.presenters,
-          artUri: episode.sequence[0].tag.artwork,
-          title: episode.sequence[0].tag.title);
-      queue.add(item);
-    }
-
-    await AudioService.updateQueue(queue);
-    await AudioService.play();
+    await playAudio();
   }
 }
-
-
