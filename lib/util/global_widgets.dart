@@ -7,7 +7,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-// import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/res/strings.dart';
@@ -16,7 +15,7 @@ import 'package:JayFm/util/functions.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:JayFm/services/player_service/player_service.dart';
 
-JayFmPlayerService get audioPlayerService =>
+JayFmPlayerService? get audioPlayerService =>
     GetIt.instance<JayFmPlayerService>();
 
 /// The now playing footer(typically goes into scaffold bottom)
@@ -26,11 +25,11 @@ class NowPlayingFooter extends HookWidget {
   NowPlayingFooter(this.state);
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<SequenceState>(
-      stream: audioPlayerService.audioPlayer.sequenceStateStream,
+    return StreamBuilder<SequenceState?>(
+      stream: audioPlayerService!.audioPlayer!.sequenceStateStream,
       builder: (context, snapshot) {
         return StreamBuilder<PlayerState>(
-            stream: audioPlayerService.audioPlayer.playerStateStream,
+            stream: audioPlayerService!.audioPlayer!.playerStateStream,
             builder: (context, playerStateSnapshot) {
               if (!snapshot.hasData) {
                 return Container(
@@ -52,10 +51,10 @@ class NowPlayingFooter extends HookWidget {
                 );
               }
 
-              final state2 = snapshot.data;
-              final metadata = state2.currentSource.tag as AudioMetadata;
+              final state2 = snapshot.data!;
+              final metadata = state2.currentSource!.tag as AudioMetadata?;
 
-              if (state2?.sequence?.isEmpty ?? true)
+              if (state2.sequence.isEmpty)
                 return Container(
                   padding: EdgeInsets.all(10),
                   color: jayFmMaroon,
@@ -98,7 +97,7 @@ class NowPlayingFooter extends HookWidget {
                                     child: CachedNetworkImage(
                                       placeholder: (context, url) => Image.asset(
                                           'assets/images/about-you-placeholder.jpg'),
-                                      imageUrl: metadata.artwork,
+                                      imageUrl: metadata!.artwork!,
                                       errorWidget: (context, error, stack) =>
                                           Image.asset(
                                               'assets/images/about-you-placeholder.jpg'),
@@ -118,13 +117,13 @@ class NowPlayingFooter extends HookWidget {
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
-                                          metadata.title,
+                                          metadata.title!,
                                           style: TextStyle(
                                               fontSize: 18, color: Colors.grey),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          metadata.presenters,
+                                          metadata.presenters!,
                                           style: TextStyle(
                                               fontSize: 15, color: jayFmOrange),
                                           overflow: TextOverflow.ellipsis,
@@ -140,9 +139,11 @@ class NowPlayingFooter extends HookWidget {
                               ? GestureDetector(
                                   onTap: metadata != null &&
                                           playerStateSnapshot.data != null
-                                      ? playerStateSnapshot.data.playing
-                                          ? audioPlayerService.audioPlayer.pause
-                                          : audioPlayerService.audioPlayer.play
+                                      ? playerStateSnapshot.data!.playing
+                                          ? audioPlayerService!
+                                              .audioPlayer!.pause
+                                          : audioPlayerService!
+                                              .audioPlayer!.play
                                       : null,
                                   child: PlayerStateIconBuilder(
                                     80,
@@ -162,7 +163,7 @@ class NowPlayingFooter extends HookWidget {
 }
 
 /// The drawer pop up menu
-Widget drawerPopUpMenu({AppState state, BuildContext context}) {
+Widget drawerPopUpMenu({required AppState state, BuildContext? context}) {
   return Container(
     color: state.colors.mainBackgroundColor,
     child: ListView(
@@ -171,9 +172,12 @@ Widget drawerPopUpMenu({AppState state, BuildContext context}) {
         // ignore: missing_required_param
         DrawerHeader(
           decoration: BoxDecoration(
-              color: state.colors.mainIconsColor.withOpacity(0.5),
-              image:
-                  DecorationImage(image: AssetImage('assets/images/logo.png'))),
+            color: state.colors.mainIconsColor!.withOpacity(0.5),
+            image: DecorationImage(
+              image: AssetImage('assets/images/logo.png'),
+            ),
+          ),
+          child: SizedBox.shrink(),
         ),
         Column(
             children: choices.map((String choice) {
@@ -186,10 +190,10 @@ Widget drawerPopUpMenu({AppState state, BuildContext context}) {
               Icons.check_circle,
               color: switchCase2(state.colors.mainBackgroundColor, {
                 jayFmFancyBlack: choice == darkTheme
-                    ? state.colors.mainIconsColor
+                    ? state.colors.mainIconsColor!
                     : Colors.grey,
                 jayFmBlue: choice == lightTheme
-                    ? state.colors.mainIconsColor
+                    ? state.colors.mainIconsColor!
                     : Colors.grey
               }),
             ),
@@ -243,8 +247,7 @@ Widget drawerPopUpMenu({AppState state, BuildContext context}) {
                   ),
                   GestureDetector(
                     onTap: () {
-                      launchApp(
-                          "https://www.instagram.com/jay_fm_/");
+                      launchApp("https://www.instagram.com/jay_fm_/");
                     },
                     child: Image.asset(
                       "assets/images/ig.png",
@@ -271,12 +274,12 @@ Widget drawerPopUpMenu({AppState state, BuildContext context}) {
 /// Custom scaffold widget for use throughout the application
 class SharedScaffold extends Scaffold {
   SharedScaffold(
-      {Widget body,
-      AppBar appBar,
+      {Widget? body,
+      AppBar? appBar,
       dynamic bottomSheet,
-      @required BuildContext context,
-      @required AppState state,
-      Drawer drawer})
+      required BuildContext context,
+      required AppState state,
+      Drawer? drawer})
       : super(
             body: body,
             appBar: appBar,
@@ -287,7 +290,7 @@ class SharedScaffold extends Scaffold {
 }
 
 /// Audio quality widget
-Widget audioQuality(AppState state, BuildContext context) {
+Widget audioQuality(AppState state, BuildContext? context) {
   return Column(
     children: [
       Text("AUDIO QUALITY", style: defaultTextStyle(state)),
@@ -297,8 +300,8 @@ Widget audioQuality(AppState state, BuildContext context) {
           Column(
             children: [
               Radio(
-                onChanged: (value) {
-                  setPodcastQuality(context, value);
+                onChanged: (dynamic value) {
+                  setPodcastQuality(context!, value);
                 },
                 groupValue: state.podcastQuality,
                 value: PodcastQuality.LOW,
@@ -310,8 +313,8 @@ Widget audioQuality(AppState state, BuildContext context) {
             children: [
               Radio(
                 groupValue: state.podcastQuality,
-                onChanged: (value) {
-                  setPodcastQuality(context, value);
+                onChanged: (dynamic value) {
+                  setPodcastQuality(context!, value);
                 },
                 value: PodcastQuality.MED,
               ),
@@ -322,8 +325,8 @@ Widget audioQuality(AppState state, BuildContext context) {
             children: [
               Radio(
                 groupValue: state.podcastQuality,
-                onChanged: (value) {
-                  setPodcastQuality(context, value);
+                onChanged: (dynamic value) {
+                  setPodcastQuality(context!, value);
                 },
                 value: PodcastQuality.HIGH,
               ),
@@ -360,17 +363,17 @@ Widget allPodcastsListView(List<Widget> tileList) {
 
 class PlayerStateIconBuilder extends StatelessWidget {
   final double _playButtonDiameter;
-  final AudioMetadata data;
+  final AudioMetadata? data;
   final AppState state;
 
   PlayerStateIconBuilder(this._playButtonDiameter, this.data, this.state);
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<PlayerState>(
-      stream: audioPlayerService.audioPlayer.playerStateStream,
+      stream: audioPlayerService!.audioPlayer!.playerStateStream,
       builder: (context, snapshot) {
-        return StreamBuilder<SequenceState>(
-          stream: audioPlayerService.audioPlayer.sequenceStateStream,
+        return StreamBuilder<SequenceState?>(
+          stream: audioPlayerService!.audioPlayer!.sequenceStateStream,
           builder: (context, sequenceSnapshot) {
             if (snapshot.data == null) {
               return Icon(
@@ -380,13 +383,13 @@ class PlayerStateIconBuilder extends StatelessWidget {
               );
             }
 
-            if (snapshot.data.playing) {
+            if (snapshot.data!.playing) {
               final metadata =
-                  sequenceSnapshot.data.currentSource.tag as AudioMetadata;
-              if (snapshot.data.processingState == ProcessingState.loading ||
-                  snapshot.data.processingState == ProcessingState.buffering) {
-                if (data.title == metadata.title &&
-                    data.presenters == metadata.presenters) {
+                  sequenceSnapshot.data!.currentSource!.tag as AudioMetadata?;
+              if (snapshot.data!.processingState == ProcessingState.loading ||
+                  snapshot.data!.processingState == ProcessingState.buffering) {
+                if (data!.title == metadata!.title &&
+                    data!.presenters == metadata.presenters) {
                   return SizedBox(
                     height: _playButtonDiameter / 2,
                     width: _playButtonDiameter / 2,
@@ -394,16 +397,16 @@ class PlayerStateIconBuilder extends StatelessWidget {
                   );
                 }
               }
-              if (data.title == metadata.title &&
-                  data.presenters == metadata.presenters) {
+              if (data!.title == metadata!.title &&
+                  data!.presenters == metadata.presenters) {
                 return Icon(
                   Icons.pause,
                   color: state.colors.mainIconsColor,
                   size: _playButtonDiameter / 2,
                 );
               }
-            } else if (!snapshot.data.playing) {
-              return switchCase2(snapshot.data.processingState, {
+            } else if (!snapshot.data!.playing) {
+              return switchCase2(snapshot.data!.processingState, {
                 ProcessingState.idle: Icon(
                   Icons.play_arrow,
                   color: state.colors.mainIconsColor,
@@ -424,7 +427,7 @@ class PlayerStateIconBuilder extends StatelessWidget {
                   color: state.colors.mainIconsColor,
                   size: _playButtonDiameter / 2,
                 ),
-              });
+              })!;
             }
 
             return Container(

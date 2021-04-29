@@ -23,6 +23,6 @@ GlobalAppColors themeReducer(GlobalAppColors colors, dynamic action) {
   return colors;
 }
 
-PodcastQuality podcastQualityReducer(PodcastQuality quality, dynamic action) {
+PodcastQuality? podcastQualityReducer(PodcastQuality? quality, dynamic action) {
   return action is PodcastQualityAction ? action.payload : quality;
 }

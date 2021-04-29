@@ -7,24 +7,24 @@ import 'package:JayFm/res/strings.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-AudioPlayer get _audioPlayer => GetIt.instance<AudioPlayer>();
+AudioPlayer? get _audioPlayer => GetIt.instance<AudioPlayer>();
 
 /// set the theme in application state
-void setThemeState(BuildContext context, String choice) {
+void setThemeState(BuildContext? context, String choice) {
   switch (choice) {
     case darkTheme:
-      StoreProvider.of<AppState>(context)
+      StoreProvider.of<AppState>(context!)
           .dispatch(SelectedThemeAction(SelectedTheme.DARK));
       break;
     case lightTheme:
-      StoreProvider.of<AppState>(context)
+      StoreProvider.of<AppState>(context!)
           .dispatch(SelectedThemeAction(SelectedTheme.LIGHT));
       break;
   }
 }
 
 /// Save the podcast quality in app state
-setPodcastQuality(BuildContext context, PodcastQuality value) {
+setPodcastQuality(BuildContext context, PodcastQuality? value) {
   StoreProvider.of<AppState>(context).dispatch(PodcastQualityAction(value));
 }
 
@@ -34,10 +34,10 @@ void tabBarPopUpChoiceAction(String choice, BuildContext context) {
 }
 
 ///Helper function for a dynamic switch case with dynamic types
-TValue switchCase2<TOptionType, TValue>(
+TValue? switchCase2<TOptionType, TValue>(
   TOptionType selectedOption,
   Map<TOptionType, TValue> branches, [
-  TValue defaultValue,
+  TValue? defaultValue,
 ]) {
   if (!branches.containsKey(selectedOption)) {
     return defaultValue;

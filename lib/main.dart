@@ -37,7 +37,7 @@ void main() async {
   }
 
   if (prefs.getInt(strings.podcastQuality) != null) {
-    quality = PodcastQuality.values[prefs.getInt(strings.podcastQuality)];
+    quality = PodcastQuality.values[prefs.getInt(strings.podcastQuality)!];
   }
 
   final _initialState = AppState(colors, prefs, quality);
@@ -60,15 +60,15 @@ void setUpGetIt() {
 }
 
 class Root extends StatelessWidget {
-  final Store<AppState> store;
-  PodcastsService get podcastService => GetIt.instance<PodcastsService>();
+  final Store<AppState>? store;
+  PodcastsService? get podcastService => GetIt.instance<PodcastsService>();
 
-  const Root({Key key, this.store}) : super(key: key);
+  const Root({Key? key, this.store}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return StoreProvider<AppState>(
-      store: store,
+      store: store!,
       child: StoreConnector<AppState, AppState>(
         converter: (store) => store.state,
         builder: (context, state) {
@@ -83,10 +83,10 @@ class Root extends StatelessWidget {
             home: StatefulWrapper(
               store: store,
               onInit: () {
-                podcastService.getAllSavedPodcasts();
+                podcastService!.getAllSavedPodcasts();
               },
               onDispose: () {
-                podcastService.dispose();
+                podcastService!.dispose();
               },
               child: StoreConnector<AppState, AppState>(
                 converter: (store) => store.state,

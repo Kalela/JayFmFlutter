@@ -10,9 +10,9 @@ import 'package:JayFm/util/global_widgets.dart';
 
 // ignore: must_be_immutable
 class DetailsPage extends StatelessWidget {
-  final Podcast podcast;
+  final Podcast? podcast;
 
-  PodcastsService get podcastService => GetIt.instance<PodcastsService>();
+  PodcastsService? get podcastService => GetIt.instance<PodcastsService>();
 
   DetailsPage({this.podcast});
 
@@ -27,8 +27,8 @@ class DetailsPage extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: state.colors.mainBackgroundColor,
             iconTheme:
-                IconThemeData(color: state.colors.textTheme.bodyText1.color),
-            title: Text(podcast.name),
+                IconThemeData(color: state.colors.textTheme!.bodyText1!.color),
+            title: Text(podcast!.name!),
           ),
           body: Container(
               padding: EdgeInsets.only(left: 10, right: 9, top: 10),
@@ -41,7 +41,7 @@ class DetailsPage extends StatelessWidget {
                           child: Column(
                         children: [
                           Text(
-                            podcast.description,
+                            podcast!.description,
                             style: defaultTextStyle(state,
                                 textStyle: TextStyle(fontSize: 15)),
                           ),
@@ -54,47 +54,39 @@ class DetailsPage extends StatelessWidget {
                       pinned: true,
                       shadowColor: Colors.black.withOpacity(0.0),
                       backgroundColor: Colors.black.withOpacity(0.0),
-                      title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            StreamBuilder<List<Podcast>>(
-                                stream: podcastService
-                                    .streamController.savedPodcasts,
-                                initialData: [],
-                                builder: (context, snapshot) {
-                                  if (snapshot.data.any((element) =>
-                                      element.name == podcast.name)) {
-                                    // If podcast is already saved
-                                    return FloatingActionButton.extended(
-                                      heroTag: "deleteButton",
-                                      onPressed: () {
-                                        podcastService.deletePodcast(podcast);
-                                      },
-                                      label: Text("Remove from Saved"),
-                                      icon: Icon(Icons.delete_outline),
-                                    );
-                                  }
+                      title: Center(
+                        child: StreamBuilder<List<Podcast>>(
+                            stream:
+                                podcastService!.streamController!.savedPodcasts,
+                            initialData: [],
+                            builder: (context, snapshot) {
+                              if (snapshot.data!.any(
+                                  (element) => element.name == podcast!.name)) {
+                                // If podcast is already saved
+                                return FloatingActionButton.extended(
+                                  heroTag: "deleteButton",
+                                  onPressed: () {
+                                    podcastService!.deletePodcast(podcast!);
+                                  },
+                                  label: Text("Remove from Saved"),
+                                  icon: Icon(Icons.delete_outline),
+                                );
+                              }
 
-                                  return FloatingActionButton.extended(
-                                    heroTag: "saveButton",
-                                    onPressed: () {
-                                      podcastService.savePodcast(podcast);
-                                    },
-                                    label: Text("Add to Saved"),
-                                    icon: Icon(Icons.save_outlined),
-                                  );
-                                }),
-                            FloatingActionButton.extended(
-                              heroTag: "playAllButton",
-                              onPressed: () {},
-                              label: Text("Play All"),
-                              icon: Icon(Icons.shuffle_outlined),
-                            ),
-                          ]),
+                              return FloatingActionButton.extended(
+                                heroTag: "saveButton",
+                                onPressed: () {
+                                  podcastService!.savePodcast(podcast!);
+                                },
+                                label: Text("Add to Saved"),
+                                icon: Icon(Icons.save_outlined),
+                              );
+                            }),
+                      ),
                     ),
-                    podcast.isCastbox
-                        ? castboxPodcast(podcast)
-                        : nonCastBoxPodcast(state, podcast)
+                    podcast!.isIFrame!
+                        ? castboxPodcast(podcast!, context)
+                        : nonCastBoxPodcast(state, podcast!)
                   ],
                 ),
               )),

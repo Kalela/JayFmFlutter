@@ -9,80 +9,60 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 
-JayFmPlayerService get audioPlayerService =>
+JayFmPlayerService? get audioPlayerService =>
     GetIt.instance<JayFmPlayerService>();
 
 Widget playerRow(AppState state) {
   final _iconSize2 = 50.0;
   final _playButtonDiameter = 100.0;
-  return StreamBuilder<SequenceState>(
-      stream: audioPlayerService.audioPlayer.sequenceStateStream,
+  return StreamBuilder<SequenceState?>(
+      stream: audioPlayerService!.audioPlayer!.sequenceStateStream,
       builder: (context, sequenceSnapshot) {
         final sequenceState = sequenceSnapshot.data;
-        if (sequenceState?.sequence?.isEmpty ?? true) return SizedBox();
-        final metadata = sequenceState.currentSource.tag as AudioMetadata;
+        if (sequenceState?.sequence.isEmpty ?? true) return SizedBox();
+        final metadata = sequenceState!.currentSource!.tag as AudioMetadata?;
         return StreamBuilder<PlayerState>(
-            stream: audioPlayerService.audioPlayer.playerStateStream,
+            stream: audioPlayerService!.audioPlayer!.playerStateStream,
             builder: (context, playerStateSnapshot) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                      flex: 1,
-                      child: Icon(
-                        Icons.skip_previous_outlined,
-                        color: state.colors.mainButtonsColor,
-                        size: _iconSize2,
-                      )),
-                  Flexible(
-                    flex: 3,
-                    child: Container(
-                      height: _playButtonDiameter,
-                      width: _playButtonDiameter,
-                      child: RawMaterialButton(
-                        onPressed:
-                            metadata != null && playerStateSnapshot.data != null
-                                ? playerStateSnapshot.data.playing
-                                    ? audioPlayerService.audioPlayer.pause
-                                    : audioPlayerService.audioPlayer.play
-                                : null,
-                        fillColor: state.colors.mainButtonsColor,
-                        shape: CircleBorder(),
-                        elevation: 10.0,
-                        child: Center(
-                          child: PlayerStateIconBuilder(
-                              _playButtonDiameter, metadata, state),
-                        ),
-                      ),
+              return Center(
+                child: Container(
+                  height: _playButtonDiameter,
+                  width: _playButtonDiameter,
+                  child: RawMaterialButton(
+                    onPressed:
+                        metadata != null && playerStateSnapshot.data != null
+                            ? playerStateSnapshot.data!.playing
+                                ? audioPlayerService!.audioPlayer!.pause
+                                : audioPlayerService!.audioPlayer!.play
+                            : null,
+                    fillColor: state.colors.mainButtonsColor,
+                    shape: CircleBorder(),
+                    elevation: 10.0,
+                    child: Center(
+                      child: PlayerStateIconBuilder(
+                          _playButtonDiameter, metadata, state),
                     ),
                   ),
-                  Flexible(
-                      flex: 1,
-                      child: Icon(
-                        Icons.skip_next_outlined,
-                        color: state.colors.mainButtonsColor,
-                        size: _iconSize2,
-                      )),
-                ],
+                ),
               );
             });
       });
 }
 
 Widget statusRow(AppState state) {
-  return StreamBuilder<SequenceState>(
-      stream: audioPlayerService.audioPlayer.sequenceStateStream,
+  return StreamBuilder<SequenceState?>(
+      stream: audioPlayerService!.audioPlayer!.sequenceStateStream,
       builder: (context, snapshot) {
         if (snapshot.data == null) return SizedBox.shrink();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              snapshot.data.currentSource.tag.title,
+              snapshot.data!.currentSource!.tag.title,
               style: defaultTextStyle(state),
             ),
             Text(
-              snapshot.data.currentSource.tag.presenters,
+              snapshot.data!.currentSource!.tag.presenters,
               style: defaultTextStyle(state),
             )
           ],
@@ -94,17 +74,17 @@ class SeekBar extends StatefulWidget {
   final Duration duration;
   final Duration position;
   final Duration bufferedPosition;
-  final ValueChanged<Duration> onChanged;
-  final ValueChanged<Duration> onChangeEnd;
+  final ValueChanged<Duration>? onChanged;
+  final ValueChanged<Duration>? onChangeEnd;
   final AppState state;
 
   SeekBar({
-    @required this.duration,
-    @required this.position,
-    @required this.bufferedPosition,
+    required this.duration,
+    required this.position,
+    required this.bufferedPosition,
     this.onChanged,
     this.onChangeEnd,
-    @required this.state,
+    required this.state,
   });
 
   @override
@@ -112,8 +92,8 @@ class SeekBar extends StatefulWidget {
 }
 
 class _SeekBarState extends State<SeekBar> {
-  double _dragValue;
-  SliderThemeData _sliderThemeData;
+  double? _dragValue;
+  late SliderThemeData _sliderThemeData;
   final AppState state;
 
   _SeekBarState(this.state);
@@ -147,12 +127,12 @@ class _SeekBarState extends State<SeekBar> {
                   _dragValue = value;
                 });
                 if (widget.onChanged != null) {
-                  widget.onChanged(Duration(milliseconds: value.round()));
+                  widget.onChanged!(Duration(milliseconds: value.round()));
                 }
               },
               onChangeEnd: (value) {
                 if (widget.onChangeEnd != null) {
-                  widget.onChangeEnd(Duration(milliseconds: value.round()));
+                  widget.onChangeEnd!(Duration(milliseconds: value.round()));
                 }
                 _dragValue = null;
               },
@@ -173,12 +153,12 @@ class _SeekBarState extends State<SeekBar> {
                 _dragValue = value;
               });
               if (widget.onChanged != null) {
-                widget.onChanged(Duration(milliseconds: value.round()));
+                widget.onChanged!(Duration(milliseconds: value.round()));
               }
             },
             onChangeEnd: (value) {
               if (widget.onChangeEnd != null) {
-                widget.onChangeEnd(Duration(milliseconds: value.round()));
+                widget.onChangeEnd!(Duration(milliseconds: value.round()));
               }
               _dragValue = null;
             },
@@ -209,15 +189,15 @@ class HiddenThumbComponentShape extends SliderComponentShape {
   void paint(
     PaintingContext context,
     Offset center, {
-    Animation<double> activationAnimation,
-    Animation<double> enableAnimation,
-    bool isDiscrete,
-    TextPainter labelPainter,
-    RenderBox parentBox,
-    SliderThemeData sliderTheme,
-    TextDirection textDirection,
-    double value,
-    double textScaleFactor,
-    Size sizeWithOverflow,
+    Animation<double>? activationAnimation,
+    Animation<double>? enableAnimation,
+    bool? isDiscrete,
+    TextPainter? labelPainter,
+    RenderBox? parentBox,
+    SliderThemeData? sliderTheme,
+    TextDirection? textDirection,
+    double? value,
+    double? textScaleFactor,
+    Size? sizeWithOverflow,
   }) {}
 }

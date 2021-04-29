@@ -12,10 +12,10 @@ class StatefulWrapper extends StatefulWidget {
   final Function onInit;
   final Function onDispose;
   final Widget child;
-  final Store<AppState> store;
+  final Store<AppState>? store;
 
   const StatefulWrapper(
-      {@required this.onInit, @required this.onDispose, @required this.child, @required this.store});
+      {required this.onInit, required this.onDispose, required this.child, required this.store});
 
   @override
   _StatefulWrapperState createState() => _StatefulWrapperState();
@@ -26,7 +26,7 @@ class _StatefulWrapperState extends State<StatefulWrapper>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     if (widget.onInit != null) {
       widget.onInit();
     }
@@ -37,7 +37,7 @@ class _StatefulWrapperState extends State<StatefulWrapper>
     if (widget.onDispose != null) {
       widget.onDispose(this);
     }
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
@@ -49,8 +49,8 @@ class _StatefulWrapperState extends State<StatefulWrapper>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      widget.store.state.sharedPreferences.setInt(appTheme, widget.store.state.colors.mainBackgroundColor == jayFmFancyBlack ? 0 : 1);
-      widget.store.state.sharedPreferences.setInt(podcastQuality, widget.store.state.podcastQuality.index);
+      widget.store!.state.sharedPreferences.setInt(appTheme, widget.store!.state.colors.mainBackgroundColor == jayFmFancyBlack ? 0 : 1);
+      widget.store!.state.sharedPreferences.setInt(podcastQuality, widget.store!.state.podcastQuality!.index);
     }
   }
 }

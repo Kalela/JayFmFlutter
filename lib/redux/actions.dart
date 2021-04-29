@@ -8,7 +8,7 @@ class SelectedThemeAction {
 }
 
 class PodcastQualityAction {
-  final PodcastQuality payload;
+  final PodcastQuality? payload;
 
   PodcastQualityAction(this.payload);
 }

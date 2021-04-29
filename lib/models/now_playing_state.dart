@@ -10,7 +10,7 @@ class NowPlaying {
   final String audioUrl;
 
   NowPlaying(this.imageUrl, this.title, this.presenters, this.audioUrl,
-      [String id])
+      [String? id])
       : id = id ?? _uuid.v4();
 
   @override

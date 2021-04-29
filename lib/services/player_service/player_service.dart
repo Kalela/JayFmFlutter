@@ -6,8 +6,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
 class JayFmPlayerService {
-  AudioPlayer get audioPlayer => GetIt.instance<AudioPlayer>();
-  ConcatenatingAudioSource playlist;
+  AudioPlayer? get audioPlayer => GetIt.instance<AudioPlayer>();
+  ConcatenatingAudioSource? playlist;
   final _nowPlayingStream = ReplaySubject<NowPlaying>();
 
   /// Currently playing
@@ -15,18 +15,15 @@ class JayFmPlayerService {
 
   Function(NowPlaying) get changeNowPlaying => _nowPlayingStream.sink.add;
 
-  JayFmPlayerService() {
-    _init();
-  }
-
-  _init() async {
+  Future setPlaylist(ConcatenatingAudioSource playlist, bool isRadio) async {
     final session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration.speech());
-  }
-
-  Future setPlaylist(ConcatenatingAudioSource playlist) async {
+    if (isRadio) {
+      await session.configure(AudioSessionConfiguration.music());
+    } else {
+      await session.configure(AudioSessionConfiguration.speech());
+    }
     try {
-      await audioPlayer.setAudioSource(playlist);
+      await audioPlayer!.setAudioSource(playlist);
     } on Exception catch (e) {
       print("An error occured $e");
     }
@@ -34,6 +31,6 @@ class JayFmPlayerService {
 
   dispose() {
     _nowPlayingStream.close();
-    audioPlayer.dispose();
+    audioPlayer!.dispose();
   }
 }

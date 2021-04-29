@@ -6,10 +6,10 @@ import 'package:path/path.dart' as path;
 
 class DatabaseService {
 
-  static Database _database;
+  static Database? _database;
 
   /// Set up the database
-  Future<Database> get database async {
+  Future<Database?> get database async {
     if(_database != null) return _database;
 
     final Future<Database> db = openDatabase(
@@ -29,9 +29,9 @@ class DatabaseService {
   /// Insert a new table into the database
   Future insertPodcastToTable(Podcast podcast) async {
     int podcastBoolean =
-        podcast.isCastbox ? 1 : 0; // Convert boolean to integer
-    Database db = await database;
-    await db.transaction((txn) async {
+        podcast.isIFrame! ? 1 : 0; // Convert boolean to integer
+    Database? db = await database;
+    await db!.transaction((txn) async {
       await txn.rawInsert(
           'INSERT INTO Podcast(name, isCastbox, url, description) VALUES("${podcast.name}", "$podcastBoolean", "${podcast.url}", "${podcast.description}")');
     });
@@ -39,12 +39,12 @@ class DatabaseService {
 
   /// Get saved podcasts from the on device database
   Future<List<Map>> getAllSavedPodcasts() async {
-    Database db = await database;
-    return await db.query('Podcast');
+    Database? db = await database;
+    return await db!.query('Podcast');
   }
 
   Future<int> deletePodcast(Podcast podcast) async {
-    Database db = await database;
-    return db.rawDelete('DELETE FROM Podcast WHERE name = ?', [podcast.name]);
+    Database? db = await database;
+    return db!.rawDelete('DELETE FROM Podcast WHERE name = ?', [podcast.name]);
   }
 }

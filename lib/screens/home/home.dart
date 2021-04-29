@@ -27,15 +27,15 @@ class HomePage extends StatelessWidget {
               ),
               centerTitle: true,
               backgroundColor: state.colors.mainBackgroundColor,
-              iconTheme: IconThemeData(color: state.colors.textTheme.bodyText1.color),
+              iconTheme: IconThemeData(color: state.colors.textTheme!.bodyText1!.color),
               textTheme: state.colors.textTheme,
               bottom: PreferredSize(
                 preferredSize: Size.fromHeight(30.0),
                 child: TabBar(
                   tabs: [
-                    topBarTab("Live", state.colors.textTheme.headline6.color),
-                    topBarTab("Browse", state.colors.textTheme.headline6.color),
-                    topBarTab("Saved", state.colors.textTheme.headline6.color),
+                    topBarTab("Live", state.colors.textTheme!.headline6!.color),
+                    topBarTab("Browse", state.colors.textTheme!.headline6!.color),
+                    topBarTab("Saved", state.colors.textTheme!.headline6!.color),
                   ],
                 ),
               ),

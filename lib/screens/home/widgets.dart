@@ -1,5 +1,4 @@
 import 'package:JayFm/models/audio_meta_data.dart';
-import 'package:JayFm/models/now_playing_state.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -14,10 +13,10 @@ import 'package:JayFm/services/player_service/player_service.dart';
 import 'package:JayFm/util/global_widgets.dart';
 import 'package:just_audio/just_audio.dart';
 
-JayFmPlayerService get audioPlayerService =>
+JayFmPlayerService? get audioPlayerService =>
     GetIt.instance<JayFmPlayerService>();
-PodcastsService get podcastService => GetIt.instance<PodcastsService>();
-AdMobService get admobService => GetIt.instance<AdMobService>();
+PodcastsService? get podcastService => GetIt.instance<PodcastsService>();
+AdMobService? get admobService => GetIt.instance<AdMobService>();
 
 /// Parent widget of live tab contents
 Widget liveTabDetails(AppState state, BuildContext context) {
@@ -28,13 +27,13 @@ Widget liveTabDetails(AppState state, BuildContext context) {
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Padding(padding: EdgeInsets.only(top: 0)),
-      StreamBuilder<SequenceState>(
-          stream: audioPlayerService.audioPlayer.sequenceStateStream,
+      StreamBuilder<SequenceState?>(
+          stream: audioPlayerService!.audioPlayer!.sequenceStateStream,
           builder: (context, snapshot) {
             final state2 = snapshot.data;
             var metadata;
             if (state2 != null) {
-              metadata = state2.currentSource.tag as AudioMetadata;
+              metadata = state2.currentSource!.tag as AudioMetadata?;
             }
 
             return Column(
@@ -81,13 +80,13 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                 Container(
                   height: _playButtonDiameter,
                   width: _playButtonDiameter,
-                  child: StreamBuilder<SequenceState>(
+                  child: StreamBuilder<SequenceState?>(
                       stream:
-                          audioPlayerService.audioPlayer.sequenceStateStream,
+                          audioPlayerService!.audioPlayer!.sequenceStateStream,
                       builder: (context, sequenceSnapshot) {
                         return StreamBuilder<PlayerState>(
-                            stream: audioPlayerService
-                                .audioPlayer.playerStateStream,
+                            stream: audioPlayerService!
+                                .audioPlayer!.playerStateStream,
                             builder: (context, playerStateSnapshot) {
                               return RawMaterialButton(
                                 onPressed: () async {
@@ -105,33 +104,34 @@ Widget liveTabDetails(AppState state, BuildContext context) {
                                   ]);
                                   if (sequenceSnapshot.data != null) {
                                     if (sequenceSnapshot
-                                            .data.sequence[0].tag.title !=
+                                            .data!.sequence[0].tag.title !=
                                         playlist.children[0].sequence[0].tag
                                             .title) {
                                       // Check if the playing playlist and the new playlist are the same
-                                      await audioPlayerService
-                                          .setPlaylist(playlist);
+                                      await audioPlayerService!
+                                          .setPlaylist(playlist, true);
                                     }
 
-                                    if (sequenceSnapshot
-                                                .data.currentSource.tag.title ==
+                                    if (sequenceSnapshot.data!.currentSource!
+                                                .tag.title ==
                                             playlist.children[0].sequence[0].tag
                                                 .title &&
-                                        playerStateSnapshot.data.playing) {
-                                      await audioPlayerService.audioPlayer
+                                        playerStateSnapshot.data!.playing) {
+                                      await audioPlayerService!.audioPlayer!
                                           .pause();
                                     } else {
-                                      await audioPlayerService.audioPlayer
+                                      await audioPlayerService!.audioPlayer!
                                           .seek(Duration.zero, index: 0);
-                                      await audioPlayerService.audioPlayer
+                                      await audioPlayerService!.audioPlayer!
                                           .play();
                                     }
                                   } else {
-                                    await audioPlayerService
-                                        .setPlaylist(playlist);
-                                    await audioPlayerService.audioPlayer
+                                    await audioPlayerService!
+                                        .setPlaylist(playlist, true);
+                                    await audioPlayerService!.audioPlayer!
                                         .seek(Duration.zero, index: 0);
-                                    await audioPlayerService.audioPlayer.play();
+                                    await audioPlayerService!.audioPlayer!
+                                        .play();
                                   }
                                 },
                                 fillColor: state.colors.mainButtonsColor,
@@ -154,7 +154,7 @@ Widget liveTabDetails(AppState state, BuildContext context) {
               ],
             );
           }),
-      admobService.getBannerAd(context)
+      admobService!.getBannerAd(context)
     ],
   );
 }
@@ -165,7 +165,6 @@ Widget browseTabDetails(AppState state, BuildContext context) {
 
   final List<Widget> _tabViews = [
     allPodcastsListView(podcastTileList),
-    Container(),
   ];
 
   return Container(
@@ -199,13 +198,12 @@ Widget browseTabDetails(AppState state, BuildContext context) {
                       unselectedLabelColor: Colors.black.withOpacity(0.3),
                       tabs: [
                         browseBarTab(
-                            "PODCASTS",
-                            defaultTextStyle(state,
-                                textStyle: TextStyle(fontSize: 10.0))),
-                        browseBarTab(
-                            "FUN-TO-MENTAL",
-                            defaultTextStyle(state,
-                                textStyle: TextStyle(fontSize: 10.0))),
+                          "PODCASTS",
+                          defaultTextStyle(
+                            state,
+                            textStyle: TextStyle(fontSize: 10.0),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -235,72 +233,67 @@ Widget savedTabDetails(AppState state) {
         Padding(padding: EdgeInsets.only(top: 5)),
         Flexible(
           child: StreamBuilder<List<Podcast>>(
-            stream: podcastService.streamController.savedPodcasts,
+            stream: podcastService!.streamController!.savedPodcasts,
             initialData: [],
             // ignore: missing_return
             builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                  break;
-                case ConnectionState.waiting:
-                  return Center(child: CircularProgressIndicator());
-                  break;
-                case ConnectionState.active:
-                  if (snapshot.data.length > 0) {
-                    return ListView.separated(
-                      itemBuilder: (context, index) {
-                        return Dismissible(
-                          key: Key(snapshot.data[index].name),
-                          background: Container(
-                            color: jayFmMaroon,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  child: Icon(Icons.delete),
-                                  padding: EdgeInsets.only(left: 10),
-                                ),
-                                Container(
-                                  child: Icon(Icons.delete),
-                                  padding: EdgeInsets.only(right: 10),
-                                ),
-                              ],
-                            ),
+              if (snapshot.connectionState == ConnectionState.active ||
+                  snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.data!.length > 0) {
+                  return ListView.separated(
+                    itemBuilder: (context, index) {
+                      return Dismissible(
+                        key: Key(snapshot.data![index].name!),
+                        background: Container(
+                          color: jayFmMaroon,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                child: Icon(Icons.delete),
+                                padding: EdgeInsets.only(left: 10),
+                              ),
+                              Container(
+                                child: Icon(Icons.delete),
+                                padding: EdgeInsets.only(right: 10),
+                              ),
+                            ],
                           ),
-                          onDismissed: (direction) {
-                            podcastService.deletePodcast(snapshot.data[index]);
-                            Scaffold.of(context).showSnackBar(SnackBar(
-                                content: Text(
-                                    "${snapshot.data[index].name} dismissed")));
+                        ),
+                        onDismissed: (direction) {
+                          podcastService!.deletePodcast(snapshot.data![index]);
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  "${snapshot.data![index].name} dismissed")));
+                        },
+                        child: ListTile(
+                          title: Text(snapshot.data![index].name!,
+                              style:
+                                  TextStyle(color: state.colors.mainTextColor)),
+                          onTap: () {
+                            openPodcastEpisodes(context, snapshot.data![index]);
                           },
-                          child: ListTile(
-                            title: Text(snapshot.data[index].name,
-                                style: TextStyle(
-                                    color: state.colors.mainTextColor)),
-                            onTap: () {
-                              openPodcastEpisodes(
-                                  context, snapshot.data[index]);
-                            },
-                          ),
-                        );
-                      },
-                      itemCount: snapshot.data.length,
-                      separatorBuilder: (context, index) => Divider(
-                        color: Colors.black,
-                      ),
-                    );
-                  } else {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 8.0, left: 15),
-                      child: Text(
-                        "No podcasts saved for quick access",
-                        style: defaultTextStyle(state),
-                      ),
-                    );
-                  }
-                  break;
-                case ConnectionState.done:
-                  break;
+                        ),
+                      );
+                    },
+                    itemCount: snapshot.data!.length,
+                    separatorBuilder: (context, index) => Divider(
+                      color: Colors.black,
+                    ),
+                  );
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0, left: 15),
+                    child: Text(
+                      "No podcasts saved for quick access",
+                      style: defaultTextStyle(state),
+                    ),
+                  );
+                }
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
               }
             },
           ),
@@ -314,7 +307,7 @@ Widget savedTabDetails(AppState state) {
 ///
 /// Accepts the tab text [text]
 /// Acceppts th tab text color [textColor]
-Widget topBarTab(String text, Color textColor) {
+Widget topBarTab(String text, Color? textColor) {
   return SizedBox(
     height: topBarHeight,
     child: Center(
