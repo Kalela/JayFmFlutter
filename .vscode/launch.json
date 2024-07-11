@@ -7,13 +7,15 @@
         {
             "name": "debug",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": ["--verbose"]
         },
         {
             "name": "profile",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "profile",
+            "args": ["--verbose"]
         }
     ]
 }

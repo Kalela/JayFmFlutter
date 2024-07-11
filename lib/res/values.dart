@@ -1,4 +1,3 @@
-import 'package:JayFm/res/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:JayFm/models/app_state.dart';
 import 'package:JayFm/models/podcast.dart';

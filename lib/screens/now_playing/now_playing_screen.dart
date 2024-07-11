@@ -26,7 +26,7 @@ class NowPlayingPage extends HookWidget {
             appBar: AppBar(
               backgroundColor: state.colors.mainBackgroundColor,
               iconTheme: IconThemeData(
-                  color: state.colors.textTheme!.bodyText1!.color),
+                  color: state.colors.textTheme!.bodyLarge!.color),
               title: Text("Now Playing"),
             ),
             body: Container(

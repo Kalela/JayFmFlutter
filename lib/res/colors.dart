@@ -15,15 +15,15 @@ const Color jayFmPurple = Color.fromARGB(200, 149, 11, 205);
 
 /// Text colors for dark theme
 const TextTheme darkTextTheme = TextTheme(
-    bodyText2: TextStyle(color: Colors.grey),
-    bodyText1: TextStyle(color: Colors.grey),
-    headline6: TextStyle(color: Colors.grey));
+    bodyMedium: TextStyle(color: Colors.grey),
+    bodyLarge: TextStyle(color: Colors.grey),
+    titleLarge: TextStyle(color: Colors.grey));
 
 /// Text colors for dark theme
 const TextTheme lightTextTheme = TextTheme(
-    bodyText2: TextStyle(color: Colors.black),
-    bodyText1: TextStyle(color: Colors.black),
-    headline6: TextStyle(color: Colors.black));
+    bodyMedium: TextStyle(color: Colors.black),
+    bodyLarge: TextStyle(color: Colors.black),
+    titleLarge: TextStyle(color: Colors.black));
 
 //Palette
 // rgb(49, 49, 49) Fancy black

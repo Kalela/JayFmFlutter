@@ -11,6 +11,7 @@ import 'package:JayFm/screens/home/functions.dart';
 import 'package:JayFm/services/podcasts_service/podcasts_service.dart';
 import 'package:JayFm/services/player_service/player_service.dart';
 import 'package:JayFm/util/global_widgets.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart' as google_mobile_ads;
 import 'package:just_audio/just_audio.dart';
 
 JayFmPlayerService? get audioPlayerService =>
@@ -154,7 +155,7 @@ Widget liveTabDetails(AppState state, BuildContext context) {
               ],
             );
           }),
-      admobService!.getBannerAd(context)
+      google_mobile_ads.AdWidget(ad: admobService!.getBannerAd(context)..load())
     ],
   );
 }

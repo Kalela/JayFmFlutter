@@ -27,7 +27,7 @@ class DetailsPage extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: state.colors.mainBackgroundColor,
             iconTheme:
-                IconThemeData(color: state.colors.textTheme!.bodyText1!.color),
+                IconThemeData(color: state.colors.textTheme!.bodyLarge!.color),
             title: Text(podcast!.name!),
           ),
           body: Container(

@@ -1,6 +1,6 @@
 import 'package:JayFm/models/global_app_colors.dart';
 import 'package:JayFm/res/colors.dart';
-import 'package:admob_flutter/admob_flutter.dart';
+import 'package:JayFm/util/background_audio_handler.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -12,6 +12,7 @@ import 'package:JayFm/services/podcasts_service/podcasts_service.dart';
 import 'package:JayFm/services/player_service/player_service.dart';
 import 'package:JayFm/services/podcasts_service/dependencies/podcast_stream_controller.dart';
 import 'package:JayFm/util/stateful_wrapper.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart' as google_mobile_ads;
 import 'package:just_audio/just_audio.dart';
 import 'package:redux/redux.dart';
 
@@ -23,9 +24,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Admob.initialize();
+  google_mobile_ads.MobileAds.instance.initialize();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   setUpGetIt();
+
+  await AudioService.init(
+    builder: () => BackgroundAudioHandler(),
+  );
 
   GlobalAppColors colors = darkColors;
   PodcastQuality quality = PodcastQuality.MED;
@@ -91,7 +96,7 @@ class Root extends StatelessWidget {
               child: StoreConnector<AppState, AppState>(
                 converter: (store) => store.state,
                 builder: (context, state) =>
-                    AudioServiceWidget(child: HomePage()),
+                    HomePage(),
               ),
             ),
           );

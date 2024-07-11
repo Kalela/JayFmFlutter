@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:JayFm/models/audio_meta_data.dart';
 import 'package:JayFm/util/global_widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
@@ -11,6 +9,7 @@ import 'package:JayFm/models/podcast.dart';
 import 'package:JayFm/res/values.dart';
 import 'package:JayFm/screens/details/functions.dart';
 import 'package:JayFm/services/admob_service.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart' as google_mobile_ads;
 import 'package:just_audio/just_audio.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -136,6 +135,22 @@ Widget nonCastBoxPodcast(AppState state, Podcast podcast) {
 }
 
 Widget castboxPodcast(Podcast podcast, BuildContext context) {
+  final webViewController = WebViewController()
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..setBackgroundColor(const Color(0x00000000))
+    ..loadHtmlString(Uri.dataFromString(
+            '<html><body><iframe allowtransparency="true" src="${podcast.url}" frameborder="0" width="100%" height="500"></iframe></body></html>',
+            mimeType: 'text/html')
+        .toString())
+    ..setNavigationDelegate(
+      NavigationDelegate(
+        onPageStarted: (String url) {},
+        onPageFinished: (String url) {},
+        onHttpError: (HttpResponseError error) {},
+        onWebResourceError: (WebResourceError error) {},
+      ),
+    );
+
   return SliverPadding(
     padding: EdgeInsets.only(bottom: 70),
     sliver: SliverList(
@@ -146,7 +161,7 @@ Widget castboxPodcast(Podcast podcast, BuildContext context) {
             future: urlCompleter.future,
             builder: (context, controller) {
               if (controller.hasData) {
-                return admobService!.getBannerAd(context);
+                return google_mobile_ads.AdWidget(ad: admobService!.getBannerAd(context)..load());
               }
 
               return SizedBox.shrink();
@@ -154,25 +169,9 @@ Widget castboxPodcast(Podcast podcast, BuildContext context) {
           ),
           Container(
             height: MediaQuery.of(context).size.height / 1.8,
-            child: WebView(
-              allowsInlineMediaPlayback: true,
-              initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy
-                  .require_user_action_for_all_media_types,
-              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                Factory<VerticalDragGestureRecognizer>(
-                  () => VerticalDragGestureRecognizer(),
-                ),
-              },
-              initialUrl: Uri.dataFromString(
-                      '<html><body><iframe allowtransparency="true" src="${podcast.url}" frameborder="0" width="100%" height="500"></iframe></body></html>',
-                      mimeType: 'text/html')
-                  .toString(),
+            child: WebViewWidget(
+              controller: webViewController,
               key: Key("webviewKey"),
-              javascriptMode: JavascriptMode.unrestricted,
-              debuggingEnabled: true,
-              onPageFinished: (url) {
-                urlCompleter.complete(url);
-              },
             ),
           ),
         ],

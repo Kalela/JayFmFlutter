@@ -13,7 +13,6 @@ JayFmPlayerService? get audioPlayerService =>
     GetIt.instance<JayFmPlayerService>();
 
 Widget playerRow(AppState state) {
-  final _iconSize2 = 50.0;
   final _playButtonDiameter = 100.0;
   return StreamBuilder<SequenceState?>(
       stream: audioPlayerService!.audioPlayer!.sequenceStateStream,

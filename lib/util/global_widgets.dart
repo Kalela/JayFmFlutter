@@ -5,7 +5,6 @@ import 'package:JayFm/res/colors.dart';
 import 'package:JayFm/screens/now_playing/now_playing_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get_it/get_it.dart';
 import 'package:JayFm/models/app_state.dart';
@@ -135,10 +134,9 @@ class NowPlayingFooter extends HookWidget {
                               ],
                             ),
                           ),
-                          metadata != null && playerStateSnapshot.data != null
+                          playerStateSnapshot.data != null
                               ? GestureDetector(
-                                  onTap: metadata != null &&
-                                          playerStateSnapshot.data != null
+                                  onTap: playerStateSnapshot.data != null
                                       ? playerStateSnapshot.data!.playing
                                           ? audioPlayerService!
                                               .audioPlayer!.pause
